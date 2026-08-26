@@ -7,7 +7,7 @@
 
 ## 🌐 Live Demo & GitHub Pages
 สามารถเปิดใช้งานผ่าน GitHub Pages ได้ที่:
-[https://thinnathep.github.io/DotNetLearningHub/](https://thinnathep.github.io/DotNetLearningHub/) หรือเปิดไฟล์ `index.html` บนเครื่องคอมพิวเตอร์ของคุณ
+[https://thinnathep.github.io/DotNetLearningHub-/](https://thinnathep.github.io/DotNetLearningHub-/) หรือเปิดไฟล์ `index.html` บนเครื่องคอมพิวเตอร์ของคุณ
 
 ---
 
@@ -87,7 +87,7 @@
    ```
 3. ไปที่เมนู **Settings ➔ Pages** ใน GitHub Repository
 4. เลือก Source เป็น `Deploy from a branch` ➔ เลือก Branch `main` โฟลเดอร์ `/ (root)` แล้วกด **Save**
-5. รอ 1-2 นาที คุณจะได้ URL เว็บไซต์พร้อมใช้งานทันทีที่ [https://thinnathep.github.io/DotNetLearningHub/](https://thinnathep.github.io/DotNetLearningHub/)!
+5. รอ 1-2 นาที คุณจะได้ URL เว็บไซต์พร้อมใช้งานทันทีที่ [https://thinnathep.github.io/DotNetLearningHub-/](https://thinnathep.github.io/DotNetLearningHub-/)!
 
 ---
 
