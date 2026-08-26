@@ -55,7 +55,9 @@
 - [SDLC & Agile Scrum](pages/sdlc-agile.html) — Scrum Ceremonies (Planning, Daily, Review, Retro), Story Points, User Stories, BA/QA
 - [Technical Documentation](pages/tech-docs.html) — C# XML Comments (///), Swagger/OpenAPI Specs, README.md Standard
 
-### 🏛️ Architecture & Career Track
+### 🏛️ Architecture & Tools Track
+- [คู่มือการเรียน & Roadmap 3 สัปดาห์](pages/study-guide.html) — ลำดับการเรียนรู้ 3 สเต็ป, Checklist ก่อนสอบสัมภาษณ์
+- [Multi-Language Code Sandbox](pages/code-sandbox.html) — รันโค้ดสดบนเว็บ: C# Simulator, SQL Live Engine, HTML/CSS/JS Studio
 - [Clean Architecture](pages/architecture.html) — 4 เลเยอร์มาตรฐาน (Domain, Application, Infrastructure, Presentation), CQRS & MediatR
 - [Quiz Arena](pages/quiz-arena.html) — ศูนย์รวมข้อสอบ 84 ข้อ ครบ 12 หมวดหมู่, โหมด Normal, Speed Run (20 วิ) และ Streak Mode
 - [เตรียมตัวสัมภาษณ์งาน](pages/interview-prep.html) — Top 10 Technical Q&A, เทคนิค STAR Method, Mock Interview Simulator

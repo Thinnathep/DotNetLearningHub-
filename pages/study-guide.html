@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คู่มือการเรียน & แผนที่เตรียมสอบสัมภาษณ์ — DotNet Learning Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">🧭</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+    <a href="./study-guide.html" class="sidebar-link active"><span class="link-icon">🧭</span> คู่มือการเรียน <span class="link-badge badge-new">แนะนำ</span></a>
+    <a href="./code-sandbox.html" class="sidebar-link"><span class="link-icon">💻</span> Code Sandbox <span class="link-badge badge-new">ใหม่</span></a>
+    <a href="./tech-glossary.html" class="sidebar-link"><span class="link-icon">📖</span> ศัพท์เทคนิค & คำอ่าน</a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน</a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP</a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections & LINQ</a>
+    <a href="./csharp-advanced.html" class="sidebar-link"><span class="link-icon">📕</span> C# ขั้นสูง</a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET</a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection</a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware</a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-link"><span class="link-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link"><span class="link-icon">🎮</span> SQL Playground</a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link"><span class="link-icon">🧩</span> Blazor Components</a>
+    <a href="./xaml-basics.html" class="sidebar-link"><span class="link-icon">📐</span> XAML พื้นฐาน</a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML & JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps & Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git & CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link"><span class="link-icon">🛡️</span> Secure Coding</a>
+
+    <div class="sidebar-section-title">🟡 Web & คุณภาพ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link"><span class="link-icon">👀</span> Code Review</a>
+    <a href="./sdlc-agile.html" class="sidebar-link"><span class="link-icon">📋</span> SDLC & Agile</a>
+    <a href="./tech-docs.html" class="sidebar-link"><span class="link-icon">📝</span> Technical Docs</a>
+    <a href="./architecture.html" class="sidebar-link"><span class="link-icon">🏛️</span> Architecture</a>
+
+    <div class="sidebar-section-title">🎮 Games & Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> เตรียมสัมภาษณ์</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header reveal">
+            <div class="breadcrumb">
+                <a href="../index.html">🏠 หน้าแรก</a>
+                <span>/</span>
+                <span>คู่มือการเรียน</span>
+            </div>
+            <div class="page-title">
+                <div class="title-icon" style="background: var(--gradient-primary); color: #fff;">🧭</div>
+                <h1>คู่มือการเรียน & แผนที่เตรียมสอบสัมภาษณ์ Junior .NET Developer</h1>
+            </div>
+            <p class="page-description">
+                แนะนำลำดับการเรียนรู้ 3 สเต็ปที่ตรงจุดที่สุด, วิธีทบทวนเนื้อหาโดยไม่เสียเวลา, เทคนิคการทำคะแนนในห้องสัมภาษณ์ และการใช้งานแพลตฟอร์มอย่างเต็มประสิทธิภาพ
+            </p>
+        </div>
+
+        <!-- Sister's Note Callout -->
+        <div class="concept-card reveal" style="border-left: 4px solid var(--accent-primary);">
+            <div class="concept-header">
+                <span class="concept-emoji">🐱</span>
+                <span class="concept-title">คำแนะนำจากพี่สาว .NET Architect: "เรียนอย่างไรไม่ให้หลงทาง?"</span>
+            </div>
+            <div class="concept-body">
+                <p class="text-sm" style="line-height: 1.8;">
+                    "ในแพลตฟอร์มนี้มีเนื้อหาครบ 10 Tracks 28 หน้าเว็บ แต่สำหรับน้องที่กำลังเตรียมสมัครงาน <strong>Junior Backend .NET Developer</strong> น้องไม่จำเป็นต้องอ่านทุกหน้าพร้อมกันในวันเดียวค่ะ! ให้โฟกัสที่ <strong>Core 80%</strong> ที่กรรมการสัมภาษณ์ถามบ่อยที่สุดก่อน แล้วค่อยขยายไปยังส่วนเสริม พี่สาวจัดตารางเรียน 3 สัปดาห์ไว้ให้ด้านล่างนี้แล้ว เดินตามนี้ได้เลยจ้า!"
+                </p>
+            </div>
+        </div>
+
+        <!-- 3-Step Roadmap -->
+        <section class="lesson-section reveal">
+            <h2 class="mb-lg">🗺️ แผนที่การเรียน 3 สัปดาห์ (3-Week Step-by-Step Plan)</h2>
+
+            <div class="grid grid-3 mb-xl">
+                <!-- Week 1 -->
+                <div class="card hover-lift" style="border-top: 3px solid var(--cat-csharp);">
+                    <div class="card-header">
+                        <span class="card-icon" style="background: var(--cat-csharp); color: #fff;">1</span>
+                        <div>
+                            <div class="card-title">สัปดาห์ที่ 1: C# & Core Engine</div>
+                            <span class="text-xs text-muted">ปูพื้นฐาน & OOP & DI</span>
+                        </div>
+                    </div>
+                    <ul class="text-xs" style="line-height: 2; padding-left: 16px; margin: 12px 0;">
+                        <li><a href="./csharp-basics.html">📗 Day 1: C# พื้นฐาน (ตัวแปร/ลูป/Try-Catch)</a></li>
+                        <li><a href="./csharp-oop.html">📘 Day 2: C# OOP (Interface/Polymorphism)</a></li>
+                        <li><a href="./csharp-advanced.html">📕 Day 3: C# ขั้นสูง (Async/Await &amp; Task)</a> ⚠️</li>
+                        <li><a href="./dotnet-structure.html">🏗️ Day 4: โครงสร้าง ASP.NET Core &amp; Program.cs</a></li>
+                        <li><a href="./dotnet-di.html">💉 Day 5: Dependency Injection (3 Lifetimes)</a> ⚠️</li>
+                    </ul>
+                    <div class="callout callout-tip" style="padding: 8px 12px; margin: 0; font-size: 0.75rem;">
+                        🎯 <strong>เป้าหมาย:</strong> อธิบายได้ว่า DI 3 Lifetimes ต่างกันอย่างไร และทำไมห้ามใช้ `.Result`
+                    </div>
+                </div>
+
+                <!-- Week 2 -->
+                <div class="card hover-lift" style="border-top: 3px solid var(--cat-sql);">
+                    <div class="card-header">
+                        <span class="card-icon" style="background: var(--cat-sql); color: #fff;">2</span>
+                        <div>
+                            <div class="card-title">สัปดาห์ที่ 2: APIs & Database</div>
+                            <span class="text-xs text-muted">Web API & EF Core & Testing</span>
+                        </div>
+                    </div>
+                    <ul class="text-xs" style="line-height: 2; padding-left: 16px; margin: 12px 0;">
+                        <li><a href="./rest-api.html">🔌 Day 6: RESTful API Design &amp; Status Codes</a></li>
+                        <li><a href="./sql-basics.html">📊 Day 7: SQL Basics &amp; JOINs</a> + <a href="./sql-playground.html">Sandbox</a></li>
+                        <li><a href="./ef-core.html">🗄️ Day 8: EF Core (DbContext &amp; N+1 Query)</a> ⚠️</li>
+                        <li><a href="./unit-testing.html">✅ Day 9: Unit Testing (xUnit &amp; Moq AAA)</a></li>
+                        <li><a href="./secure-coding.html">🛡️ Day 10: Secure Coding (OWASP &amp; DB-First)</a></li>
+                    </ul>
+                    <div class="callout callout-tip" style="padding: 8px 12px; margin: 0; font-size: 0.75rem;">
+                        🎯 <strong>เป้าหมาย:</strong> สร้าง Web API เชื่อม Database ด้วย EF Core และเขียน Unit Test ดักจับบัคได้
+                    </div>
+                </div>
+
+                <!-- Week 3 -->
+                <div class="card hover-lift" style="border-top: 3px solid var(--cat-arch);">
+                    <div class="card-header">
+                        <span class="card-icon" style="background: var(--cat-arch); color: #fff;">3</span>
+                        <div>
+                            <div class="card-title">สัปดาห์ที่ 3: สถาปัตยกรรม & ซ้อมสัมภาษณ์</div>
+                            <span class="text-xs text-muted">Clean Arch & Mock Interview</span>
+                        </div>
+                    </div>
+                    <ul class="text-xs" style="line-height: 2; padding-left: 16px; margin: 12px 0;">
+                        <li><a href="./architecture.html">🏛️ Day 11: Clean Architecture 4 เลเยอร์ &amp; CQRS</a></li>
+                        <li><a href="./interview-prep.html">💼 Day 12: ซ้อมตอบคำถามสัมภาษณ์ (STAR Method)</a> ⚠️</li>
+                        <li><a href="./quiz-arena.html">🎯 Day 13: ตะลุยด่าน Quiz Arena ทุกหมวด</a></li>
+                        <li><a href="./tech-glossary.html">📖 Day 14: ทบทวนคำศัพท์ภาษาอังกฤษ &amp; คำอ่าน</a></li>
+                        <li><a href="./code-sandbox.html">💻 Day 15: ทดลองเขียนโค้ดสดใน Sandbox</a></li>
+                    </ul>
+                    <div class="callout callout-tip" style="padding: 8px 12px; margin: 0; font-size: 0.75rem;">
+                        🎯 <strong>เป้าหมาย:</strong> พูดตอบคำถามสัมภาษณ์ได้อย่างมั่นใจ มีหลักการ และยกตัวอย่างจริงได้
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interview Preparation Checklist -->
+        <section class="lesson-section reveal">
+            <h2 class="mb-lg">✅ Checklist เตรียมความพร้อมก่อนวันสัมภาษณ์งาน</h2>
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3 style="color: var(--accent-primary); margin-bottom: 12px;">🧠 คำถามเชิงเทคนิค (Technical Must-Know)</h3>
+                    <ul class="text-xs" style="line-height: 2;">
+                        <li>[ ] อธิบายความต่างของ <code>AddTransient</code>, <code>AddScoped</code>, <code>AddSingleton</code> ได้</li>
+                        <li>[ ] รู้จักกับดัก <strong>Captive Dependency</strong> และวิธีแก้ด้วย <code>IServiceScopeFactory</code></li>
+                        <li>[ ] อธิบายการทำงานของ <code>async / await</code> (Non-blocking I/O vs Thread Blocking)</li>
+                        <li>[ ] อธิบายปัญหา <strong>N+1 Query</strong> ใน EF Core และวิธีแก้ด้วย <code>.Include()</code></li>
+                        <li>[ ] ทราบเหตุผลที่ต้องใช้ <code>.AsNoTracking()</code> ใน Read queries</li>
+                        <li>[ ] อธิบายความต่างของ HTTP Status Codes: 200, 201, 204, 400, 401, 403, 404, 500</li>
+                        <li>[ ] เขียน Unit Test รูปแบบ <strong>AAA Pattern (Arrange-Act-Assert)</strong> ร่วมกับ Moq ได้</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--accent-success); margin-bottom: 12px;">🌟 พฤติกรรมและการสื่อสาร (Behavioral & STAR Method)</h3>
+                    <ul class="text-xs" style="line-height: 2;">
+                        <li>[ ] เตรียมการแนะนำตัวสั้นๆ 1-2 นาที เน้นความหลงใหลใน .NET Core Backend</li>
+                        <li>[ ] มีเรื่องเล่าแก้ปัญหาบัคยากๆ 1 เรื่องโดยใช้โครงสร้าง **STAR (Situation, Task, Action, Result)**</li>
+                        <li>[ ] มีทัศนคติเชิงบวกต่อการทำ **Code Review** และการทำงานเป็นทีม (Agile/Scrum)</li>
+                        <li>[ ] เตรียมคำถามฉลาดๆ ถามกลับกรรมการ 2-3 ข้อ (เช่น "ทีมใช้ .NET 8 หรือ 9?", "กระบวนการ CI/CD ในทีมเป็นอย่างไร?")</li>
+                        <li>[ ] มั่นใจในการออกเสียงศัพท์เทคนิคภาษาอังกฤษ (เปิดดูที่ <a href="./tech-glossary.html">Tech Glossary</a>)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools in Hub -->
+        <section class="lesson-section reveal">
+            <h2 class="mb-lg">🛠️ เครื่องมือช่วยฝึกฝนบนแพลตฟอร์ม</h2>
+            <div class="grid grid-3">
+                <a href="./code-sandbox.html" class="card hover-lift text-center" style="text-decoration: none;">
+                    <div style="font-size: 2.5rem; margin-bottom: 8px;">💻</div>
+                    <h3 class="text-md" style="color: var(--accent-primary);">Code Sandbox</h3>
+                    <p class="text-xs text-muted">ทดสอบเขียนโค้ด C#, SQL, HTML, CSS, JS แบบ Live Interactive</p>
+                </a>
+                <a href="./quiz-arena.html" class="card hover-lift text-center" style="text-decoration: none;">
+                    <div style="font-size: 2.5rem; margin-bottom: 8px;">🎯</div>
+                    <h3 class="text-md" style="color: var(--accent-warning);">Quiz Arena</h3>
+                    <p class="text-xs text-muted">คลังข้อสอบ 84 ข้อ ครบ 12 หมวดหมู่ พร้อมโหมด Speed Run จับเวลา</p>
+                </a>
+                <a href="./tech-glossary.html" class="card hover-lift text-center" style="text-decoration: none;">
+                    <div style="font-size: 2.5rem; margin-bottom: 8px;">📖</div>
+                    <h3 class="text-md" style="color: var(--accent-info);">Tech Glossary</h3>
+                    <p class="text-xs text-muted">รวมคำศัพท์เทคนิคภาษาอังกฤษ พร้อมคำอ่านไทยออกเสียงง่าย</p>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+</body>
+</html>

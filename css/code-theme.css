@@ -19,15 +19,39 @@ pre[class*="language-"] {
   word-wrap: normal;
   tab-size: 4;
   hyphens: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 pre[class*="language-"] {
   padding: var(--space-lg);
   margin: 0;
-  overflow: auto;
+  overflow-x: auto;
   background: var(--bg-code);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-default);
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  code[class*="language-"],
+  pre[class*="language-"] {
+    font-size: 0.8rem;
+    line-height: 1.55;
+  }
+  pre[class*="language-"] {
+    padding: var(--space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  code[class*="language-"],
+  pre[class*="language-"] {
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+  pre[class*="language-"] {
+    padding: 10px;
+  }
 }
 
 :not(pre) > code[class*="language-"] {
