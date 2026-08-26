@@ -7,7 +7,7 @@
 
 ## 🌐 Live Demo & GitHub Pages
 สามารถเปิดใช้งานผ่าน GitHub Pages ได้ที่:
-`https://<your-username>.github.io/<repo-name>/` หรือเปิดไฟล์ `index.html` บนเครื่องคอมพิวเตอร์ของคุณ
+[https://thinnathep.github.io/DotNetLearningHub/](https://thinnathep.github.io/DotNetLearningHub/) หรือเปิดไฟล์ `index.html` บนเครื่องคอมพิวเตอร์ของคุณ
 
 ---
 
@@ -79,19 +79,15 @@
 2. ดับเบิลคลิกไฟล์ `index.html` เพื่อเปิดใช้งานบนเว็บเบราว์เซอร์ได้ทันที
 
 ### วิธีที่ 2: Deploy ขึ้น GitHub Pages (Public Web Host)
-1. สร้าง Repository ใหม่บน GitHub
+1. สร้าง Repository ใหม่บน GitHub ชื่อ `DotNetLearningHub`
 2. รันคำสั่ง Git:
    ```bash
-   git init
-   git add .
-   git commit -m "feat: Initial release of DotNet Learning Hub"
-   git branch -M main
-   git remote add origin https://github.com/<your-username>/<repo-name>.git
+   git remote add origin https://github.com/Thinnathep/DotNetLearningHub.git
    git push -u origin main
    ```
 3. ไปที่เมนู **Settings ➔ Pages** ใน GitHub Repository
 4. เลือก Source เป็น `Deploy from a branch` ➔ เลือก Branch `main` โฟลเดอร์ `/ (root)` แล้วกด **Save**
-5. รอ 1-2 นาที คุณจะได้ URL เว็บไซต์พร้อมใช้งานทันที!
+5. รอ 1-2 นาที คุณจะได้ URL เว็บไซต์พร้อมใช้งานทันทีที่ [https://thinnathep.github.io/DotNetLearningHub/](https://thinnathep.github.io/DotNetLearningHub/)!
 
 ---
 
