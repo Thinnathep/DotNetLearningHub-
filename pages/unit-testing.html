@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit Testing ด้วย xUnit &amp; Moq ใน .NET — DotNet Learning Hub</title>
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  
+  <style>
+    /* ─── Unit Testing Custom Styling ─── */
+    .aaa-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    @media (max-width: 860px) {
+      .aaa-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .aaa-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition-normal);
+    }
+    .aaa-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .aaa-card.arrange { border-top: 4px solid var(--accent-primary); }
+    .aaa-card.act { border-top: 4px solid var(--accent-warning); }
+    .aaa-card.assert { border-top: 4px solid var(--accent-success); }
+
+    .aaa-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-code);
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-sm);
+    }
+    .arrange .aaa-badge { background: rgba(88, 166, 255, 0.15); color: var(--accent-primary); border: 1px solid rgba(88, 166, 255, 0.3); }
+    .act .aaa-badge { background: rgba(210, 153, 34, 0.15); color: var(--accent-warning); border: 1px solid rgba(210, 153, 34, 0.3); }
+    .assert .aaa-badge { background: rgba(63, 185, 80, 0.15); color: var(--accent-success); border: 1px solid rgba(63, 185, 80, 0.3); }
+
+    /* Test Double Types Matrix */
+    .double-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    .double-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      transition: all var(--transition-fast);
+    }
+    .double-card:hover {
+      border-color: var(--accent-info);
+      transform: translateY(-2px);
+    }
+    .double-name {
+      font-family: var(--font-code);
+      font-weight: 700;
+      color: var(--syn-type);
+      font-size: 1rem;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Interactive Test Runner Console */
+    .test-runner-simulator {
+      background: #090d13;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      margin: var(--space-lg) 0;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+    .runner-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px var(--space-md);
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border-default);
+    }
+    .runner-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .runner-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .runner-dot.red { background: #ff5f56; }
+    .runner-dot.yellow { background: #ffbd2e; }
+    .runner-dot.green { background: #27c93f; }
+
+    .runner-console {
+      padding: var(--space-md) var(--space-lg);
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      min-height: 180px;
+    }
+    .runner-pass { color: var(--accent-success); font-weight: 700; }
+    .runner-fail { color: var(--accent-danger); font-weight: 700; }
+    .runner-info { color: var(--accent-primary); }
+    .runner-cmd { color: var(--text-primary); font-weight: 600; }
+
+    /* FIRST Principles Badge Grid */
+    .first-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-md) 0;
+    }
+    .first-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      text-align: center;
+      transition: all var(--transition-fast);
+    }
+    .first-item:hover {
+      border-color: var(--accent-success);
+    }
+    .first-letter {
+      font-size: 1.8rem;
+      font-weight: 900;
+      font-family: var(--font-heading);
+      color: var(--accent-success);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    /* Pyramid Visual */
+    .pyramid-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin: var(--space-lg) 0;
+    }
+    .pyramid-tier {
+      text-align: center;
+      padding: 12px var(--space-lg);
+      border-radius: var(--radius-md);
+      font-family: var(--font-heading);
+      font-weight: 700;
+      transition: all var(--transition-normal);
+      position: relative;
+    }
+    .pyramid-tier:hover {
+      transform: scale(1.02);
+      filter: brightness(1.15);
+    }
+    .tier-e2e {
+      width: 45%;
+      max-width: 300px;
+      background: rgba(248, 81, 73, 0.15);
+      border: 1px solid var(--accent-danger);
+      color: var(--accent-danger);
+    }
+    .tier-integration {
+      width: 70%;
+      max-width: 480px;
+      background: rgba(210, 153, 34, 0.15);
+      border: 1px solid var(--accent-warning);
+      color: var(--accent-warning);
+    }
+    .tier-unit {
+      width: 95%;
+      max-width: 660px;
+      background: rgba(63, 185, 80, 0.15);
+      border: 2px solid var(--accent-success);
+      color: var(--accent-success);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div style="display: flex; align-items: center; gap: var(--space-md);">
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+      <a href="../index.html" class="site-logo">
+        <div class="logo-icon">✅</div>
+        <span>DotNet Learning Hub</span>
+      </a>
+    </div>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <a href="quiz-arena.html" class="btn btn-outline btn-sm" style="border-radius: var(--radius-full);">
+        🎮 Quiz Arena
+      </a>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation (All Tracks)
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าแรก (Dashboard)</span>
+      </a>
+    </div>
+
+    <!-- 🟣 Track C# Language -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="csharp-basics.html" class="sidebar-link">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="csharp-oop.html" class="sidebar-link">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="csharp-collections.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Collections &amp; Generics</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>LINQ &amp; Async/Await</span>
+        <span class="sidebar-badge badge-mid">Lv 4</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track .NET & Web API -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track .NET &amp; Web API</div>
+      <a href="dotnet-structure.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 Project Structure</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="dotnet-di.html" class="sidebar-link">
+        <span class="link-icon">💉</span>
+        <span>Dependency Injection</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="dotnet-middleware.html" class="sidebar-link">
+        <span class="link-icon">🛡️</span>
+        <span>Middleware Pipeline</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="rest-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>RESTful API Design</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="system-integration.html" class="sidebar-link">
+        <span class="link-icon">🔄</span>
+        <span>System Integration</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🔴 Track Database & ORM -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔴 Track Database &amp; ORM</div>
+      <a href="sql-basics.html" class="sidebar-link">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; CRUD</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="sql-advanced.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>SQL Advanced &amp; Index</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="sql-playground.html" class="sidebar-link">
+        <span class="link-icon">💻</span>
+        <span>SQL Playground Live</span>
+        <span class="sidebar-badge badge-new">Live</span>
+      </a>
+      <a href="ef-core.html" class="sidebar-link">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🟢 Track Blazor & Frontend -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟢 Track Blazor &amp; Markup</div>
+      <a href="blazor-intro.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Blazor Intro &amp; WASM</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="blazor-components.html" class="sidebar-link">
+        <span class="link-icon">🧩</span>
+        <span>Blazor Components</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="xaml-basics.html" class="sidebar-link">
+        <span class="link-icon">📐</span>
+        <span>XAML Basics (.NET MAUI)</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="xml-json.html" class="sidebar-link">
+        <span class="link-icon">📄</span>
+        <span>XML &amp; JSON Data Formats</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🟡 Track Web Basics -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟡 Track Web Basics</div>
+      <a href="html-css-js.html" class="sidebar-link">
+        <span class="link-icon">🌐</span>
+        <span>HTML, CSS &amp; JavaScript</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track DevOps & Security -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track DevOps &amp; Security</div>
+      <a href="git-cicd.html" class="sidebar-link">
+        <span class="link-icon">🐙</span>
+        <span>Git &amp; CI/CD Pipelines</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="secure-coding.html" class="sidebar-link">
+        <span class="link-icon">🔒</span>
+        <span>Secure Coding &amp; OWASP</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🟢 Track Quality & Testing (Active Track) -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟢 Track Quality &amp; Process</div>
+      <a href="unit-testing.html" class="sidebar-link active">
+        <span class="link-icon">✅</span>
+        <span>Unit Testing (xUnit &amp; Moq)</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="code-review.html" class="sidebar-link">
+        <span class="link-icon">👀</span>
+        <span>Code Review Best Practices</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="sdlc-agile.html" class="sidebar-link">
+        <span class="link-icon">🔄</span>
+        <span>SDLC &amp; Agile / Scrum</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="tech-docs.html" class="sidebar-link">
+        <span class="link-icon">📝</span>
+        <span>Technical Documentation</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🔴 Track Architecture -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔴 Track Architecture</div>
+      <a href="architecture.html" class="sidebar-link">
+        <span class="link-icon">🏛️</span>
+        <span>Clean Architecture &amp; CQRS</span>
+        <span class="sidebar-badge badge-new">Adv</span>
+      </a>
+    </div>
+
+    <!-- 🎮 Games & Arena -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🎮 Games &amp; Arena</div>
+      <a href="quiz-arena.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Quiz Arena ท้าประลอง</span>
+      </a>
+      <a href="interview-prep.html" class="sidebar-link">
+        <span class="link-icon">💼</span>
+        <span>เตรียมสัมภาษณ์ C#/.NET</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header reveal">
+        <div class="breadcrumb">
+          <a href="../index.html">หน้าหลัก</a>
+          <span>/</span>
+          <span>Quality &amp; Testing Track</span>
+          <span>/</span>
+          <span class="text-primary">Unit Testing ด้วย xUnit &amp; Moq</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(63, 185, 80, 0.2); color: #3fb950; border: 1px solid rgba(63, 185, 80, 0.4);">✅</div>
+          <div>
+            <h1>Unit Testing ด้วย xUnit &amp; Moq ใน .NET</h1>
+            <div class="page-description">
+              คู่มือสมบูรณ์สำหรับเขียน Unit Test ระดับมืออาชีพ: เจาะลึก AAA Pattern, xUnit [Fact]/[Theory], เทคนิค Mocking ด้วย Moq, Test Naming Convention, Code Coverage และการขจัด Flaky Tests
+            </div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="badge badge-warning">⭐⭐ กลาง</span></span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>เวลา: <strong>~45 นาที</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>รางวัล: <strong class="text-warning">+100 XP</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>🏷️</span>
+            <span>หมวดหมู่: <span class="text-secondary">xUnit / Moq / Quality Assurance</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Analogy Section ─── -->
+      <div class="concept-card reveal">
+        <div class="concept-header">
+          <span class="concept-emoji">🚗</span>
+          <span class="concept-title">เปรียบเทียบให้เห็นภาพ: ช่างตรวจเช็คสภาพเครื่องยนต์ก่อนส่งมอบรถยนต์</span>
+        </div>
+        <div class="concept-body">
+          <div class="analogy-box">
+            <div class="analogy-label">💡 ทำไมต้องมี Unit Test vs Integration Test?</div>
+            <p class="analogy-text">
+              ลองจินตนาการถึงโรงงานประกอบรถยนต์สมรรถนะสูง:
+              <br><br>
+              • <strong>🧪 Unit Testing (การทดสอบระดับหน่วย):</strong> เหมือนกับช่างที่นำ <em>"ลูกสูบแต่ละลูก"</em> หรือ <em>"หัวเทียนแต่ละอัน"</em> มาจับขึ้นแท่นวัดขนาด แรงดัน และการจ่ายไฟเดี่ยวๆ ในห้องแล็บ โดย<strong>ยังไม่ต้องประกอบเข้าตัวถังรถยนต์</strong> เพื่อให้มั่นใจ 100% ว่าชิ้นส่วนชิ้นนี้ทำงานได้ตามสเปกเป๊ะทุกเงื่อนไข รันตรวจได้เป็นพันชิ้นในเสี้ยววินาที
+              <br><br>
+              • <strong>🔩 Integration Testing (การทดสอบการทำงานร่วมกัน):</strong> คือการนำลูกสูบ เพลาข้อเหวี่ยง และเกียร์มาประกอบเข้าด้วยกัน แล้วสตาร์ทดูว่าส่งกำลังถึงกันได้ราบรื่นหรือไม่ (ทดสอบ Database, Message Queue หรือ External API จริง)
+              <br><br>
+              • <strong>🏁 End-to-End Testing (การทดสอบทั้งระบบ):</strong> คือการขับรถคันจริงออกไปวิ่งบนถนนที่มีฝนตกและโค้งลาดชัน (ทดสอบ User Journey ผ่านหน้าบ้านและหลังบ้านจริง)
+            </p>
+          </div>
+
+          <!-- Pyramid Diagram Visualizer -->
+          <div class="pyramid-wrapper mt-lg">
+            <div class="pyramid-tier tier-e2e">
+              <span>👑 E2E / UI Tests (5-10%)</span>
+              <div class="text-xs text-muted">ช้า, แพง, จำลอง User จริงทั้งระบบ</div>
+            </div>
+            <div class="pyramid-tier tier-integration">
+              <span>🔄 Integration Tests (15-20%)</span>
+              <div class="text-xs text-muted">เร็วปานกลาง, ต่อ Database จริง, ทดสอบเชื่อมโยง</div>
+            </div>
+            <div class="pyramid-tier tier-unit">
+              <span>⚡ Unit Tests (70-80% ของระบบ)</span>
+              <div class="text-xs text-muted">เร็วระดับมิลลิวินาที, ราคาถูกที่สุด, ทำงานแบบ Isolated 100%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Interactive Test Runner Simulator ─── -->
+      <div class="test-runner-simulator reveal">
+        <div class="runner-bar">
+          <div class="runner-dots">
+            <span class="runner-dot red"></span>
+            <span class="runner-dot yellow"></span>
+            <span class="runner-dot green"></span>
+          </div>
+          <div class="text-xs text-muted" style="font-family: var(--font-code);">Terminal: dotnet test</div>
+          <button id="btn-run-tests" class="btn btn-success btn-sm">▶ รันการทดสอบ (Run Tests)</button>
+        </div>
+        <div class="runner-console" id="runner-output">
+          <span class="runner-info">Microsoft (R) Test Execution Command Line Tool Version 17.8.0</span><br>
+          <span class="text-muted">กำลังเตรียมรัน Test Suite สำหรับ OrderManagement.UnitTests...</span><br>
+          <span class="runner-cmd">กดปุ่ม "▶ รันการทดสอบ" ด้านบนเพื่อดูการทำงานของ xUnit Test Engine</span>
+        </div>
+      </div>
+
+      <!-- ─── Section 1: AAA Pattern ─── -->
+      <section class="lesson-section reveal" id="aaa-pattern">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(88, 166, 255, 0.2); color: var(--accent-primary); border: 1px solid var(--accent-primary);">01</div>
+          <div>
+            <h2>รูปแบบ AAA Pattern (Arrange - Act - Assert) มาตรฐานสากล</h2>
+            <p class="text-muted" style="margin-bottom: 0;">โครงสร้าง 3 จังหวะที่เป็นมาตรฐานระดับโลกในการเขียน Unit Test ให้อ่านง่าย ตรวจสอบง่าย และบำรุงรักษาง่าย</p>
+          </div>
+        </div>
+
+        <div class="aaa-grid">
+          <!-- Arrange Card -->
+          <div class="aaa-card arrange">
+            <div class="aaa-badge">1. ARRANGE (จัดเตรียม)</div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">เตรียมข้อมูล &amp; สถานะ</h3>
+            <p class="text-sm text-secondary">
+              สร้างอ็อบเจกต์ (SUT - System Under Test), กำหนดค่า Input Parameter, จำลอง Mock Dependency และเซ็ตค่าเริ่มต้นที่จำเป็นก่อนเริ่มรัน
+            </p>
+            <div class="callout callout-info" style="margin: 0; padding: 8px 12px; font-size: 0.8rem;">
+              <strong>ตัวอย่าง:</strong> <code>var cart = new ShoppingCart();</code><br><code>var item = new CartItem("Book", 500m);</code>
+            </div>
+          </div>
+
+          <!-- Act Card -->
+          <div class="aaa-card act">
+            <div class="aaa-badge">2. ACT (กระทำ/สั่งการ)</div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">เรียกใช้ Method จริง</h3>
+            <p class="text-sm text-secondary">
+              สั่งรันฟังก์ชันหรือเมธอดที่ต้องการทดสอบเพียง <strong>1 บรรทัด หรือ 1 Action หลัก</strong> เพื่อเก็บผลลัพธ์ (Result) หรือดักจับ Exception
+            </p>
+            <div class="callout callout-warning" style="margin: 0; padding: 8px 12px; font-size: 0.8rem;">
+              <strong>ตัวอย่าง:</strong> <code>cart.AddItem(item);</code><br><code>decimal total = cart.CalculateTotal();</code>
+            </div>
+          </div>
+
+          <!-- Assert Card -->
+          <div class="aaa-card assert">
+            <div class="aaa-badge">3. ASSERT (ตรวจสอบผล)</div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">ยืนยันความถูกต้อง</h3>
+            <p class="text-sm text-secondary">
+              เปรียบเทียบผลลัพธ์ที่ได้ (Actual) กับสิ่งที่คาดหวังไว้ (Expected) โดยใช้ฟังก์ชันของ <code>Assert.*</code> หากไม่ตรง Test จะล้มเหลวทันที
+            </p>
+            <div class="callout callout-tip" style="margin: 0; padding: 8px 12px; font-size: 0.8rem;">
+              <strong>ตัวอย่าง:</strong> <code>Assert.Equal(500m, total);</code><br><code>Assert.Single(cart.Items);</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Block: Full AAA Pattern Example -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>ShoppingCartTests.cs — ตัวอย่างโครงสร้าง AAA Pattern ครบวงจร</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using Xunit;
+using MyStore.Core.Models;
+using MyStore.Core.Services;
+
+namespace MyStore.UnitTests.Services
+{
+    public class ShoppingCartTests
+    {
+        [Fact]
+        public void CalculateTotal_WithValidDiscountCoupon_ReturnsDiscountedPrice()
+        {
+            // ─── 1. ARRANGE (จัดเตรียมข้อมูลและสถานะ) ───
+            var cart = new ShoppingCart();
+            cart.AddItem(new CartItem(id: 1, name: "Mechanical Keyboard", price: 3000m, quantity: 1));
+            cart.AddItem(new CartItem(id: 2, name: "Wireless Mouse", price: 1000m, quantity: 1));
+            
+            var discountService = new DiscountCalculator();
+            string couponCode = "DISCOUNT10"; // คูปองลด 10%
+
+            // ─── 2. ACT (สั่งเรียก Method ที่ต้องการทดสอบจริง) ───
+            decimal finalPrice = discountService.ApplyCoupon(cart, couponCode);
+
+            // ─── 3. ASSERT (ตรวจสอบความถูกต้องของผลลัพธ์) ───
+            // ราคารวม 4,000 บาท หักส่วนลด 10% (400) จะต้องเหลือ 3,600 บาท พอดี
+            Assert.Equal(3600m, finalPrice);
+            Assert.NotNull(cart.AppliedCoupon);
+            Assert.True(cart.IsDiscountApplied);
+        }
+
+        [Fact]
+        public void ApplyCoupon_WhenCouponIsExpired_ThrowsInvalidOperationException()
+        {
+            // ─── 1. ARRANGE ───
+            var cart = new ShoppingCart();
+            cart.AddItem(new CartItem(1, "USB Hub", 500m, 1));
+            var discountService = new DiscountCalculator();
+            string expiredCoupon = "EXPIRED2023";
+
+            // ─── 2. ACT & 3. ASSERT (ตรวจสอบ Exception ด้วย Assert.Throws) ───
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+            {
+                discountService.ApplyCoupon(cart, expiredCoupon);
+            });
+
+            Assert.Equal("คูปองนี้หมดอายุการใช้งานแล้ว", exception.Message);
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Assert Methods สรุปการใช้งานที่พบบ่อยที่สุด:</span>
+            <span class="output-text">
+• <strong>Assert.Equal(expected, actual):</strong> ตรวจสอบว่าค่าสองตัวเท่ากันทุกประการ
+• <strong>Assert.NotEqual(notExpected, actual):</strong> ตรวจสอบว่าค่าต้องไม่เท่ากัน
+• <strong>Assert.NotNull(object) / Assert.Null(object):</strong> ตรวจสอบสถานะการมีอยู่ของ Reference
+• <strong>Assert.True(condition) / Assert.False(condition):</strong> ตรวจสอบเงื่อนไข Boolean
+• <strong>Assert.Throws&lt;TException&gt;(() =&gt; act()):</strong> ตรวจสอบว่าโค้ดโยน Exception ชนิดที่ระบุออกมาจริง
+• <strong>Assert.Contains("word", fullText) / Assert.Contains(item, collection):</strong> ตรวจสอบว่ามีสมาชิกอยู่ในชุดข้อมูล
+• <strong>Assert.Empty(collection) / Assert.Single(collection):</strong> ตรวจสอบจำนวนสมาชิกใน Collection
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 2: xUnit Structure [Fact] vs [Theory] ─── -->
+      <section class="lesson-section reveal" id="xunit-structure">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(163, 113, 247, 0.2); color: var(--accent-info); border: 1px solid var(--accent-info);">02</div>
+          <div>
+            <h2>โครงสร้างโปรเจกต์ทดสอบ xUnit และ [Fact] vs [Theory]</h2>
+            <p class="text-muted" style="margin-bottom: 0;">เรียนรู้วิธีเซ็ตอัป xUnit Project, การใช้งาน [Fact] สำหรับกรณีเดี่ยว และ [Theory] ร่วมกับ [InlineData] เพื่อทดสอบหลายเงื่อนไข</p>
+          </div>
+        </div>
+
+        <div class="card mb-lg" style="background: var(--bg-card);">
+          <h3 style="font-size: 1.1rem; color: var(--accent-primary); margin-bottom: var(--space-sm);">🛠️ คำสั่ง .NET CLI ในการสร้างโปรเจกต์ Test</h3>
+          <div class="code-block-wrapper" style="margin: 0;">
+            <div class="code-block-header">
+              <div class="file-info"><span class="file-icon">💻</span> Terminal CLI Setup</div>
+              <button class="copy-btn">📋 Copy</button>
+            </div>
+            <div class="code-block-body">
+              <pre class="language-bash"><code class="language-bash"># 1. สร้าง Solution หลัก
+dotnet new sln -n MyStoreApp
+
+# 2. สร้าง Class Library โปรเจกต์จริง
+dotnet new classlib -n MyStore.Core -o src/MyStore.Core
+
+# 3. สร้าง xUnit Test Project
+dotnet new xunit -n MyStore.Core.Tests -o tests/MyStore.Core.Tests
+
+# 4. เชื่อมโยง Project Reference ให้โปรเจกต์ทดสอบมองเห็นโปรเจกต์จริง
+dotnet add tests/MyStore.Core.Tests reference src/MyStore.Core
+
+# 5. เพิ่มแพ็กเกจ Moq สำหรับจำลอง Dependencies
+dotnet add tests/MyStore.Core.Tests package Moq
+
+# 6. สั่งรัน Unit Test ทั้งหมดใน Solution
+dotnet test</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison Table: Fact vs Theory -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-xl); margin-bottom: var(--space-sm);">📊 เปรียบเทียบ [Fact] vs [Theory]</h3>
+        <table class="comparison-table mb-lg">
+          <thead>
+            <tr>
+              <th>คุณสมบัติ</th>
+              <th>[Fact]</th>
+              <th>[Theory]</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ความหมาย</strong></td>
+              <td>การทดสอบเงื่อนไข <strong>"เดี่ยว" (Single Scenario)</strong> ที่ค่า Input ตายตัวเสมอ</td>
+              <td>การทดสอบ <strong>"ทฤษฎี/ชุดข้อมูล" (Parameterized)</strong> ด้วย Logic เดียวกันแต่เปลี่ยน Input</td>
+            </tr>
+            <tr>
+              <td><strong>การรับ Parameter</strong></td>
+              <td>❌ เมธอด<strong>ห้าม</strong>รับ Parameter ใดๆ (Parameterless)</td>
+              <td>✅ เมธอด<strong>ต้อง</strong>รับ Parameter ตามที่ส่งมาจาก Data Source</td>
+            </tr>
+            <tr>
+              <td><strong>แหล่งข้อมูล (Data Attributes)</strong></td>
+              <td>ไม่ต้องระบุ Attribute เพิ่มเติม</td>
+              <td>ใช้ร่วมกับ <code>[InlineData]</code>, <code>[MemberData]</code>, หรือ <code>[ClassData]</code></td>
+            </tr>
+            <tr>
+              <td><strong>ผลลัพธ์ใน Test Runner</strong></td>
+              <td>นับเป็น <strong>1 Test Case</strong></td>
+              <td>นับแยกเป็น <strong>N Test Cases</strong> ตามจำนวนแถวของข้อมูลที่ป้อนเข้ามา</td>
+            </tr>
+            <tr>
+              <td><strong>ตัวอย่างการใช้งาน</strong></td>
+              <td>ตรวจสอบ Constructor ว่าเซ็ตค่า Default ถูกต้องหรือไม่</td>
+              <td>คำนวณเกรด (คะแนน 80-100 ได้ 'A', 70-79 ได้ 'B', ติดลบโยน Exception)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Code Block: Fact vs Theory in Action -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>TaxCalculatorTests.cs — เปรียบเทียบ Fact และ Theory + InlineData</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using Xunit;
+using MyStore.Core.Services;
+
+namespace MyStore.UnitTests.Services
+{
+    public class TaxCalculatorTests
+    {
+        // ─── ตัวอย่าง [Fact]: ทดสอบกรณีเฉพาะเจาะจง 1 เคส ───
+        [Fact]
+        public void CalculateVat_StandardNetPrice_ReturnsSevenPercentVat()
+        {
+            // Arrange
+            var calculator = new TaxCalculator();
+            decimal netPrice = 1000m;
+
+            // Act
+            decimal vat = calculator.CalculateVat(netPrice);
+
+            // Assert (VAT 7% ของ 1,000 คือ 70 บาท)
+            Assert.Equal(70m, vat);
+        }
+
+        // ─── ตัวอย่าง [Theory]: ทดสอบชุดข้อมูลหลากหลายด้วย Logic เดียวกัน ───
+        [Theory]
+        [InlineData(0, 0)]          // ยอด 0 บาท -> ภาษี 0 บาท
+        [InlineData(100, 7)]        // ยอด 100 บาท -> ภาษี 7 บาท
+        [InlineData(500, 35)]       // ยอด 500 บาท -> ภาษี 35 บาท
+        [InlineData(1000, 70)]      // ยอด 1,000 บาท -> ภาษี 70 บาท
+        [InlineData(2500, 175)]     // ยอด 2,500 บาท -> ภาษี 175 บาท
+        public void CalculateVat_VariousAmounts_ReturnsCorrectSevenPercent(decimal netPrice, decimal expectedVat)
+        {
+            // Arrange
+            var calculator = new TaxCalculator();
+
+            // Act
+            decimal actualVat = calculator.CalculateVat(netPrice);
+
+            // Assert
+            Assert.Equal(expectedVat, actualVat);
+        }
+
+        // ─── ตัวอย่าง [Theory] ดักจับ Boundary Values & Invalid Inputs ───
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(-100)]
+        [InlineData(-9999.99)]
+        public void CalculateVat_NegativeAmount_ThrowsArgumentOutOfRangeException(decimal negativePrice)
+        {
+            // Arrange
+            var calculator = new TaxCalculator();
+
+            // Act & Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+            {
+                calculator.CalculateVat(negativePrice);
+            });
+        }
+    }
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 3: Mocking Dependencies ด้วย Moq ─── -->
+      <section class="lesson-section reveal" id="moq-mocking">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(248, 81, 73, 0.2); color: var(--accent-danger); border: 1px solid var(--accent-danger);">03</div>
+          <div>
+            <h2>การ Mocking Dependencies ด้วย Moq Library</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ทำไมต้อง Mock? เข้าใจ Test Doubles, การใช้ <code>Setup()</code>, <code>ReturnsAsync()</code>, <code>It.IsAny&lt;T&gt;()</code> และ <code>Verify()</code></p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🎭</span>
+            <span class="concept-title">ทำไมเราถึง "ห้าม" ต่อ Database หรือ Third-party API จริงใน Unit Test?</span>
+          </div>
+          <div class="concept-body">
+            <p class="text-secondary">
+              Unit Test มีเป้าหมายเพื่อทดสอบ <strong>Business Logic ในคลาสนั้นๆ เพียงอย่างเดียว (Single Unit of Work)</strong> การต่อ Database จริงหรือยิง API ภายนอกจะทำให้เกิดปัญหาใหญ่ 4 ประการ:
+            </p>
+            <div class="grid grid-2 mt-md">
+              <div class="card" style="border-left: 3px solid var(--accent-danger);">
+                <strong class="text-danger">⏱️ ช้ามาก (Slow Execution)</strong>
+                <p class="text-sm text-secondary mt-xs">การเปิด Connection ต่อฐานข้อมูลใช้เวลา 50-500ms ต่อเคส หากระบบมี 1,000 Tests จะใช้เวลาหลายนาที แต่ถ้าใช้ Mock จะรันเสร็จใน 1-2 วินาที!</p>
+              </div>
+              <div class="card" style="border-left: 3px solid var(--accent-danger);">
+                <strong class="text-danger">💣 ข้อมูลปนเปื้อน (Side Effects &amp; Pollution)</strong>
+                <p class="text-sm text-secondary mt-xs">การเขียน/ลบข้อมูลใน DB จริงอาจทำให้ Test รันตีกันเอง หรือมีข้อมูลขยะค้างในระบบ</p>
+              </div>
+              <div class="card" style="border-left: 3px solid var(--accent-warning);">
+                <strong class="text-warning">💸 ค่าใช้จ่าย &amp; ข้อจำกัด (Cost &amp; Rate Limits)</strong>
+                <p class="text-sm text-secondary mt-xs">ถ้า Unit Test ยิง Payment Gateway (Stripe) หรือ SMS OTP จริง จะทำให้เสียเงินและติด Rate Limit ได้</p>
+              </div>
+              <div class="card" style="border-left: 3px solid var(--accent-info);">
+                <strong class="text-info">🎲 ขาดความแน่นอน (Non-Deterministic)</strong>
+                <p class="text-sm text-secondary mt-xs">หาก Network หลุด หรือเซิร์ฟเวอร์ภายนอกล่ม Unit Test จะตก ทั้งๆ ที่โค้ด C# ของเราเขียนถูกต้อง 100%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Test Doubles 5 Types Matrix -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-xl); margin-bottom: var(--space-xs);">🎭 ตระกูล Test Doubles (ตัวแทนจำลอง 5 ประเภท)</h3>
+        <p class="text-muted text-sm mb-md">ในวงการ Software Testing เราเรียกอ็อบเจกต์ตัวแทนเหล่านี้รวมๆ ว่า "Test Doubles" (เหมือนสตันท์แมนเล่นแทนดารา):</p>
+        
+        <div class="double-grid">
+          <div class="double-card">
+            <div class="double-name">1. Dummy 🧸</div>
+            <p class="text-xs text-secondary">วัตถุตัวประกอบ ส่งเข้าไปให้ครบพารามิเตอร์ของ Constructor แต่ไม่เคยถูกเรียกใช้จริงใน Logic</p>
+          </div>
+          <div class="double-card">
+            <div class="double-name">2. Stub 🪵</div>
+            <p class="text-xs text-secondary">ตัวคืนค่าตายตัว คืนค่า Hardcoded response ที่เตรียมไว้ล่วงหน้าเพื่อป้อนข้อมูลให้ Logic ทำงานต่อได้</p>
+          </div>
+          <div class="double-card">
+            <div class="double-name">3. Spy 🕵️</div>
+            <p class="text-xs text-secondary">สายสืบ บันทึกประวัติว่าฟังก์ชันถูกเรียกไปกี่ครั้ง ด้วย Parameter อะไรบ้าง เพื่อนำมา Assert ทีหลัง</p>
+          </div>
+          <div class="double-card" style="border-color: var(--accent-success); background: rgba(63,185,80,0.05);">
+            <div class="double-name" style="color: var(--accent-success);">4. Mock 🎭</div>
+            <p class="text-xs text-secondary">ตัวเก่งสุด กำหนด Expectation และสามารถ Verify ตรวจสอบได้ว่าถูกเรียกตามเงื่อนไขที่กำหนดหรือไม่</p>
+          </div>
+          <div class="double-card">
+            <div class="double-name">5. Fake 🃏</div>
+            <p class="text-xs text-secondary">มีโค้ดทำงานได้จริงแต่เป็นเวอร์ชันย่อส่วน เช่น In-Memory Database หรือ List ใน RAM แทน SQL Server</p>
+          </div>
+        </div>
+
+        <!-- Code Block: Comprehensive Moq Example -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>OrderServiceTests.cs — การใช้งาน Moq แบบสมบูรณ์ใน Clean Architecture</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System.Threading.Tasks;
+using Xunit;
+using Moq;
+using MyStore.Core.Entities;
+using MyStore.Core.Interfaces;
+using MyStore.Core.Services;
+
+namespace MyStore.UnitTests.Services
+{
+    public class OrderServiceTests
+    {
+        private readonly Mock<IOrderRepository> _mockOrderRepo;
+        private readonly Mock<IPaymentGateway> _mockPaymentGateway;
+        private readonly Mock<INotificationService> _mockNotification;
+        private readonly OrderService _orderService; // System Under Test (SUT)
+
+        public OrderServiceTests()
+        {
+            // สร้าง Mock Object สำหรับทุก Dependency ที่ OrderService ต้องใช้
+            _mockOrderRepo = new Mock<IOrderRepository>();
+            _mockPaymentGateway = new Mock<IPaymentGateway>();
+            _mockNotification = new Mock<INotificationService>();
+
+            // ฉีด Mock.Object เข้าไปใน Constructor ของ Service จริง
+            _orderService = new OrderService(
+                _mockOrderRepo.Object,
+                _mockPaymentGateway.Object,
+                _mockNotification.Object
+            );
+        }
+
+        [Fact]
+        public async Task CheckoutAsync_PaymentSuccessful_SavesOrderAndSendsEmail()
+        {
+            // ─── 1. ARRANGE ───
+            var customerId = 42;
+            var orderAmount = 2500m;
+            var fakeOrder = new Order { Id = 101, CustomerId = customerId, TotalAmount = orderAmount };
+
+            // ตั้งค่า Mock 1: จำลองให้ PaymentGateway ตัดเงินสำเร็จ และคืนค่า TransactionId
+            _mockPaymentGateway
+                .Setup(p => p.ChargeAsync(customerId, orderAmount))
+                .ReturnsAsync(new PaymentResult { IsSuccess = true, TransactionId = "TXN-998877" });
+
+            // ตั้งค่า Mock 2: จำลองการบันทึกข้อมูลลง Repo แล้วคืนค่า Order ที่มี ID
+            _mockOrderRepo
+                .Setup(r => r.CreateOrderAsync(It.IsAny<Order>()))
+                .ReturnsAsync(fakeOrder);
+
+            // ─── 2. ACT ───
+            var result = await _orderService.CheckoutAsync(customerId, orderAmount);
+
+            // ─── 3. ASSERT & VERIFY ───
+            // 3.1 ตรวจสอบผลลัพธ์ของ Service
+            Assert.True(result.IsSuccess);
+            Assert.Equal(101, result.OrderId);
+
+            // 3.2 ตรวจสอบว่า OrderRepo.CreateOrderAsync ถูกเรียกใช้งาน "1 ครั้งถ้วน"
+            _mockOrderRepo.Verify(r => r.CreateOrderAsync(It.Is<Order>(o => 
+                o.CustomerId == customerId && o.TotalAmount == orderAmount)), Times.Once);
+
+            // 3.3 ตรวจสอบว่า NotificationService.SendConfirmationEmailAsync ถูกเรียกส่งอีเมล 1 ครั้ง
+            _mockNotification.Verify(n => n.SendConfirmationEmailAsync(customerId, "TXN-998877"), Times.Once);
+        }
+
+        [Fact]
+        public async Task CheckoutAsync_PaymentFails_DoesNotSaveOrderAndDoesNotSendEmail()
+        {
+            // ─── 1. ARRANGE ───
+            var customerId = 99;
+            var orderAmount = 5000m;
+
+            // จำลองกรณีที่บัตรเครดิตถูกปฏิเสธ (Payment Failed)
+            _mockPaymentGateway
+                .Setup(p => p.ChargeAsync(customerId, orderAmount))
+                .ReturnsAsync(new PaymentResult { IsSuccess = false, ErrorMessage = "Insufficient Funds" });
+
+            // ─── 2. ACT ───
+            var result = await _orderService.CheckoutAsync(customerId, orderAmount);
+
+            // ─── 3. ASSERT & VERIFY ───
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Insufficient Funds", result.ErrorMessage);
+
+            // ✅ กฎเหล็ก: เมื่อตัดเงินไม่ผ่าน ต้อง "ไม่เคย" บันทึก Order และ "ไม่เคย" ส่งอีเมลเด็ดขาด (Times.Never)
+            _mockOrderRepo.Verify(r => r.CreateOrderAsync(It.IsAny<Order>()), Times.Never);
+            _mockNotification.Verify(n => n.SendConfirmationEmailAsync(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">💡 สรุปหัวใจสำคัญของ Moq:</span>
+            <span class="output-text">
+• <code>mock.Setup(x =&gt; x.Method(It.IsAny&lt;T&gt;())).ReturnsAsync(val);</code> — กำหนดให้เมื่อเรียก Method นี้ด้วยค่าชนิด T ให้คืนค่า val ออกไปทันที<br>
+• <code>mock.Verify(x =&gt; x.Method(), Times.Once);</code> — ยืนยันว่าเมธอดนี้ถูกเรียกตรงตามจำนวนครั้งที่คาดไว้ (Times.Once, Times.Never, Times.Exactly(n))
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 4: Naming Conventions & FIRST Principles ─── -->
+      <section class="lesson-section reveal" id="naming-conventions">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(210, 153, 34, 0.2); color: var(--accent-warning); border: 1px solid var(--accent-warning);">04</div>
+          <div>
+            <h2>เทคนิคการตั้งชื่อ Test Method ให้สื่อความหมาย &amp; กฎ F.I.R.S.T.</h2>
+            <p class="text-muted" style="margin-bottom: 0;">เปลี่ยนชื่อ Test จากความคลุมเครือให้กลายเป็นเอกสารคู่มือ (Living Documentation) ที่อ่านรู้เรื่องทันทีเมื่อรันตกใน CI/CD</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🏷️</span>
+            <span class="concept-title">สูตรมาตรฐานสากล: MethodName_StateUnderTest_ExpectedBehavior</span>
+          </div>
+          <div class="concept-body">
+            <p class="text-secondary">
+              เมื่อ Unit Test เกิด Failure ในระบบ Automated CI/CD Pipeline สิ่งเดียวที่โปรแกรมเมอร์จะเห็นในหน้ารายงานคือ <strong>"ชื่อเมธอดของ Test"</strong> ดังนั้นชื่อ Test ที่ดีต้องบอกได้ทันทีว่า <em>เกิดอะไรขึ้น ในสถานการณ์ไหน และคาดหวังอะไร</em> โดยไม่ต้องเปิดอ่านโค้ดข้างใน:
+            </p>
+
+            <table class="comparison-table mt-md">
+              <thead>
+                <tr>
+                  <th style="width: 40%;">❌ ชื่อที่ไม่ดี (Bad / Vague)</th>
+                  <th style="width: 60%;">✅ ชื่อที่ดีตามมาตรฐาน (Clean &amp; Descriptive)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code class="text-danger">Test1()</code> หรือ <code class="text-danger">CheckDiscount()</code></td>
+                  <td><code class="text-success">CalculateDiscount_VipMember_ReturnsTenPercentDiscount()</code></td>
+                </tr>
+                <tr>
+                  <td><code class="text-danger">TransferMoney()</code></td>
+                  <td><code class="text-success">TransferFunds_InsufficientBalance_ThrowsInvalidOperationException()</code></td>
+                </tr>
+                <tr>
+                  <td><code class="text-danger">GetProduct()</code></td>
+                  <td><code class="text-success">GetProductById_NonExistingId_ReturnsNull()</code></td>
+                </tr>
+                <tr>
+                  <td><code class="text-danger">TestLoginError()</code></td>
+                  <td><code class="text-success">Authenticate_InvalidPasswordThreeTimes_LocksAccountForThirtyMinutes()</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- FIRST Principles Grid -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-xl); margin-bottom: var(--space-xs);">⭐ หลักการ F.I.R.S.T. ของ Unit Test ระดับพรีเมียม</h3>
+        <p class="text-muted text-sm mb-md">กฎ 5 ประการที่นักพัฒนาซอฟต์แวร์ระดับโลกยึดถือในการเขียน Unit Test ให้มีคุณภาพสูงสุด:</p>
+
+        <div class="first-grid">
+          <div class="first-item">
+            <div class="first-letter">F</div>
+            <strong>Fast (รวดเร็ว)</strong>
+            <p class="text-xs text-secondary mt-xs">รันได้หลักพันเคสในเสี้ยววินาที เพื่อให้นักพัฒนารันได้บ่อยๆ ระหว่างเขียนโค้ด</p>
+          </div>
+          <div class="first-item">
+            <div class="first-letter">I</div>
+            <strong>Independent (อิสระ)</strong>
+            <p class="text-xs text-secondary mt-xs">แต่ละเคสไม่พึ่งพาผลลัพธ์ของเคสก่อนหน้า สามารถสลับลำดับการรันได้อิสระ</p>
+          </div>
+          <div class="first-item">
+            <div class="first-letter">R</div>
+            <strong>Repeatable (รันซ้ำได้)</strong>
+            <p class="text-xs text-secondary mt-xs">รันในเครื่องไหน เวลาใด สภาพแวดล้อมใด จะต้องได้ผลลัพธ์เดิม 100% เสมอ</p>
+          </div>
+          <div class="first-item">
+            <div class="first-letter">S</div>
+            <strong>Self-Validating (ตรวจตัวเอง)</strong>
+            <p class="text-xs text-secondary mt-xs">ให้ผลลัพธ์แบบ Boolean คือ Pass หรือ Fail ชัดเจน ไม่ต้องให้คนมาคอยส่อง Log</p>
+          </div>
+          <div class="first-item">
+            <div class="first-letter">T</div>
+            <strong>Timely (ทันท่วงที)</strong>
+            <p class="text-xs text-secondary mt-xs">เขียนพร้อมกันหรือเขียนก่อนโค้ดจริง (TDD - Test Driven Development)</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 5: Code Coverage & Flaky Tests ─── -->
+      <section class="lesson-section reveal" id="coverage-flaky">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(63, 185, 80, 0.2); color: var(--accent-success); border: 1px solid var(--accent-success);">05</div>
+          <div>
+            <h2>Code Coverage &amp; การป้องกัน Flaky Tests</h2>
+            <p class="text-muted" style="margin-bottom: 0;">วัดความครอบคลุมของการทดสอบอย่างถูกต้อง และกำจัดแบบทดสอบผีเข้าผีออก (Flaky Tests) ที่ทำลายความน่าเชื่อถือของ CI/CD</p>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <!-- Code Coverage Card -->
+          <div class="card">
+            <h3 style="color: var(--accent-primary); font-size: 1.1rem; margin-bottom: 8px;">📈 Code Coverage คืออะไร?</h3>
+            <p class="text-sm text-secondary">
+              ตัวชี้วัดเปอร์เซ็นต์ของซอร์สโค้ดที่ถูก Execute ในระหว่างการรันชุดแบบทดสอบ แบ่งเป็น:
+            </p>
+            <ul class="text-sm text-secondary" style="padding-left: 20px; margin-bottom: var(--space-md);">
+              <li><strong>Line Coverage:</strong> บรรทัดของโค้ดถูกรันผ่านหรือไม่</li>
+              <li><strong>Branch Coverage:</strong> เงื่อนไข <code>if / else / switch</code> ทุกกิ่งก้าน (True/False) ถูกทดสอบครบหรือไม่</li>
+            </ul>
+
+            <div class="callout callout-warning" style="margin: 0; font-size: 0.82rem;">
+              <strong>⚠️ กับดัก 100% Coverage:</strong> เปอร์เซ็นต์สูงไม่ได้การันตีว่าไม่มีบั๊ก! หากเขียน Test รันผ่านทุกบรรทัดแต่ไม่มีคำสั่ง <code>Assert</code> ตรวจสอบค่าที่ถูกต้อง ดังนั้นเป้าหมายที่ดีขององค์กรชั้นนำมักอยู่ที่ <strong>75% - 85% Branch Coverage</strong>
+            </div>
+          </div>
+
+          <!-- Flaky Tests Card -->
+          <div class="card">
+            <h3 style="color: var(--accent-danger); font-size: 1.1rem; margin-bottom: 8px;">👻 Flaky Tests คืออะไร?</h3>
+            <p class="text-sm text-secondary">
+              แบบทดสอบที่ <em>"เดี๋ยวผ่าน เดี๋ยวตก"</em> โดยที่ไม่มีการแก้ไขซอร์สโค้ดเลยแม้แต่บรรทัดเดียว เป็นศัตรูอันดับ 1 ของทีมพัฒนาเพราะทำให้สูญเสียความไว้วางใจใน Build Pipeline
+            </p>
+
+            <h4 style="font-size: 0.85rem; color: var(--text-primary); margin-top: 8px;">5 สาเหตุหลักของ Flaky Tests &amp; วิธีแก้:</h4>
+            <div class="text-xs text-secondary" style="line-height: 1.6;">
+              1. <strong>ผูกกับเวลาจริง (<code>DateTime.Now</code>):</strong> ใช้ <code>TimeProvider</code> (.NET 8) หรือ Mock IDateTime แทน<br>
+              2. <strong>ใช้ <code>Thread.Sleep()</code> ใน Async:</strong> ให้ใช้ <code>TaskCompletionSource</code> หรือ Task-based mocking<br>
+              3. <strong>แชร์ State ระหว่าง Tests:</strong> หลีกเลี่ยง Static Field ให้ new instance ใหม่ทุกเคส<br>
+              4. <strong>ลำดับการรัน (Order Dependency):</strong> แต่ละ Test ต้องทำงานได้เดี่ยวๆ โดยไม่สนลำดับ<br>
+              5. <strong>สุ่มข้อมูลโดยไม่คุม Edge Case:</strong> ใช้ Deterministic seed สำหรับ Random Generator
+            </div>
+          </div>
+        </div>
+
+        <!-- CLI Code Coverage Report Generation -->
+        <div class="code-block-wrapper mt-lg">
+          <div class="code-block-header">
+            <div class="file-info"><span class="file-icon">📊</span> คำสั่งสร้าง HTML Code Coverage Report แบบละเอียด</div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-bash"><code class="language-bash"># 1. ติดตั้ง ReportGenerator Global Tool
+dotnet tool install -g dotnet-reportgenerator-globaltool
+
+# 2. รัน Test พร้อมเก็บค่า Code Coverage
+dotnet test --collect:"XPlat Code Coverage"
+
+# 3. แปลงไฟล์ coverage.cobertura.xml เป็น HTML Dashboard สวยงาม
+reportgenerator \
+  -reports:"**/TestResults/**/coverage.cobertura.xml" \
+  -targetdir:"coveragereport" \
+  -reporttypes:Html
+
+# 4. เปิดดูรายงานผ่านเบราว์เซอร์
+start coveragereport/index.html</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 6: Inline Quiz ─── -->
+      <section class="lesson-section reveal" id="quiz-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(210, 168, 255, 0.2); color: var(--syn-method); border: 1px solid var(--syn-method);">06</div>
+          <div>
+            <h2>แบบทดสอบวัดความเข้าใจ (Unit Testing Quiz)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ทดสอบความรู้เกี่ยวกับ AAA Pattern, xUnit, Moq, Naming Conventions และ Code Coverage จำนวน 5 ข้อ</p>
+          </div>
+        </div>
+
+        <!-- Quiz Container rendered by QuizEngine -->
+        <div id="unit-testing-quiz"></div>
+      </section>
+
+      <!-- ─── Next Lesson Navigation ─── -->
+      <div class="card mt-2xl reveal" style="border-color: var(--border-active); background: linear-gradient(135deg, rgba(63, 185, 80, 0.12) 0%, rgba(22, 27, 34, 0.85) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge badge-success mb-xs">🎉 ยอดเยี่ยม! สำเร็จบทเรียน Unit Testing</span>
+            <h3 style="margin-top: 4px; margin-bottom: 4px;">พร้อมไปต่อกับบทเรียน Code Review Best Practices แล้วหรือยัง?</h3>
+            <p class="text-muted" style="margin-bottom: 0;">เรียนรู้กระบวนการตรวจโค้ดอย่างมีประสิทธิภาพ, Checklist ตรวจสอบความปลอดภัย และวัฒนธรรมการให้ Feedback เชิงบวก</p>
+          </div>
+          <div>
+            <a href="code-review.html" class="btn btn-success btn-lg">
+              <span>ไปบทเรียนถัดไป: Code Review →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Mark lesson as completed & Add XP
+      if (typeof Progress !== 'undefined') {
+        Progress.completeLesson('unit-testing');
+        Progress.setModuleProgress('testing', 75);
+      }
+
+      // 2. Interactive Test Runner Simulator Logic
+      const btnRunTests = document.getElementById('btn-run-tests');
+      const runnerOutput = document.getElementById('runner-output');
+
+      if (btnRunTests && runnerOutput) {
+        btnRunTests.addEventListener('click', () => {
+          btnRunTests.disabled = true;
+          btnRunTests.textContent = '⏳ กำลังรันการทดสอบ...';
+          runnerOutput.innerHTML = `
+            <span class="runner-info">dotnet test --verbosity normal</span><br>
+            <span class="text-muted">กำลัง Build Solution และค้นหาชุดการทดสอบ xUnit...</span>
+          `;
+
+          const testSteps = [
+            { delay: 400, text: '<span class="runner-cmd">Test run for /bin/Debug/net8.0/MyStore.UnitTests.dll (.NETCoreApp,Version=v8.0)</span>' },
+            { delay: 700, text: '<span class="runner-pass">  [PASS]</span> ShoppingCartTests.CalculateTotal_WithValidDiscountCoupon_ReturnsDiscountedPrice [3 ms]' },
+            { delay: 1000, text: '<span class="runner-pass">  [PASS]</span> ShoppingCartTests.ApplyCoupon_WhenCouponIsExpired_ThrowsInvalidOperationException [1 ms]' },
+            { delay: 1300, text: '<span class="runner-pass">  [PASS]</span> TaxCalculatorTests.CalculateVat_VariousAmounts_ReturnsCorrectSevenPercent(netPrice: 1000, expectedVat: 70) [1 ms]' },
+            { delay: 1600, text: '<span class="runner-pass">  [PASS]</span> OrderServiceTests.CheckoutAsync_PaymentSuccessful_SavesOrderAndSendsEmail [18 ms]' },
+            { delay: 1900, text: '<span class="runner-pass">  [PASS]</span> OrderServiceTests.CheckoutAsync_PaymentFails_DoesNotSaveOrderAndDoesNotSendEmail [4 ms]' },
+            { delay: 2200, text: '<br><strong class="runner-pass">Passed!</strong> - Failed: 0, <strong class="runner-pass">Passed: 5</strong>, Skipped: 0, Total: 5, Duration: 27 ms - MyStore.UnitTests.dll' }
+          ];
+
+          testSteps.forEach(step => {
+            setTimeout(() => {
+              runnerOutput.innerHTML += `<br>${step.text}`;
+              runnerOutput.scrollTop = runnerOutput.scrollHeight;
+            }, step.delay);
+          });
+
+          setTimeout(() => {
+            btnRunTests.disabled = false;
+            btnRunTests.textContent = '🔄 รันอีกครั้ง (Rerun Tests)';
+            if (typeof App !== 'undefined' && App.showXPGain) {
+              const rect = btnRunTests.getBoundingClientRect();
+              App.showXPGain(20, rect.left, rect.top - 20);
+            }
+          }, 2400);
+        });
+      }
+
+      // 3. Quiz Questions Definition (5 Comprehensive Unit Testing Questions)
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'รูปแบบ AAA Pattern ในการเขียน Unit Test ประกอบด้วย 3 ขั้นตอนใดเรียงตามลำดับที่ถูกต้อง?',
+          options: [
+            'Action -> Analyze -> Assert',
+            'Arrange -> Act -> Assert',
+            'Allocate -> Apply -> Approve',
+            'Assert -> Act -> Arrange'
+          ],
+          answer: 1,
+          explanation: 'AAA Pattern มาตรฐานประกอบด้วย Arrange (เตรียมข้อมูล/Mock/สถานะ) -> Act (สั่งรันเมธอดที่ต้องการทดสอบ) -> Assert (ตรวจสอบยืนยันความถูกต้องของผลลัพธ์)'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ใน xUnit Framework ข้อใดอธิบายความแตกต่างระหว่าง [Fact] และ [Theory] ได้ถูกต้องที่สุด?',
+          options: [
+            '[Fact] ใช้สำหรับ Async Method ส่วน [Theory] ใช้สำหรับ Synchronous Method',
+            '[Fact] เป็นการทดสอบกรณีเดี่ยวไม่มี Parameter ส่วน [Theory] ใช้ร่วมกับ [InlineData] เพื่อทดสอบชุดข้อมูลหลายกรณีด้วย Logic เดียวกัน',
+            '[Fact] บังคับต่อ Database จริง ส่วน [Theory] บังคับใช้ Mock เสมอ',
+            '[Fact] และ [Theory] มีการทำงานเหมือนกันทุกประการ สามารถใช้สลับกันได้เสมอ'
+          ],
+          answer: 1,
+          explanation: '[Fact] ใช้สำหรับ Single Test Case ที่เงื่อนไขและค่า Input คงที่ ส่วน [Theory] (Parameterized Test) ใช้เมื่อต้องการนำเอา Logic เดิมมาทดสอบกับชุดข้อมูลหลายๆ ตัวผ่าน Data Source เช่น [InlineData]'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'ในการใช้ Moq Library คำสั่ง mockRepo.Verify(r => r.SaveAsync(It.IsAny<Order>()), Times.Once); มีจุดประสงค์เพื่ออะไร?',
+          options: [
+            'เพื่อสั่งให้ SaveAsync ทำงานจริงใน Database 1 ครั้ง',
+            'เพื่อตรวจสอบยืนยันว่าเมธอด SaveAsync ถูก Service เรียกใช้งานตรงตามจำนวน 1 ครั้งถ้วนจริง',
+            'เพื่อลบข้อมูล Order ออกจาก RAM ภายใน 1 วินาที',
+            'เพื่อแปลง Order ให้กลายเป็น JSON Format'
+          ],
+          answer: 1,
+          explanation: 'ฟังก์ชัน .Verify() ใน Moq ทำหน้าที่ตรวจสอบพฤติกรรม (Behavior Verification) ว่าเมธอดของ Mock ถูกเรียกใช้งานจริงหรือไม่ และถูกเรียกไปกี่ครั้ง เช่น Times.Once (1 ครั้ง) หรือ Times.Never (ห้ามถูกเรียกเด็ดขาด)'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'ตามหลักการตั้งชื่อ Test Method ที่ดี (MethodName_StateUnderTest_ExpectedBehavior) ข้อใดตั้งชื่อได้ถูกต้องและสื่อความหมายชัดเจนที่สุด?',
+          options: [
+            'Test_Withdraw_Function_Error()',
+            'Withdraw_NegativeAmount_ThrowsArgumentException()',
+            'DoWithdrawal_CheckAll_OK()',
+            'BankTest1_Case2_Pass()'
+          ],
+          answer: 1,
+          explanation: 'Withdraw_NegativeAmount_ThrowsArgumentException ระบุครบ 3 ส่วนคือ: 1. เมธอดที่ทดสอบ (Withdraw) 2. สถานะ/เงื่อนไข (เมื่อส่งยอดติดลบ NegativeAmount) 3. ผลลัพธ์ที่คาดหวัง (ต้องโยน ArgumentException ออกมา)'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'ปัญหา "Flaky Tests" (แบบทดสอบที่บางครั้งผ่าน บางครั้งตกโดยไม่มีการแก้โค้ด) มักเกิดจากสาเหตุใด และวิธีป้องกันที่ดีที่สุดคืออะไร?',
+          options: [
+            'เกิดจากการใช้ xUnit แทน NUnit; แก้โดยการเปลี่ยน Library',
+            'เกิดจากการเขียนโค้ดที่ผูกติดกับ DateTime.Now หรือ Race condition ใน Async; แก้โดยการ Mock TimeProvider และหลีกเลี่ยง Thread.Sleep',
+            'เกิดจากคอมพิวเตอร์มี RAM มากเกินไป; แก้โดยการจำกัด Memory ให้โปรเจกต์',
+            'เกิดจากการมี Code Coverage เกิน 50%; แก้โดยการลบ Test ทิ้ง'
+          ],
+          answer: 1,
+          explanation: 'Flaky Tests มักเกิดจากการพึ่งพาเวลาจริง (DateTime.Now), การหน่วงเวลาด้วย Thread.Sleep(), หรือการแชร์ State ร่วมกันระหว่าง Tests วิธีแก้คือแยก Context ให้เป็นอิสระ (Isolated) และจำลองเวลาด้วย TimeProvider / IDateTime Mocking'
+        }
+      ];
+
+      // 4. Initialize Quiz via QuizEngine
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('unit-testing-quiz', quizQuestions, {
+          quizId: 'unit-testing',
+          showTimer: false,
+          showExplanation: true
+        });
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL ระดับกลาง-สูง: Index, Transaction &amp; Stored Procedures — DotNet Learning Hub</title>
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  
+  <style>
+    /* ══════════════════════════════════════════════════════════
+       Custom Styles for SQL Advanced Page
+       ══════════════════════════════════════════════════════════ */
+
+    /* Index Architecture Visualizer */
+    .btree-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+      overflow-x: auto;
+    }
+
+    .btree-level {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+      position: relative;
+    }
+
+    .btree-node {
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-md);
+      text-align: center;
+      min-width: 140px;
+      position: relative;
+      transition: all var(--transition-normal);
+      font-family: var(--font-code);
+    }
+
+    .btree-node.root {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 15px rgba(88, 166, 255, 0.2);
+    }
+
+    .btree-node.intermediate {
+      border-color: var(--accent-info);
+      box-shadow: 0 0 10px rgba(163, 113, 247, 0.15);
+    }
+
+    .btree-node.leaf {
+      border-color: var(--accent-success);
+      background: rgba(63, 185, 80, 0.05);
+    }
+
+    .btree-node-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+      color: var(--text-muted);
+    }
+
+    .btree-node.root .btree-node-title { color: var(--accent-primary); }
+    .btree-node.intermediate .btree-node-title { color: var(--accent-info); }
+    .btree-node.leaf .btree-node-title { color: var(--accent-success); }
+
+    .btree-keys {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .btree-key {
+      background: var(--bg-tertiary);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+    }
+
+    /* ACID Cards Grid */
+    .acid-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+
+    .acid-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .acid-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+
+    .acid-card.card-a::before { background: var(--accent-danger); }
+    .acid-card.card-c::before { background: var(--accent-warning); }
+    .acid-card.card-i::before { background: var(--accent-primary); }
+    .acid-card.card-d::before { background: var(--accent-success); }
+
+    .acid-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .acid-letter {
+      font-size: 2.4rem;
+      font-family: var(--font-heading);
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: var(--space-xs);
+    }
+
+    .acid-card.card-a .acid-letter { color: var(--accent-danger); }
+    .acid-card.card-c .acid-letter { color: var(--accent-warning); }
+    .acid-card.card-i .acid-letter { color: var(--accent-primary); }
+    .acid-card.card-d .acid-letter { color: var(--accent-success); }
+
+    .acid-name {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .acid-thai {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    .acid-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Comparison matrix */
+    .matrix-table-wrapper {
+      overflow-x: auto;
+      margin: var(--space-lg) 0;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+    }
+
+    /* Interactive SQL Injection Sandbox */
+    .sqli-sandbox {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin: var(--space-lg) 0;
+    }
+
+    .sqli-sandbox-header {
+      background: var(--bg-tertiary);
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sqli-sandbox-body {
+      padding: var(--space-xl);
+    }
+
+    .sqli-input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    @media (max-width: 768px) {
+      .sqli-input-row { grid-template-columns: 1fr; }
+    }
+
+    .sqli-field label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-family: var(--font-heading);
+    }
+
+    .sqli-field input {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: var(--font-code);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color var(--transition-fast);
+    }
+
+    .sqli-field input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 8px rgba(88, 166, 255, 0.2);
+    }
+
+    .preset-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .preset-btn {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-default);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: var(--font-code);
+      transition: all var(--transition-fast);
+    }
+
+    .preset-btn:hover {
+      background: rgba(248, 81, 73, 0.15);
+      color: var(--accent-danger);
+      border-color: var(--accent-danger);
+    }
+
+    .sqli-comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin-top: var(--space-lg);
+    }
+
+    @media (max-width: 768px) {
+      .sqli-comparison-grid { grid-template-columns: 1fr; }
+    }
+
+    .sqli-box {
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      position: relative;
+    }
+
+    .sqli-box.vulnerable {
+      background: rgba(248, 81, 73, 0.05);
+      border: 1px solid rgba(248, 81, 73, 0.3);
+    }
+
+    .sqli-box.secure {
+      background: rgba(63, 185, 80, 0.05);
+      border: 1px solid rgba(63, 185, 80, 0.3);
+    }
+
+    .sqli-box-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: var(--space-sm);
+    }
+
+    .sqli-box.vulnerable .sqli-box-title { color: var(--accent-danger); }
+    .sqli-box.secure .sqli-box-title { color: var(--accent-success); }
+
+    .sqli-code-preview {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      padding: var(--space-md);
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      min-height: 80px;
+      word-break: break-all;
+      line-height: 1.5;
+    }
+
+    .sqli-status-badge {
+      display: inline-block;
+      margin-top: var(--space-sm);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .status-hacked { background: rgba(248, 81, 73, 0.2); color: var(--accent-danger); border: 1px solid var(--accent-danger); }
+    .status-safe { background: rgba(63, 185, 80, 0.2); color: var(--accent-success); border: 1px solid var(--accent-success); }
+
+    /* Interactive Index Simulator */
+    .index-simulator {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+    }
+
+    .sim-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+      background: var(--bg-secondary);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+    }
+
+    .sim-row-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 6px;
+      margin: var(--space-md) 0;
+      max-height: 160px;
+      overflow-y: auto;
+      padding: var(--space-sm);
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-muted);
+    }
+
+    .sim-cell {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      padding: 6px 2px;
+      text-align: center;
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .sim-cell.scanned {
+      background: rgba(248, 81, 73, 0.25);
+      border-color: var(--accent-danger);
+      color: #fff;
+    }
+
+    .sim-cell.seek-found {
+      background: var(--accent-success);
+      border-color: #fff;
+      color: #000;
+      box-shadow: 0 0 12px var(--accent-success);
+      transform: scale(1.15);
+      z-index: 2;
+    }
+
+    .sim-result-box {
+      display: flex;
+      gap: var(--space-xl);
+      margin-top: var(--space-md);
+      padding: var(--space-md);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-muted);
+    }
+
+    .sim-stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .sim-stat-val {
+      font-family: var(--font-code);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <a href="../index.html" class="site-logo">
+      <div class="logo-icon">🟣</div>
+      <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation (All Tracks)
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าแรก (Dashboard)</span>
+      </a>
+    </div>
+
+    <!-- 🟣 Track C# Language -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="csharp-basics.html" class="sidebar-link">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="csharp-oop.html" class="sidebar-link">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="csharp-collections.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Collections &amp; Generics</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>LINQ &amp; Async/Await</span>
+        <span class="sidebar-badge badge-mid">Lv 4</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track .NET & Web API -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track .NET &amp; Web API</div>
+      <a href="dotnet-structure.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 Project Structure</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="dotnet-di.html" class="sidebar-link">
+        <span class="link-icon">💉</span>
+        <span>Dependency Injection</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="dotnet-middleware.html" class="sidebar-link">
+        <span class="link-icon">🛡️</span>
+        <span>Middleware Pipeline</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="rest-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>RESTful API Design</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="system-integration.html" class="sidebar-link">
+        <span class="link-icon">🔄</span>
+        <span>System Integration</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🔴 Track Database & ORM (Active Track) -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔴 Track Database &amp; ORM</div>
+      <a href="sql-basics.html" class="sidebar-link">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; CRUD</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="sql-advanced.html" class="sidebar-link active">
+        <span class="link-icon">⚡</span>
+        <span>SQL Advanced &amp; Index</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="sql-playground.html" class="sidebar-link">
+        <span class="link-icon">💻</span>
+        <span>SQL Playground Live</span>
+        <span class="sidebar-badge badge-new">Live</span>
+      </a>
+      <a href="ef-core.html" class="sidebar-link">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🟢 Track Blazor & Frontend -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟢 Track Blazor &amp; Markup</div>
+      <a href="blazor-intro.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Blazor Intro &amp; WASM</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="blazor-components.html" class="sidebar-link">
+        <span class="link-icon">🧩</span>
+        <span>Blazor Components</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="xaml-basics.html" class="sidebar-link">
+        <span class="link-icon">📐</span>
+        <span>XAML Basics (.NET MAUI)</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="xml-json.html" class="sidebar-link">
+        <span class="link-icon">📄</span>
+        <span>XML &amp; JSON Data Formats</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🟡 Track Web Basics -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟡 Track Web Basics</div>
+      <a href="html-css-js.html" class="sidebar-link">
+        <span class="link-icon">🌐</span>
+        <span>HTML, CSS &amp; JavaScript</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track DevOps & Security -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track DevOps &amp; Security</div>
+      <a href="git-cicd.html" class="sidebar-link">
+        <span class="link-icon">🐙</span>
+        <span>Git &amp; CI/CD Pipelines</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="secure-coding.html" class="sidebar-link">
+        <span class="link-icon">🔒</span>
+        <span>Secure Coding &amp; OWASP</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🟢 Track Quality & Testing -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟢 Track Quality &amp; Process</div>
+      <a href="unit-testing.html" class="sidebar-link">
+        <span class="link-icon">🧪</span>
+        <span>Unit Testing &amp; xUnit</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="code-review.html" class="sidebar-link">
+        <span class="link-icon">👀</span>
+        <span>Code Review Best Practices</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="sdlc-agile.html" class="sidebar-link">
+        <span class="link-icon">🔄</span>
+        <span>SDLC &amp; Agile / Scrum</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="tech-docs.html" class="sidebar-link">
+        <span class="link-icon">📝</span>
+        <span>Technical Documentation</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🔴 Track Architecture -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔴 Track Architecture</div>
+      <a href="architecture.html" class="sidebar-link">
+        <span class="link-icon">🏛️</span>
+        <span>Clean Architecture &amp; CQRS</span>
+        <span class="sidebar-badge badge-new">Adv</span>
+      </a>
+    </div>
+
+    <!-- 🎮 Games & Arena -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🎮 Games &amp; Arena</div>
+      <a href="quiz-arena.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Quiz Arena</span>
+        <span class="link-badge badge-new">Arena</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header animate-fade-in">
+        <div class="breadcrumb">
+          <a href="../index.html">หน้าแรก</a>
+          <span>/</span>
+          <span>🔴 Track Database &amp; ORM</span>
+          <span>/</span>
+          <span class="text-primary">SQL ระดับกลาง-สูง</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(248, 81, 73, 0.15); color: #ff7b72; border: 1px solid rgba(248, 81, 73, 0.3);">📈</div>
+          <div>
+            <h1>SQL ระดับกลาง-สูง: Index, Transaction &amp; Stored Procedures</h1>
+            <div class="page-description">เจาะลึกเทคนิคการจูนฐานข้อมูลระดับโปร: B-Tree Indexing, ความปลอดภัยของข้อมูลด้วย ACID Transactions, การเขียน CTEs &amp; Subqueries, Stored Procedures vs Views และการป้องกัน SQL Injection 100%</div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="level-tag level-mid">⭐⭐ กลาง (Mid-Level)</span></span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>เวลาเรียน: <strong>~50 นาที</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>XP ที่ได้รับ: <strong class="text-warning">+100 XP</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>🗄️</span>
+            <span>หมวดหมู่: <strong>T-SQL / Performance / Security</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Overview & Analogy Section ─── -->
+      <section class="section reveal">
+        <h2 class="section-title">
+          <span class="section-number">00</span>
+          <span>เปรียบเทียบให้เห็นภาพ: สารบัญหนังสือและการทำสัญญาทางการเงิน</span>
+        </h2>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <div class="concept-emoji">💡</div>
+            <div class="concept-title">2 ปริศนาสำคัญที่วิศวกรซอฟต์แวร์ทุกคนต้องเข้าใจในระบบ Database</div>
+          </div>
+          <div class="concept-body">
+            
+            <div class="analogy-box">
+              <div class="analogy-label">📖 ปริศนาที่ 1: สารบัญท้ายเล่มหนังสือ (Database Indexing)</div>
+              <p class="analogy-text">
+                ลองนึกภาพหนังสือสารานุกรมหนา <strong>1,000,000 หน้า</strong> หากคุณต้องการหาคำว่า <em>"Quantum Computing"</em> แต่หนังสือเล่มนี้<strong>ไม่มีสารบัญหรือดัชนีท้ายเล่ม</strong> คุณมีทางเลือกเดียวคือ <strong>เปิดอ่านทีละหน้าตั้งแต่หน้า 1 ไปจนถึงหน้าสุดท้าย</strong> (นี่คือสิ่งที่ฐานข้อมูลเรียกว่า <code>Table Scan</code> ใช้เวลาค้นหานานมาก O(N))<br><br>
+                แต่ถ้าหนังสือมี <strong>ดัชนีท้ายเล่ม (Index)</strong> ที่เรียงตามอักษร A-Z คุณจะเปิดไปที่หมวดอักษร <strong>Q</strong> แล้วพบว่า <em>"Quantum Computing อยู่หน้า 742"</em> จากนั้นคุณพลิกตรงไปยังหน้า 742 ได้ในเวลาเพียง <strong>เสี้ยววินาที!</strong> (นี่คือสิ่งที่ฐานข้อมูลเรียกว่า <code>Index Seek</code> บนโครงสร้าง B-Tree ที่มีความเร็วระดับ O(log N))
+              </p>
+            </div>
+
+            <div class="analogy-box" style="background: rgba(63, 185, 80, 0.08); border-color: rgba(63, 185, 80, 0.25);">
+              <div class="analogy-label" style="color: var(--accent-success);">🏦 ปริศนาที่ 2: การทำสัญญาโอนเงินธนาคาร (Transactions &amp; ACID)</div>
+              <p class="analogy-text">
+                การโอนเงิน 10,000 บาทจาก <strong>นาย A</strong> ไปให้ <strong>นาย B</strong> ในโลกของฐานข้อมูลประกอบด้วย 2 ขั้นตอนแยกกัน:
+                <br><code>1. UPDATE Accounts SET Balance = Balance - 10000 WHERE User = 'A';</code>
+                <br><code>2. UPDATE Accounts SET Balance = Balance + 10000 WHERE User = 'B';</code>
+                <br><br>
+                สมมติว่าขั้นตอนที่ 1 สำเร็จ (ตัดเงิน A ไปแล้ว) แต่ทันใดนั้นเกิด<strong>ไฟดับ เซิร์ฟเวอร์ล่ม หรือเน็ตตัด</strong>ก่อนที่ขั้นตอนที่ 2 จะทำงาน! เงิน 10,000 บาทจะหายวับไปกับตา!<br><br>
+                <strong>Database Transaction</strong> คือกลไกสัญญา <em>"สำเร็จครบทั้งหมด (COMMIT) หรือถ้าพังแม้แต่นิดเดียวให้ย้อนคืนสู่จุดเริ่มต้น (ROLLBACK)"</em> เพื่อรับประกันว่าเงินจะไม่สูญหายและข้อมูลจะถูกต้องสมบูรณ์แบบ 100% เสมอ
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 1: Database Indexing ─── -->
+      <section class="section reveal">
+        <h2 class="section-title">
+          <span class="section-number">01</span>
+          <span>Database Indexing — ผ่าโครงสร้าง B-Tree และเบื้องหลังความเร็ว</span>
+        </h2>
+
+        <p class="lead-text">
+          <strong>Index</strong> ในฐานข้อมูลเชิงสัมพันธ์ (RDBMS เช่น SQL Server, PostgreSQL, MySQL) คือโครงสร้างข้อมูลพิเศษที่สร้างขึ้นเพื่อเพิ่มความเร็วในการค้นหาแถวข้อมูล (Retrieve Rows) โดยใช้โครงสร้างแบบ <strong>B-Tree (Balanced Tree)</strong>
+        </p>
+
+        <!-- B-Tree Visual Representation -->
+        <div class="btree-container">
+          <div style="text-align: center; margin-bottom: var(--space-md);">
+            <span class="badge badge-primary">แผนผังโครงสร้าง B-Tree 3 ระดับ (Balanced Search Tree)</span>
+          </div>
+
+          <!-- Root Level -->
+          <div class="btree-level">
+            <div class="btree-node root">
+              <div class="btree-node-title">Root Node (จุดเริ่มต้น)</div>
+              <div class="btree-keys">
+                <span class="btree-key">Key: 50</span>
+                <span class="btree-key">Key: 100</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Intermediate Level -->
+          <div class="btree-level">
+            <div class="btree-node intermediate">
+              <div class="btree-node-title">Intermediate Node 1</div>
+              <div class="btree-keys">
+                <span class="btree-key">1 - 25</span>
+                <span class="btree-key">26 - 49</span>
+              </div>
+            </div>
+            <div class="btree-node intermediate">
+              <div class="btree-node-title">Intermediate Node 2</div>
+              <div class="btree-keys">
+                <span class="btree-key">51 - 75</span>
+                <span class="btree-key">76 - 99</span>
+              </div>
+            </div>
+            <div class="btree-node intermediate">
+              <div class="btree-node-title">Intermediate Node 3</div>
+              <div class="btree-keys">
+                <span class="btree-key">101 - 150</span>
+                <span class="btree-key">151+</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leaf Level -->
+          <div class="btree-level" style="margin-bottom: 0;">
+            <div class="btree-node leaf">
+              <div class="btree-node-title">Leaf Page 1</div>
+              <div class="btree-keys"><span class="btree-key">ID: 1..25</span></div>
+            </div>
+            <div class="btree-node leaf">
+              <div class="btree-node-title">Leaf Page 2</div>
+              <div class="btree-keys"><span class="btree-key">ID: 26..49</span></div>
+            </div>
+            <div class="btree-node leaf">
+              <div class="btree-node-title">Leaf Page 3</div>
+              <div class="btree-keys"><span class="btree-key">ID: 50..75</span></div>
+            </div>
+            <div class="btree-node leaf">
+              <div class="btree-node-title">Leaf Page 4</div>
+              <div class="btree-keys"><span class="btree-key">ID: 76..100</span></div>
+            </div>
+            <div class="btree-node leaf">
+              <div class="btree-node-title">Leaf Page 5</div>
+              <div class="btree-keys"><span class="btree-key">ID: 101..150</span></div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="mt-xl">เปรียบเทียบ Clustered Index vs Non-Clustered Index</h3>
+
+        <div class="matrix-table-wrapper">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th style="width: 25%;">หัวข้อเปรียบเทียบ</th>
+                <th style="width: 37.5%; color: var(--syn-keyword);">🔴 Clustered Index</th>
+                <th style="width: 37.5%; color: var(--syn-type);">🔵 Non-Clustered Index</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>การจัดเก็บทางกายภาพ (Physical Order)</strong></td>
+                <td>จัดเรียงข้อมูลแถวจริงบน Hard Disk / SSD ตามลำดับของ Index Key</td>
+                <td>สร้างโครงสร้าง B-Tree แยกต่างหาก โดย Leaf Node จะเก็บ Key และตัวชี้ (Pointer / Bookmark) ไปยังแถวจริง</td>
+              </tr>
+              <tr>
+                <td><strong>จำนวนต่อ 1 ตาราง</strong></td>
+                <td><strong>มีได้เพียง 1 ตัวเท่านั้น</strong> ต่อ 1 ตาราง (เพราะข้อมูลจริงจัดเรียงลำดับกายภาพได้แบบเดียว)</td>
+                <td><strong>สร้างได้หลายตัว</strong> (ใน SQL Server สร้างได้สูงสุดถึง 999 ตัวต่อตาราง)</td>
+              </tr>
+              <tr>
+                <td><strong>ค่าเริ่มต้น (Default)</strong></td>
+                <td>ระบบจะสร้างให้อัตโนมัติเมื่อกำหนด <code>PRIMARY KEY</code> ให้ตาราง</td>
+                <td>สร้างเพิ่มเติมเองตามคอลัมน์ที่ถูกค้นหาบ่อยๆ เช่น <code>Email</code>, <code>CitizenId</code>, <code>CreatedDate</code></td>
+              </tr>
+              <tr>
+                <td><strong>Leaf Node เก็บอะไร?</strong></td>
+                <td><strong>Data Pages จริง</strong> ครบทุกคอลัมน์ของแถวนั้น (ไม่ต้องค้นต่อ)</td>
+                <td>Index Key + Clustered Key (หรือ Heap RID) เพื่อใช้ทำ <strong>Key Lookup</strong></td>
+              </tr>
+              <tr>
+                <td><strong>ตัวอย่างการสร้าง</strong></td>
+                <td><code>CREATE CLUSTERED INDEX IX_Users_Id ON Users(UserId);</code></td>
+                <td><code>CREATE NONCLUSTERED INDEX IX_Users_Email ON Users(Email);</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="mt-xl">ศัพท์สำคัญใน Execution Plan: Scan vs Seek</h3>
+        <div class="pillar-grid">
+          <div class="pillar-card">
+            <div class="pillar-card-icon" style="color: var(--accent-danger);">❌</div>
+            <div class="pillar-card-title" style="color: var(--accent-danger);">Table Scan (Heap Scan)</div>
+            <div class="pillar-card-subtitle">ความเร็ว: O(N) — ช้าที่สุด</div>
+            <div class="pillar-card-desc">
+              ตารางไม่มี Clustered Index และไม่มี Index ที่ตรงกับเงื่อนไข Database Engine จึงต้องอ่านข้อมูลทุกหน้าดิสก์ตั้งแต่แถวแรกยันแถวสุดท้าย เปลือง I/O สูงมาก
+            </div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-card-icon" style="color: var(--accent-warning);">⚠️</div>
+            <div class="pillar-card-title" style="color: var(--accent-warning);">Index Scan</div>
+            <div class="pillar-card-subtitle">ความเร็ว: O(N ของ Index) — ปานกลาง</div>
+            <div class="pillar-card-desc">
+              มี Index อยู่ แต่เงื่อนไข WHERE ไม่สามารถกระโดดเจาะจงได้ (เช่น <code>WHERE LastName LIKE '%son'</code>) Database Engine จึงต้องกวาดอ่านทุกหน้าใน Leaf Level ของ Index
+            </div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-card-icon" style="color: var(--accent-success);">⚡</div>
+            <div class="pillar-card-title" style="color: var(--accent-success);">Index Seek</div>
+            <div class="pillar-card-subtitle">ความเร็ว: O(log N) — เร็วที่สุด ยอดเยี่ยม!</div>
+            <div class="pillar-card-desc">
+              Database Engine ใช้คุณสมบัติ B-Tree วิ่งจาก Root Node ตรงดิ่งลงไปยัง Leaf Page ที่ตรงกับเงื่อนไขทันที อ่านหน้าดิสก์เพียง 3-4 หน้า แม้ตารางจะมีข้อมูลเป็นร้อยล้านแถว!
+            </div>
+          </div>
+        </div>
+
+        <h3 class="mt-xl">Covering Index &amp; INCLUDE Columns (เทคนิคระดับ Advance)</h3>
+        <p>
+          เมื่อ Query มีการค้นหาด้วย Non-Clustered Index แต่ต้องการ <code>SELECT</code> คอลัมน์อื่นๆ ที่ไม่ได้อยู่ใน Index ด้วย Database Engine จะต้องทำ <strong>Key Lookup (Bookmark Lookup)</strong> ย้อนกลับไปค้นข้อมูลจริงที่ Clustered Index ซึ่งหากผลลัพธ์มีหลายแถวจะทำให้ช้าลงอย่างมาก
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📜</span>
+              <span>Covering-Index-Optimization.sql</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.textContent='คัดลอกแล้ว!'; setTimeout(()=>this.textContent='คัดลอกโค้ด', 2000)">คัดลอกโค้ด</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-sql">-- สมมติมี Query ที่ระบบ API เรียกใช้งานบ่อยมาก:
+SELECT FirstName, LastName, Email, PhoneNumber 
+FROM Customers 
+WHERE CitizenId = '1234567890123';
+
+-- ❌ แบบที่ 1: สร้าง Index ปกติ (เกิด Key Lookup ไปยัง Clustered Index เพื่อเอา Phone, Name)
+CREATE NONCLUSTERED INDEX IX_Customers_CitizenId 
+ON Customers(CitizenId);
+
+-- ✅ แบบที่ 2: สร้าง Covering Index ด้วย INCLUDE (เร็วกว่ามหาศาล ไม่มี Key Lookup!)
+-- CitizenId จะอยู่ในโครงสร้าง B-Tree สำหรับค้นหา (Seek)
+-- ส่วนคอลัมน์ใน INCLUDE จะถูกเก็บไว้ที่ Leaf Level ไม่เปลืองขนาดของ Tree Node
+CREATE NONCLUSTERED INDEX IX_Customers_CitizenId_Covering 
+ON Customers(CitizenId)
+INCLUDE (FirstName, LastName, Email, PhoneNumber);</code></pre>
+          </div>
+        </div>
+
+        <!-- Interactive Index Seek vs Scan Simulator -->
+        <div class="index-simulator">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: var(--space-md);">
+            <div>
+              <h4 style="margin: 0; font-family: var(--font-heading); color: var(--accent-primary);">🎮 Interactive Simulator: Table Scan vs Index Seek</h4>
+              <p class="text-muted" style="margin: 0; font-size: 0.85rem;">จำลองการค้นหาข้อมูลในตาราง 100 แถวเพื่อดูจำนวน Disk Page I/O ที่ต้องอ่าน</p>
+            </div>
+            <span class="badge badge-info">จำลอง B-Tree 3 ชั้น</span>
+          </div>
+
+          <div class="sim-controls">
+            <label style="font-size: 0.88rem; font-weight: 600;">เลือกเป้าหมาย ID ที่ต้องการค้นหา (1 - 100):</label>
+            <input type="number" id="sim-target-id" value="74" min="1" max="100" style="width: 80px; padding: 6px 10px; background: var(--bg-primary); border: 1px solid var(--border-default); border-radius: var(--radius-sm); color: #fff; font-family: var(--font-code);">
+            <button class="btn btn-primary btn-sm" id="btn-run-sim-seek">⚡ ทดสอบ Index Seek (B-Tree)</button>
+            <button class="btn btn-danger btn-sm" id="btn-run-sim-scan">🐢 ทดสอบ Table Scan (Full Scan)</button>
+            <button class="btn btn-outline btn-sm" id="btn-reset-sim">รีเซ็ต</button>
+          </div>
+
+          <div class="sim-row-grid" id="sim-grid">
+            <!-- Rendered by JS: 100 cells -->
+          </div>
+
+          <div class="sim-result-box">
+            <div>
+              <div class="sim-stat-label">โหมดการค้นหา</div>
+              <div class="sim-stat-val" id="sim-mode-text">-</div>
+            </div>
+            <div>
+              <div class="sim-stat-label">จำนวนหน้า (Pages Read)</div>
+              <div class="sim-stat-val" id="sim-pages-read" style="color: var(--accent-warning);">0</div>
+            </div>
+            <div>
+              <div class="sim-stat-label">สถานะการค้นหา</div>
+              <div class="sim-stat-val" id="sim-status-text" style="color: var(--text-muted); font-size: 1rem;">พร้อมทดสอบ</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-warning mt-lg">
+          <div class="callout-title">⚠️ เมื่อไหร่ที่ Index อาจทำให้ระบบช้าลง? (The Cost of Over-Indexing)</div>
+          <ul style="margin: var(--space-xs) 0 0 var(--space-lg); padding: 0; line-height: 1.6;">
+            <li><strong>Write Overhead (INSERT, UPDATE, DELETE ช้าลง):</strong> ทุกครั้งที่เขียนข้อมูลใหม่ ฐานข้อมูลจะต้องตามไปปรับโครงสร้างและจัดสมดุล B-Tree ของทุก Index ที่เกี่ยวข้อง</li>
+            <li><strong>Disk &amp; RAM Bloat:</strong> หากสร้าง Index มากเกินไป ขนาดไฟล์ Index อาจใหญ่กว่าข้อมูลจริงในตาราง และแย่งพื้นที่ RAM Buffer Pool ของเซิร์ฟเวอร์</li>
+            <li><strong>Page Splits &amp; Fragmentation:</strong> การแทรกข้อมูลแบบสุ่มคีย์ (เช่น Random GUID) เข้าไปในหน้าที่เต็มแล้ว จะทำให้เกิดการแบ่งหน้า (Page Split) ซึ่งลดประสิทธิภาพ I/O ลง</li>
+          </ul>
+        </div>
+
+      </section>
+
+      <!-- ─── Section 2: Subqueries & CTEs ─── -->
+      <section class="section reveal">
+        <h2 class="section-title">
+          <span class="section-number">02</span>
+          <span>Subqueries &amp; CTEs (Common Table Expressions)</span>
+        </h2>
+
+        <p class="lead-text">
+          เมื่อระบบเริ่มมีความซับซ้อน เช่น ต้องหา <em>"ยอดขายของพนักงานที่สูงกว่าค่าเฉลี่ยของแผนกตนเอง"</em> หรือ <em>"การดึงแผนผังสายการบังคับบัญชาแบบลำดับชั้น"</em> การเขียน SQL Query ให้สะอาด อ่านง่าย และประสิทธิภาพสูงถือเป็นทักษะชี้ขาดของ Senior Developer
+        </p>
+
+        <div class="tabs mt-lg">
+          <button class="tab-btn active" data-tab="tab-subquery">1. Subqueries ทั่วไป</button>
+          <button class="tab-btn" data-tab="tab-cte-basic">2. CTE พื้นฐาน (WITH ... AS)</button>
+          <button class="tab-btn" data-tab="tab-cte-recursive">3. Recursive CTE (โครงสร้างองค์กร)</button>
+          <button class="tab-btn" data-tab="tab-window-cte">4. Window Functions + CTE</button>
+        </div>
+
+        <!-- Tab 1: Subqueries -->
+        <div class="tab-content active" id="tab-subquery">
+          <p>
+            <strong>Subquery</strong> คือคำสั่ง <code>SELECT</code> ที่ซ้อนอยู่ภายในคำสั่ง SQL หลัก แบ่งออกเป็น:
+            <br>1. <strong>Scalar Subquery:</strong> คืนค่าแถวเดียวคอลัมน์เดียว
+            <br>2. <strong>Correlated Subquery:</strong> Subquery ที่อ้างอิงค่าจาก Query ด้านนอก (ทำงานซ้ำทุกแถว อาจช้า)
+          </p>
+
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <div class="file-info"><span class="file-icon">📄</span><span>Subquery-Examples.sql</span></div>
+              <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.textContent='คัดลอกแล้ว!'; setTimeout(()=>this.textContent='คัดลอกโค้ด', 2000)">คัดลอกโค้ด</button>
+            </div>
+            <div class="code-block-body">
+              <pre><code class="language-sql">-- ตัวอย่างที่ 1: Scalar Subquery ใน WHERE Clause
+-- หาพนักงานที่มีเงินเดือนสูงกว่า "เงินเดือนเฉลี่ยของทั้งบริษัท"
+SELECT EmployeeId, FirstName, LastName, Salary
+FROM Employees
+WHERE Salary > (SELECT AVG(Salary) FROM Employees);
+
+-- ตัวอย่างที่ 2: Correlated Subquery
+-- หาพนักงานที่มีเงินเดือนสูงกว่า "เงินเดือนเฉลี่ยของแผนกที่ตนเองสังกัด"
+SELECT e.EmployeeId, e.FirstName, e.DepartmentId, e.Salary
+FROM Employees e
+WHERE e.Salary > (
+    SELECT AVG(d.Salary) 
+    FROM Employees d 
+    WHERE d.DepartmentId = e.DepartmentId -- อ้างอิง e จากด้านนอก!
+);</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Basic CTE -->
+        <div class="tab-content" id="tab-cte-basic">
+          <p>
+            <strong>CTE (Common Table Expression)</strong> คือการสร้าง <em>"ตารางผลลัพธ์ชั่วคราวที่มีชื่อ" (Named Temporary Result Set)</em> โดยใช้คีย์เวิร์ด <code>WITH ... AS (...)</code> ทำให้โค้ดแบ่งเป็นสัดส่วน อ่านจากบนลงล่างได้เข้าใจง่ายกว่า Subquery ซ้อนหลายชั้น
+          </p>
+
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <div class="file-info"><span class="file-icon">📄</span><span>CTE-Readable-Query.sql</span></div>
+              <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.textContent='คัดลอกแล้ว!'; setTimeout(()=>this.textContent='คัดลอกโค้ด', 2000)">คัดลอกโค้ด</button>
+            </div>
+            <div class="code-block-body">
+              <pre><code class="language-sql">-- การเขียน CTE หลายตารางพร้อมกันคั่นด้วยเครื่องหมายจุลภาค (,)
+WITH DepartmentAverages AS (
+    -- ขั้นตอนที่ 1: คำนวณเงินเดือนเฉลี่ยของแต่ละแผนก
+    SELECT DepartmentId, AVG(Salary) AS AvgSalary
+    FROM Employees
+    GROUP BY DepartmentId
+),
+HighSalaryEmployees AS (
+    -- ขั้นตอนที่ 2: กรองเฉพาะพนักงานที่เงินเดือนเกิน 50,000
+    SELECT EmployeeId, FirstName, LastName, DepartmentId, Salary
+    FROM Employees
+    WHERE Salary >= 50000
+)
+-- ขั้นตอนที่ 3: รวมผลลัพธ์หลัก (Main Query)
+SELECT 
+    h.EmployeeId,
+    h.FirstName + ' ' + h.LastName AS FullName,
+    h.Salary,
+    d.AvgSalary AS DepartmentAverage,
+    h.Salary - d.AvgSalary AS DifferenceFromAvg
+FROM HighSalaryEmployees h
+INNER JOIN DepartmentAverages d ON h.DepartmentId = d.DepartmentId
+ORDER BY DifferenceFromAvg DESC;</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Recursive CTE -->
+        <div class="tab-content" id="tab-cte-recursive">
+          <p>
+            <strong>Recursive CTE</strong> ใช้สำหรับดึงข้อมูลที่มีความสัมพันธ์แบบลำดับชั้น (Hierarchy / Tree Structure) เช่น <em>ผังโครงสร้างองค์กร (Org Chart)</em>, <em>หมวดหมู่สินค้าย่อยไม่จำกัดระดับ</em> โดยมี 2 ส่วนหลักคือ <strong>Anchor Member</strong> (จุดเริ่มต้น) และ <strong>Recursive Member</strong> (ส่วนเรียกตัวเอง)
+          </p>
+
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <div class="file-info"><span class="file-icon">📄</span><span>Recursive-CTE-OrgChart.sql</span></div>
+              <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.textContent='คัดลอกแล้ว!'; setTimeout(()=>this.textContent='คัดลอกโค้ด', 2000)">คัดลอกโค้ด</button>
+            </div>
+            <div class="code-block-body">
+              <pre><code class="language-sql">-- ดึงสายการบังคับบัญชาตั้งแต่ CEO ลงมาจนถึงพนักงานระดับปฏิบัติการ
+WITH OrgChartHierarchy AS (
+    -- 1. Anchor Member: จุดเริ่มต้น (เช่น CEO ที่ไม่มี Manager / ManagerId IS NULL)
+    SELECT 
+        EmployeeId, 
+        FirstName + ' ' + LastName AS EmployeeName, 
+        ManagerId, 
+        0 AS HierarchyLevel,
+        CAST(FirstName + ' ' + LastName AS VARCHAR(MAX)) AS ReportingPath
+    FROM Employees
+    WHERE ManagerId IS NULL
+
+    UNION ALL
+
+    -- 2. Recursive Member: ดึงลูกน้องที่ขึ้นตรงกับคนที่พบในระดับก่อนหน้า
+    SELECT 
+        e.EmployeeId, 
+        e.FirstName + ' ' + e.LastName AS EmployeeName, 
+        e.ManagerId, 
+        h.HierarchyLevel + 1,
+        h.ReportingPath + ' -> ' + (e.FirstName + ' ' + e.LastName)
+    FROM Employees e
+    INNER JOIN OrgChartHierarchy h ON e.ManagerId = h.EmployeeId
+)
+SELECT 
+    REPLICATE('    ', HierarchyLevel) + EmployeeName AS HierarchyTree,
+    HierarchyLevel,
+    ReportingPath
+FROM OrgChartHierarchy
+ORDER BY ReportingPath;</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Window Functions + CTE -->
+        <div class="tab-content" id="tab-window-cte">
+          <p>
+            หนึ่งใน Pattern ที่ใช้บ่อยที่สุดในระดับ Enterprise คือการใช้ <code>ROW_NUMBER()</code> หรือ <code>DENSE_RANK()</code> ร่วมกับ CTE เพื่อทำ <strong>Pagination</strong> หรือหา <strong>Top N ต่อแต่ละกลุ่ม</strong>
+          </p>
+
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <div class="file-info"><span class="file-icon">📄</span><span>TopN-Per-Group-Pagination.sql</span></div>
+              <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.textContent='คัดลอกแล้ว!'; setTimeout(()=>this.textContent='คัดลอกโค้ด', 2000)">คัดลอกโค้ด</button>
+            </div>
+            <div class="code-block-body">
+              <pre><code class="language-sql">-- โจทย์: หา "พนักงานที่ได้รับเงินเดือนสูงสุด 2 อันดับแรกของแต่ละแผนก"
+WITH RankedSalaries AS (
+    SELECT 
+        EmployeeId,
+        FirstName + ' ' + LastName AS FullName,
+        DepartmentId,
+        Salary,
+        -- แบ่งกลุ่มตาม DepartmentId และจัดอันดับตาม Salary จากมากไปน้อย
+        ROW_NUMBER() OVER (
+            PARTITION BY DepartmentId 
+            ORDER BY Salary DESC
+        ) AS RowNum
+    FROM Employees
+)
+SELECT 
+    DepartmentId,
+    RowNum AS DepartmentRank,
+    FullName,
+    Salary
+FROM RankedSalaries
+WHERE RowNum <= 2
+ORDER BY DepartmentId, RowNum;</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── Section 3: Database Transactions & ACID ─── -->
+      <section class="section reveal">
+        <h2 class="section-title">
+          <span class="section-number">03</span>
+          <span>Database Transactions &amp; ACID Properties</span>
+        </h2>
+
+        <p class="lead-text">
+          ความน่าเชื่อถือของฐานข้อมูลการเงินและระบบธุรกิจขนาดใหญ่ วางอยู่บนรากฐานที่เรียกว่า <strong>ACID Properties</strong>
+        </p>
+
+        <!-- ACID Cards Grid -->
+        <div class="acid-grid">
+          <div class="acid-card card-a">
+            <div class="acid-letter">A</div>
+            <div class="acid-name">Atomicity</div>
+            <div class="acid-thai">(ความเป็นหนึ่งเดียว: All or Nothing)</div>
+            <div class="acid-desc">
+              ทุกคำสั่งย่อยใน Transaction ต้องสำเร็จครบทั้งหมด 100% หากมีคำสั่งใดล้มเหลวแม้แต่คำสั่งเดียว ทุกอย่างต้องถูก <strong>ROLLBACK</strong> ย้อนกลับสู่สถานะเดิม เหมือนไม่เคยมีอะไรเกิดขึ้น
+            </div>
+          </div>
+
+          <div class="acid-card card-c">
+            <div class="acid-letter">C</div>
+            <div class="acid-name">Consistency</div>
+            <div class="acid-thai">(ความถูกต้องตามกฎเกณฑ์)</div>
+            <div class="acid-desc">
+              ข้อมูลที่ถูกบันทึกต้องไม่ละเมิดกฎกติกาของฐานข้อมูล เช่น Foreign Key, Unique Constraints, Check Constraints และ Business Rules (เช่น ยอดคงเหลือห้ามติดลบ)
+            </div>
+          </div>
+
+          <div class="acid-card card-i">
+            <div class="acid-letter">I</div>
+            <div class="acid-name">Isolation</div>
+            <div class="acid-thai">(การแยกส่วนอิสระต่อกัน)</div>
+            <div class="acid-desc">
+              เมื่อมีผู้ใช้งานหรือ Transaction ทำงานพร้อมกันเป็นพันๆ รายการในเวลาเดียวกัน (Concurrency) แต่ละรายการต้องไม่เข้ามาก้าวก่ายหรืออ่านข้อมูลที่ยังแก้ไม่เสร็จของกันและกัน
+            </div>
+          </div>
+
+          <div class="acid-card card-d">
+            <div class="acid-letter">D</div>
+            <div class="acid-name">Durability</div>
+            <div class="acid-thai">(ความคงทนถาวร)</div>
+            <div class="acid-desc">
+              เมื่อ Transaction ได้รับการ <strong>COMMIT</strong> แล้ว ข้อมูลจะถูกบันทึกลงดิสก์และ Transaction Log (WAL) อย่างถาวร แม้ระบบจะไฟดับหรือเซิร์ฟเวอร์ระเบิดในวินาทีถัดไป ข้อมูลก็จะไม่สูญหาย
+            </div>
+          </div>
+        </div>
+
+        <h3 class="mt-xl">ระดับการล็อก (Transaction Isolation Levels)</h3>
+        <p>
+          ในระบบ RDBMS มีการแลกเปลี่ยน (Trade-off) ระหว่าง <strong>ความปลอดภัยของข้อมูล (Consistency)</strong> กับ <strong>ความเร็วในการทำงานพร้อมกัน (Concurrency Performance)</strong>
+        </p>
+
+        <div class="matrix-table-wrapper">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Isolation Level</th>
+                <th>Dirty Read<br><span style="font-weight:400; font-size:0.75rem;">(อ่านข้อมูลยังไม่ Commit)</span></th>
+                <th>Non-Repeatable Read<br><span style="font-weight:400; font-size:0.75rem;">(อ่านซ้ำได้ค่าไม่เท่าเดิม)</span></th>
+                <th>Phantom Read<br><span style="font-weight:400; font-size:0.75rem;">(มีแถวใหม่แทรกเข้ามา)</span></th>
+                <th>ระดับความเร็ว &amp; Locking</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>READ UNCOMMITTED</code></td>
+                <td><span class="badge badge-danger">เกิดได้ ⚠️</span></td>
+                <td><span class="badge badge-danger">เกิดได้ ⚠️</span></td>
+                <td><span class="badge badge-danger">เกิดได้ ⚠️</span></td>
+                <td>เร็วที่สุด ไม่ล็อกแถว (เสี่ยงอ่านข้อมูลขยะ)</td>
+              </tr>
+              <tr>
+                <td><code>READ COMMITTED</code> <span class="badge badge-primary">Default</span></td>
+                <td><span class="badge badge-success">ป้องกันได้ ✅</span></td>
+                <td><span class="badge badge-danger">เกิดได้ ⚠️</span></td>
+                <td><span class="badge badge-danger">เกิดได้ ⚠️</span></td>
+                <td>มาตรฐานของ SQL Server สมดุลดีมาก</td>
+              </tr>
+              <tr>
+                <td><code>REPEATABLE READ</code></td>
+                <td><span class="badge badge-success">ป้องกันได้ ✅</span></td>
+                <td><span class="badge badge-success">ป้องกันได้ ✅</span></td>
+                <td><span class="badge badge-danger">เกิดได้ ⚠️</span></td>
+                <td>ล็อก Shared Lock จนจบ Transaction</td>
+              </tr>
+              <tr>
+                <td><code>SERIALIZABLE</code></td>
+                <td><span class="badge badge-success">ป้องกันได้ ✅</span></td>
+                <td><span class="badge badge-success">ป้องกันได้ ✅</span></td>
+                <td><span class="badge badge-success">ป้องกันได้ ✅</span></td>
+                <td>ปลอดภัยสูงสุดแต่เสี่ยง Deadlock และคิวค้าง</td>
+              </tr>
+              <tr>
+                <td><code>SNAPSHOT</code></td>
+                <td><span class="badge badge-success">ป้องกันได้ ✅</span></td>
+                <td><span class="badge badge-success">ป้องกันได้ ✅</span></td>
+                <td><span class="badge badge-success">ป้องกันได้ ✅</span></td>
+                <td>ใช้ Row Versioning ใน TempDB อ่านไม่บล็อกเขียน</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="mt-xl">การเขียน T-SQL Transaction ระดับ Production ด้วย TRY...CATCH</h3>
+        <p>
+          โครงสร้างมาตรฐานในการเขียน Transaction ในระบบองค์กร ต้องมีบล็อก <code>BEGIN TRY ... BEGIN CATCH</code> และตรวจสอบ <code>@@TRANCOUNT</code> เสมอเพื่อความปลอดภัย
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info"><span class="file-icon">🛡️</span><span>Robust-BankTransfer-Transaction.sql</span></div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.textContent='คัดลอกแล้ว!'; setTimeout(()=>this.textContent='คัดลอกโค้ด', 2000)">คัดลอกโค้ด</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-sql">-- ตัวอย่าง Stored Procedure การโอนเงินที่มี Transaction ปลอดภัย 100%
+CREATE PROCEDURE dbo.sp_TransferMoney
+    @FromAccountId INT,
+    @ToAccountId INT,
+    @Amount DECIMAL(18, 2)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON; -- บังคับ Rollback อัตโนมัติหากเกิดข้อผิดพลาดร้ายแรง
+
+    -- 1. ตรวจสอบเงื่อนไขเบื้องต้น (Validation)
+    IF @Amount <= 0
+    BEGIN
+        RAISERROR('จำนวนเงินที่ต้องการโอนต้องมากกว่า 0 บาท', 16, 1);
+        RETURN;
+    END
+
+    -- 2. เริ่มต้น Transaction
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        -- ตรวจสอบยอดเงินคงเหลือของผู้โอน
+        DECLARE @CurrentBalance DECIMAL(18, 2);
+        SELECT @CurrentBalance = Balance 
+        FROM Accounts WITH (UPDLOCK, HOLDLOCK) -- ล็อกแถวป้องกัน Race Condition
+        WHERE AccountId = @FromAccountId;
+
+        IF @CurrentBalance < @Amount
+        BEGIN
+            -- เงินไม่พอ ให้ Raise Error เพื่อกระโดดไป CATCH
+            THROW 50001, 'ยอดเงินคงเหลือในบัญชีต้นทางไม่เพียงพอสำหรับการโอน', 1;
+        END
+
+        -- ตัดเงินจากบัญชีต้นทาง
+        UPDATE Accounts 
+        SET Balance = Balance - @Amount, UpdatedDate = GETDATE()
+        WHERE AccountId = @FromAccountId;
+
+        -- เพิ่มเงินเข้าบัญชีปลายทาง
+        UPDATE Accounts 
+        SET Balance = Balance + @Amount, UpdatedDate = GETDATE()
+        WHERE AccountId = @ToAccountId;
+
+        -- บันทึกประวัติการทำธุรกรรม (Audit Log)
+        INSERT INTO TransactionLogs (FromAccountId, ToAccountId, Amount, Status, CreatedDate)
+        VALUES (@FromAccountId, @ToAccountId, @Amount, 'SUCCESS', GETDATE());
+
+        -- หากทำงานครบถ้วนสมบูรณ์ ทำการ Commit
+        COMMIT TRANSACTION;
+        PRINT 'การโอนเงินจำนวน ' + CAST(@Amount AS VARCHAR) + ' บาท สำเร็จเรียบร้อย!';
+    END TRY
+    BEGIN CATCH
+        -- 3. หากเกิดข้อผิดพลาด ให้ Rollback ทันที
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRANSACTION;
+        END
+
+        -- บันทึก Log ข้อผิดพลาด
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
+        DECLARE @ErrorState INT = ERROR_STATE();
+
+        PRINT 'เกิดข้อผิดพลาด! ทำการ Rollback ข้อมูลเรียบร้อย: ' + @ErrorMessage;
+        
+        -- ส่งต่อ Error ไปยัง Application Layer (เช่น .NET Web API)
+        THROW @ErrorSeverity, @ErrorMessage, @ErrorState;
+    END CATCH
+END;</code></pre>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── Section 4: Stored Procedures, Functions & Views ─── -->
+      <section class="section reveal">
+        <h2 class="section-title">
+          <span class="section-number">04</span>
+          <span>Stored Procedures, Functions &amp; Views</span>
+        </h2>
+
+        <p class="lead-text">
+          ในฐานข้อมูลขนาดใหญ่ การจัดการ Logic จะถูกแบ่งออกเป็น 3 เครื่องมือหลักตามวัตถุประสงค์การใช้งาน
+        </p>
+
+        <div class="pillar-grid">
+          <!-- Stored Procedures -->
+          <div class="pillar-card">
+            <div class="pillar-card-icon" style="color: var(--accent-primary);">⚙️</div>
+            <div class="pillar-card-title" style="color: var(--accent-primary);">Stored Procedures (SP)</div>
+            <div class="pillar-card-subtitle">ชุดคำสั่งประมวลผลทางธุรกิจ</div>
+            <div class="pillar-card-desc">
+              - คอมไพล์ <strong>Execution Plan</strong> ล่วงหน้าในหน่วยความจำ<br>
+              - รองรับคำสั่ง <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, และ Transactions<br>
+              - มี Input/Output Parameters และ Return Code<br>
+              - ช่วยลด Network Traffic ระหว่าง App กับ Database<br>
+              - <strong>ไม่สามารถ</strong> เรียกใช้ภายในคำสั่ง <code>SELECT ... FROM SP</code> ได้โดยตรง
+            </div>
+          </div>
+
+          <!-- User-Defined Functions -->
+          <div class="pillar-card">
+            <div class="pillar-card-icon" style="color: var(--accent-info);">📐</div>
+            <div class="pillar-card-title" style="color: var(--accent-info);">User-Defined Functions (UDF)</div>
+            <div class="pillar-card-subtitle">สูตรคำนวณและฟังก์ชันส่งค่ากลับ</div>
+            <div class="pillar-card-desc">
+              - ต้องมีคำสั่ง <code>RETURN</code> เสมอ (Scalar หรือ Table-Valued)<br>
+              - <strong>ห้ามแก้ไขข้อมูล</strong> (ห้าม INSERT/UPDATE ในตารางอื่น)<br>
+              - สามารถนำไปเรียกใช้ใน <code>SELECT</code>, <code>WHERE</code>, และ <code>JOIN</code> ได้<br>
+              - ⚠️ <em>คำเตือน:</em> Scalar UDFs ใน WHERE อาจทำให้เกิด RBAR (Row-By-Row) ทำให้ Query ช้าลงมหาศาล
+            </div>
+          </div>
+
+          <!-- Views -->
+          <div class="pillar-card">
+            <div class="pillar-card-icon" style="color: var(--accent-success);">👁️</div>
+            <div class="pillar-card-title" style="color: var(--accent-success);">Views (ตารางเสมือน)</div>
+            <div class="pillar-card-subtitle">บันทึก Query ที่ใช้บ่อย</div>
+            <div class="pillar-card-desc">
+              - ไม่ได้เก็บข้อมูลจริงบนดิสก์ เป็นเพียง Saved Query (ยกเว้น Indexed View)<br>
+              - ช่วยซ่อนความซับซ้อนของการ <code>JOIN</code> หลายตาราง<br>
+              - ช่วยจำกัดสิทธิ์การมองเห็น เช่น ซ่อนคอลัมน์เงินเดือน หรือรหัสผ่าน<br>
+              - <strong>ไม่สามารถรับ Parameter</strong> เข้ามาโดยตรงได้
+            </div>
+          </div>
+        </div>
+
+        <h3 class="mt-xl">ตัวอย่างโค้ด T-SQL: SP vs Function vs View</h3>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info"><span class="file-icon">📜</span><span>Database-Objects-Comparison.sql</span></div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.textContent='คัดลอกแล้ว!'; setTimeout(()=>this.textContent='คัดลอกโค้ด', 2000)">คัดลอกโค้ด</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-sql">-- 1. การสร้าง View สำหรับแสดงรายงานพนักงานแบบปลอดภัย (ซ่อน Salary)
+CREATE VIEW dbo.vw_PublicEmployeeDirectory AS
+SELECT 
+    e.EmployeeId,
+    e.FirstName + ' ' + e.LastName AS FullName,
+    e.Email,
+    d.DepartmentName,
+    e.Position
+FROM Employees e
+INNER JOIN Departments d ON e.DepartmentId = d.DepartmentId;
+
+-- เรียกใช้งาน View เหมือนตารางปกติ:
+SELECT * FROM dbo.vw_PublicEmployeeDirectory WHERE DepartmentName = 'IT';
+
+
+-- 2. การสร้าง Inline Table-Valued Function (iTVF) ที่รับ Parameter
+CREATE FUNCTION dbo.fn_GetEmployeesByMinSalary(@MinSalary DECIMAL(18,2))
+RETURNS TABLE
+AS
+RETURN (
+    SELECT EmployeeId, FirstName, LastName, Salary, DepartmentId
+    FROM Employees
+    WHERE Salary >= @MinSalary
+);
+
+-- เรียกใช้ Function ร่วมกับคำสั่ง SELECT:
+SELECT * FROM dbo.fn_GetEmployeesByMinSalary(45000) WHERE DepartmentId = 1;
+
+
+-- 3. การสร้าง Stored Procedure พร้อม Output Parameter
+CREATE PROCEDURE dbo.sp_GetDepartmentStats
+    @DeptId INT,
+    @TotalEmployees INT OUTPUT,
+    @AvgSalary DECIMAL(18,2) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        @TotalEmployees = COUNT(*),
+        @AvgSalary = ISNULL(AVG(Salary), 0)
+    FROM Employees
+    WHERE DepartmentId = @DeptId;
+END;
+
+-- เรียกใช้งาน Stored Procedure ใน T-SQL:
+DECLARE @Count INT, @Avg DECIMAL(18,2);
+EXEC dbo.sp_GetDepartmentStats @DeptId = 1, @TotalEmployees = @Count OUTPUT, @AvgSalary = @Avg OUTPUT;
+SELECT @Count AS TotalStaff, @Avg AS AverageSalary;</code></pre>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── Section 5: Security & SQL Injection Prevention ─── -->
+      <section class="section reveal">
+        <h2 class="section-title">
+          <span class="section-number">05</span>
+          <span>Security &amp; White-Hat Safety: การป้องกัน SQL Injection 100%</span>
+        </h2>
+
+        <p class="lead-text">
+          <strong>SQL Injection (SQLi)</strong> ติดอันดับ OWASP Top 10 มาอย่างยาวนาน เกิดจากการที่โปรแกรมนำข้อมูลจาก User Input มาต่อสตริง (String Concatenation) เข้ากับคำสั่ง SQL โดยตรง ทำให้ผู้โจมตีสามารถแทรกคำสั่ง SQL ปลอมปนเข้าไปควบคุมฐานข้อมูลได้
+        </p>
+
+        <!-- Interactive SQL Injection Simulator -->
+        <div class="sqli-sandbox">
+          <div class="sqli-sandbox-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.2rem;">🛡️</span>
+              <span style="font-family: var(--font-heading); font-weight: 700; color: var(--text-primary);">Interactive SQL Injection Vulnerability Lab</span>
+            </div>
+            <span class="badge badge-warning">Live Demonstration</span>
+          </div>
+          <div class="sqli-sandbox-body">
+            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: var(--space-md);">
+              ทดลองกรอกชื่อผู้ใช้และรหัสผ่าน หรือคลิกปุ่ม <strong>Payload ตัวอย่าง</strong> ด้านล่างเพื่อดูว่าระบบ Dynamic SQL ที่มีช่องโหว่ vs ระบบ Parameterized Query ที่ปลอดภัย ทำงานต่างกันอย่างไร:
+            </p>
+
+            <div class="sqli-input-row">
+              <div class="sqli-field">
+                <label>Username / อีเมลผู้ใช้:</label>
+                <input type="text" id="sqli-user-input" value="admin' --">
+                <div class="preset-btn-group">
+                  <span style="font-size: 0.72rem; color: var(--text-muted); align-self: center;">ลองคลิก:</span>
+                  <button class="preset-btn" data-user="admin' --" data-pass="anything">1. Bypass Auth (admin' --)</button>
+                  <button class="preset-btn" data-user="' OR '1'='1' --" data-pass="xyz">2. Dump All (' OR '1'='1')</button>
+                  <button class="preset-btn" data-user="'; DROP TABLE Users; --" data-pass="123">3. Drop Table ('; DROP...)</button>
+                  <button class="preset-btn" data-user="somchai@mail.com" data-pass="P@ssw0rd123">4. ผู้ใช้ปกติ (Clean)</button>
+                </div>
+              </div>
+              <div class="sqli-field">
+                <label>Password / รหัสผ่าน:</label>
+                <input type="text" id="sqli-pass-input" value="anything">
+              </div>
+            </div>
+
+            <div class="sqli-comparison-grid">
+              <!-- Vulnerable Dynamic SQL -->
+              <div class="sqli-box vulnerable">
+                <div class="sqli-box-title">
+                  <span>❌ 1. Dynamic String Concatenation (มีช่องโหว่ร้ายแรง)</span>
+                </div>
+                <div class="sqli-code-preview" id="sqli-preview-vulnerable">
+                  <!-- Generated by JS -->
+                </div>
+                <div id="sqli-status-vulnerable">
+                  <!-- Status text -->
+                </div>
+              </div>
+
+              <!-- Secure Parameterized Query -->
+              <div class="sqli-box secure">
+                <div class="sqli-box-title">
+                  <span>✅ 2. Parameterized Query / ORM (ปลอดภัย 100%)</span>
+                </div>
+                <div class="sqli-code-preview" id="sqli-preview-secure">
+                  <!-- Generated by JS -->
+                </div>
+                <div id="sqli-status-secure">
+                  <!-- Status text -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <h3 class="mt-xl">การเขียนโค้ดภาษา C# .NET ที่ปลอดภัยจาก SQL Injection</h3>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info"><span class="file-icon">🔷</span><span>SecureDataAccess.cs</span></div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.textContent='คัดลอกแล้ว!'; setTimeout(()=>this.textContent='คัดลอกโค้ด', 2000)">คัดลอกโค้ด</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">// ❌ ห้ามทำเด็ดขาด: String Interpolation / String Concatenation
+string sqlDangerous = $"SELECT * FROM Users WHERE Username = '{username}' AND Password = '{password}';";
+
+// ══════════════════════════════════════════════════════════
+// ✅ วิธีที่ 1: ADO.NET ด้วย SqlCommand + Parameters (ปลอดภัย 100%)
+// ══════════════════════════════════════════════════════════
+using (var connection = new SqlConnection(connectionString))
+{
+    await connection.OpenAsync();
+    string sql = "SELECT UserId, FullName, Email FROM Users WHERE Username = @Username AND PasswordHash = @PasswordHash";
+    
+    using (var command = new SqlCommand(sql, connection))
+    {
+        // กำหนด Type และ Value ชัดเจน Database Engine จะมองค่าเป็น Data Literal เสมอ ไม่รันเป็น Code
+        command.Parameters.Add("@Username", SqlDbType.NVarChar, 50).Value = username;
+        command.Parameters.Add("@PasswordHash", SqlDbType.NVarChar, 128).Value = passwordHash;
+
+        using (var reader = await command.ExecuteReaderAsync())
+        {
+            while (await reader.ReadAsync())
+            {
+                // ประมวลผลข้อมูล...
+            }
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════════
+// ✅ วิธีที่ 2: ใช้ Dapper (Micro-ORM ยอดนิยมใน .NET)
+// ══════════════════════════════════════════════════════════
+var user = await connection.QueryFirstOrDefaultAsync&lt;User&gt;(
+    "SELECT * FROM Users WHERE Username = @Username AND PasswordHash = @PasswordHash",
+    new { Username = username, PasswordHash = passwordHash } // Dapper สร้าง Parameter ให้อัตโนมัติ!
+);
+
+// ══════════════════════════════════════════════════════════
+// ✅ วิธีที่ 3: ใช้ Entity Framework Core (LINQ Parameterization)
+// ══════════════════════════════════════════════════════════
+var authUser = await dbContext.Users
+    .Where(u => u.Username == username && u.PasswordHash == passwordHash)
+    .FirstOrDefaultAsync(); // EF Core แปลงเป็น Parameterized SQL อัตโนมัติ</code></pre>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── Section 6: Interactive Quiz ─── -->
+      <section class="section reveal">
+        <h2 class="section-title">
+          <span class="section-number">06</span>
+          <span>แบบทดสอบประเมินความรู้ (Quiz Arena: SQL Advanced)</span>
+        </h2>
+        <p class="lead-text">ทดสอบความเข้าใจเกี่ยวกับ Indexing, ACID Transactions, CTEs และความปลอดภัย เพื่อรับ <strong>+100 XP</strong></p>
+
+        <!-- Quiz Container rendered by QuizEngine -->
+        <div id="sql-advanced-quiz"></div>
+      </section>
+
+      <!-- ─── Next Lesson Navigation ─── -->
+      <div class="card mt-2xl reveal" style="border-color: var(--border-active); background: linear-gradient(135deg, rgba(248, 81, 73, 0.1) 0%, rgba(22, 27, 34, 0.8) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge badge-success mb-xs">🎉 ยอดเยี่ยม! ผ่านบทเรียน SQL ระดับกลาง-สูง</span>
+            <h3 style="margin-top: 4px; margin-bottom: 4px;">พร้อมไปต่อกับ Entity Framework Core แล้วหรือยัง?</h3>
+            <p class="text-muted" style="margin-bottom: 0;">เรียนรู้การเชื่อมต่อ Database ด้วย C# ORM สมัยใหม่: DbContext, LINQ, Migrations, และ Lazy vs Eager Loading</p>
+          </div>
+          <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+            <a href="./sql-playground.html" class="btn btn-outline">
+              <span>💻 ลองเล่น SQL Playground</span>
+            </a>
+            <a href="./ef-core.html" class="btn btn-primary btn-lg">
+              <span>ไปบทเรียนถัดไป: EF Core →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Mark lesson completion & progress
+      if (typeof Progress !== 'undefined') {
+        Progress.completeLesson('sql-advanced');
+        Progress.setModuleProgress('database', 50);
+      }
+
+      // 2. Interactive Index Seek vs Scan Simulator Logic
+      const grid = document.getElementById('sim-grid');
+      const targetInput = document.getElementById('sim-target-id');
+      const btnSeek = document.getElementById('btn-run-sim-seek');
+      const btnScan = document.getElementById('btn-run-sim-scan');
+      const btnReset = document.getElementById('btn-reset-sim');
+      const modeText = document.getElementById('sim-mode-text');
+      const pagesRead = document.getElementById('sim-pages-read');
+      const statusText = document.getElementById('sim-status-text');
+
+      // Generate 100 cells
+      for (let i = 1; i <= 100; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'sim-cell';
+        cell.id = `cell-${i}`;
+        cell.textContent = i;
+        grid.appendChild(cell);
+      }
+
+      function resetGrid() {
+        document.querySelectorAll('.sim-cell').forEach(c => {
+          c.className = 'sim-cell';
+        });
+        modeText.textContent = '-';
+        pagesRead.textContent = '0';
+        statusText.textContent = 'พร้อมทดสอบ';
+        statusText.style.color = 'var(--text-muted)';
+      }
+
+      btnReset.addEventListener('click', resetGrid);
+
+      // Seek simulation (O(log N))
+      btnSeek.addEventListener('click', () => {
+        resetGrid();
+        const target = parseInt(targetInput.value) || 50;
+        if (target < 1 || target > 100) return;
+
+        modeText.textContent = 'Index Seek (B-Tree 3 Levels)';
+        modeText.style.color = 'var(--accent-success)';
+        statusText.textContent = 'กำลังกระโดดตาม B-Tree...';
+
+        // B-Tree jumps: Root (jump 1) -> Intermediate (jump 2) -> Leaf (jump 3) -> Found
+        setTimeout(() => {
+          const targetCell = document.getElementById(`cell-${target}`);
+          if (targetCell) {
+            targetCell.classList.add('seek-found');
+            targetCell.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+          pagesRead.textContent = '3 Pages (Root -> Intermediate -> Leaf)';
+          statusText.textContent = `⚡ เจอข้อมูล ID ${target} สำเร็จใน 3 I/O!`;
+          statusText.style.color = 'var(--accent-success)';
+        }, 350);
+      });
+
+      // Scan simulation (O(N))
+      btnScan.addEventListener('click', () => {
+        resetGrid();
+        const target = parseInt(targetInput.value) || 50;
+        if (target < 1 || target > 100) return;
+
+        modeText.textContent = 'Table Scan (อ่านทีละหน้า)';
+        modeText.style.color = 'var(--accent-danger)';
+        statusText.textContent = 'กำลังไล่กวาดอ่านทุกแถวตั้งแต่แถวที่ 1...';
+
+        let current = 1;
+        btnScan.disabled = true;
+        btnSeek.disabled = true;
+
+        const interval = setInterval(() => {
+          const cell = document.getElementById(`cell-${current}`);
+          if (cell) {
+            cell.classList.add('scanned');
+            if (current % 10 === 0) cell.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+          pagesRead.textContent = `${current} Pages`;
+
+          if (current === target) {
+            clearInterval(interval);
+            if (cell) {
+              cell.classList.remove('scanned');
+              cell.classList.add('seek-found');
+            }
+            statusText.textContent = `🐢 พบข้อมูลแล้ว แต่ต้องอ่านไปถึง ${current} แถว!`;
+            statusText.style.color = 'var(--accent-warning)';
+            btnScan.disabled = false;
+            btnSeek.disabled = false;
+          } else if (current >= 100) {
+            clearInterval(interval);
+            btnScan.disabled = false;
+            btnSeek.disabled = false;
+          }
+          current++;
+        }, 20);
+      });
+
+      // 3. Interactive SQL Injection Sandbox Logic
+      const userInput = document.getElementById('sqli-user-input');
+      const passInput = document.getElementById('sqli-pass-input');
+      const previewVuln = document.getElementById('sqli-preview-vulnerable');
+      const previewSec = document.getElementById('sqli-preview-secure');
+      const statusVuln = document.getElementById('sqli-status-vulnerable');
+      const statusSec = document.getElementById('sqli-status-secure');
+
+      function updateSQLiDemo() {
+        const u = userInput.value;
+        const p = passInput.value;
+
+        // Dynamic SQL
+        previewVuln.innerHTML = `<span style="color:var(--syn-keyword);">SELECT</span> * <span style="color:var(--syn-keyword);">FROM</span> Users \n<span style="color:var(--syn-keyword);">WHERE</span> Username = <span style="color:var(--accent-danger); font-weight:bold;">'${escapeHTML(u)}'</span> \n  <span style="color:var(--syn-keyword);">AND</span> Password = <span style="color:var(--syn-string);">'${escapeHTML(p)}'</span>;`;
+
+        // Check if vulnerable payload detected
+        if (u.includes("'") || u.includes("--") || u.includes("OR") || u.includes(";")) {
+          statusVuln.innerHTML = `<span class="sqli-status-badge status-hacked">🚨 โดนแฮก! คำสั่ง SQL ถูกดัดแปลงโครงสร้าง (SQL Injected)</span><div style="font-size:0.78rem; color:var(--accent-danger); margin-top:4px;">ตัวตัดสตริง ' ทำให้เงื่อนไขหลัง -- กลายเป็นคอมเมนต์ ส่งผลให้ล็อกอินผ่านโดยไม่ต้องรู้รหัสผ่าน!</div>`;
+        } else {
+          statusVuln.innerHTML = `<span class="sqli-status-badge" style="background:rgba(88,166,255,0.15); color:var(--accent-primary);">ℹ️ อินพุตปกติ แต่ยังมีความเสี่ยงหากผู้ใช้พิมพ์ ' เข้ามา</span>`;
+        }
+
+        // Secure Parameterized
+        previewSec.innerHTML = `<span style="color:var(--syn-keyword);">-- ฐานข้อมูลคอมไพล์โครงสร้างคำสั่งก่อน:</span>\n<span style="color:var(--syn-keyword);">SELECT</span> * <span style="color:var(--syn-keyword);">FROM</span> Users \n<span style="color:var(--syn-keyword);">WHERE</span> Username = <span style="color:var(--accent-success); font-weight:bold;">@Username</span> \n  <span style="color:var(--syn-keyword);">AND</span> Password = <span style="color:var(--accent-success); font-weight:bold;">@Password</span>;\n\n<span style="color:var(--text-muted);">-- ค่า Parameter ถูกส่งแยกเป็น Data Literal:</span>\n@Username = <span style="color:var(--syn-string);">"${escapeHTML(u)}"</span>\n@Password = <span style="color:var(--syn-string);">"${escapeHTML(p)}"</span>`;
+        statusSec.innerHTML = `<span class="sqli-status-badge status-safe">🛡️ ปลอดภัย 100% — DB มองค่าทั้งหมดเป็น String ธรรมดา ไม่ Execute คำสั่ง</span>`;
+      }
+
+      function escapeHTML(str) {
+        return str.replace(/[&<>'"]/g, tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag));
+      }
+
+      userInput.addEventListener('input', updateSQLiDemo);
+      passInput.addEventListener('input', updateSQLiDemo);
+
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          userInput.value = btn.getAttribute('data-user');
+          passInput.value = btn.getAttribute('data-pass');
+          updateSQLiDemo();
+        });
+      });
+
+      updateSQLiDemo();
+
+      // 4. Tabs handling
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabBtns.forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          btn.classList.add('active');
+          const targetId = btn.getAttribute('data-tab');
+          const targetContent = document.getElementById(targetId);
+          if (targetContent) targetContent.classList.add('active');
+        });
+      });
+
+      // 5. Quiz Questions
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'medium',
+          question: 'ข้อใดอธิบายความแตกต่างระหว่าง Clustered Index และ Non-Clustered Index ในฐานข้อมูลได้ถูกต้องที่สุด?',
+          options: [
+            'Clustered Index มีได้หลายตัวในตารางเดียว ส่วน Non-Clustered Index มีได้เพียง 1 ตัวเท่านั้น',
+            'Clustered Index จัดเรียงตำแหน่งข้อมูลกายภาพจริงบนดิสก์ตาม Index Key ส่วน Non-Clustered Index คือโครงสร้าง B-Tree แยกต่างหากที่ชี้ไปยังข้อมูลจริง',
+            'Non-Clustered Index ทำงานเร็วกว่า Clustered Index เสมอในทุกกรณี',
+            'Clustered Index ใช้สำหรับข้อมูลประเภทข้อความเท่านั้น ส่วน Non-Clustered Index ใช้สำหรับตัวเลข'
+          ],
+          answer: 1,
+          explanation: 'Clustered Index จัดเรียงลำดับแถวข้อมูลจริงบน Physical Storage ตาม Index Key จึงมีได้เพียง 1 ตัวต่อตาราง (มักเป็น Primary Key) ส่วน Non-Clustered Index เป็นโครงสร้าง Tree เสริมที่ชี้ Bookmark กลับมายังข้อมูลจริง'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'medium',
+          question: 'ในหลักการ ACID คุณสมบัติ "Atomicity" (ความเป็นหนึ่งเดียว) หมายถึงข้อใด?',
+          options: [
+            'การล็อกข้อมูลไม่ให้ Transaction อื่นอ่านข้อมูลพร้อมกันได้',
+            'การบันทึกข้อมูลลงดิสก์อย่างถาวรแม้ไฟดับข้อมูลก็ไม่สูญหาย',
+            'คำสั่งย่อยทั้งหมดใน Transaction ต้องทำงานสำเร็จครบ 100% หรือหากมีคำสั่งใดล้มเหลวต้อง Rollback ยกเลิกทั้งหมด (All or Nothing)',
+            'การตรวจสอบความถูกต้องของ Foreign Key และ Check Constraints'
+          ],
+          answer: 2,
+          explanation: 'Atomicity (A ใน ACID) หมายถึง ความเป็นหนึ่งเดียวแบบ "All or Nothing" หากเกิดข้อผิดพลาดในขั้นตอนใดขั้นตอนหนึ่ง ระบบต้องย้อนคืนสถานะเดิมทั้งหมด'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'medium',
+          question: 'ประโยชน์หลักของ CTE (Common Table Expression) ด้วยคำสั่ง WITH ... AS (...) คือข้อใด?',
+          options: [
+            'ทำให้คำสั่ง SQL รันเร็วกว่า Stored Procedure เสมอ 10 เท่า',
+            'ช่วยแบ่ง Query ที่ซับซ้อนให้เป็นสัดส่วน อ่านง่าย บำรุงรักษาง่าย และรองรับการดึงข้อมูลแบบลำดับชั้น (Recursive CTE)',
+            'ใช้สำหรับสร้างตารางจริงลง Hard Disk อย่างถาวร',
+            'ป้องกันไม่ให้เกิด Deadlock ในระดับ Database Server'
+          ],
+          answer: 1,
+          explanation: 'CTE ช่วยให้เราจัดโครงสร้าง Query ที่ซับซ้อนให้เป็นตารางชั่วคราวที่มีชื่อ อ่านโค้ดแบบ Top-to-Bottom ได้ง่ายขึ้น และสามารถเขียน Recursive CTE สำหรับข้อมูลแบบ Hierarchical/Tree ได้อย่างมีประสิทธิภาพ'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'hard',
+          question: 'Isolation Level ระดับใดใน SQL Server ที่ป้องกันได้ทั้ง Dirty Read, Non-Repeatable Read และ Phantom Read โดยใช้การจัดคิวแบบเข้มงวดที่สุด?',
+          options: [
+            'READ UNCOMMITTED',
+            'READ COMMITTED',
+            'REPEATABLE READ',
+            'SERIALIZABLE'
+          ],
+          answer: 3,
+          explanation: 'SERIALIZABLE คือ Transaction Isolation Level สูงสุดที่ป้องกันปัญหา Dirty Read, Non-Repeatable Read และ Phantom Read ได้ทั้งหมด แต่จะมีการล็อกช่วงข้อมูล (Range Locks) สูงสุดทำให้ Concurrency ลดลง'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'medium',
+          question: 'เหตุใดการใช้ Parameterized Queries (เช่น SqlCommand.Parameters หรือ Dapper) จึงสามารถป้องกันช่องโหว่ SQL Injection ได้ 100%?',
+          options: [
+            'เพราะระบบจะทำการเข้ารหัสรหัสผ่านด้วย SHA-256 ก่อนส่งเข้า Database',
+            'เพราะ Database Engine จะคอมไพล์โครงสร้างคำสั่ง SQL ล่วงหน้า และปฏิบัติกับค่าของ Parameter ในฐานะ "ข้อมูล (Data Literal)" เสมอ ไม่นำมาแปลผลเป็นโค้ดคำสั่ง',
+            'เพราะมันจะทำการลบเครื่องหมาย Single Quote (\') ทิ้งโดยอัตโนมัติ',
+            'เพราะมันทำงานบน Memory ชนิดพิเศษที่ไม่สามารถถูกแฮกได้'
+          ],
+          answer: 1,
+          explanation: 'Parameterized Query แยก "โครงสร้างคำสั่ง (Query Plan)" ออกจาก "ข้อมูลอินพุต (Parameters)" อย่างเด็ดขาด Database Engine จึงมองค่าทุกอย่างใน Parameter เป็น Data เสมอ ไม่ว่าผู้ใช้จะใส่เครื่องหมาย \' OR \'1\'=\'1\' หรือคำสั่ง DROP TABLE เข้ามาก็ตาม'
+        }
+      ];
+
+      // Initialize Quiz Engine
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('sql-advanced-quiz', quizQuestions, {
+          quizId: 'sql-advanced',
+          showTimer: false,
+          showExplanation: true
+        });
+      }
+    });
+  </script>
+</body>
+</html>

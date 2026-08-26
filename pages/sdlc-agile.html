@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDLC & Agile Scrum สำหรับ Junior Developer — DotNet Learning Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">📋</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน</a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP</a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections & LINQ</a>
+    <a href="./csharp-advanced.html" class="sidebar-link"><span class="link-icon">📕</span> C# ขั้นสูง</a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET</a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection</a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware</a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-link"><span class="link-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link"><span class="link-icon">🎮</span> SQL Playground</a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link"><span class="link-icon">🧩</span> Blazor Components</a>
+    <a href="./xaml-basics.html" class="sidebar-link"><span class="link-icon">📐</span> XAML พื้นฐาน</a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML & JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps & Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git & CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link"><span class="link-icon">🛡️</span> Secure Coding</a>
+
+    <div class="sidebar-section-title">🟡 Web & คุณภาพ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link"><span class="link-icon">👀</span> Code Review</a>
+    <a href="./sdlc-agile.html" class="sidebar-link active"><span class="link-icon">📋</span> SDLC & Agile <span class="link-badge badge-basic">พื้นฐาน</span></a>
+    <a href="./tech-docs.html" class="sidebar-link"><span class="link-icon">📝</span> Technical Docs</a>
+    <a href="./architecture.html" class="sidebar-link"><span class="link-icon">🏛️</span> Architecture</a>
+
+    <div class="sidebar-section-title">🎮 Games & Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> เตรียมสัมภาษณ์</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header reveal">
+            <div class="breadcrumb">
+                <a href="../index.html">🏠 หน้าแรก</a>
+                <span>/</span>
+                <span>Process Track</span>
+                <span>/</span>
+                <span>SDLC & Agile Scrum</span>
+            </div>
+            <div class="page-title">
+                <div class="title-icon" style="background: var(--cat-process); color: #fff;">📋</div>
+                <h1>SDLC & Agile Scrum สำหรับ Junior .NET Developer</h1>
+            </div>
+            <p class="page-description">
+                วงจรการพัฒนาซอฟต์แวร์ (SDLC), พิธีกรรมของ Scrum (Sprint Events), การประเมิน Story Points, การเขียน User Stories และการประสานงานกับ BA/QA
+            </p>
+            <div class="page-meta">
+                <span class="meta-item">⭐ ระดับ: พื้นฐาน</span>
+                <span class="meta-item">⏱️ เวลา: ~40 นาที</span>
+                <span class="meta-item">⚡ รางวัล: +100 XP</span>
+                <span class="meta-item">🏷️ Agile / Scrum / BA & QA</span>
+            </div>
+        </div>
+
+        <!-- Analogy Section -->
+        <div class="concept-card reveal">
+            <div class="concept-header">
+                <span class="concept-emoji">🏉</span>
+                <span class="concept-title">เปรียบเทียบให้เห็นภาพ: ทีมรักบี้และเรือใบนำทาง</span>
+            </div>
+            <div class="concept-body">
+                <div class="analogy-box">
+                    <div class="analogy-label">💡 Analogy</div>
+                    <p class="analogy-text">
+                        • <strong>Waterfall (แบบเดิม):</strong> เหมือน <strong>การยิงจรวดไปดาวอังคาร</strong> วางแผนล่วงหน้า 2 ปี ยิงออกไปแล้วเปลี่ยนทิศทางไม่ได้ ถ้าคำนวณพลาดคือระเบิดกลางอวกาศ<br>
+                        • <strong>Agile & Scrum:</strong> เหมือน <strong>การล่องเรือใบข้ามทะเล</strong> แบ่งการเดินทางเป็นรอบสั้นๆ รอบละ 2 สัปดาห์ (Sprint) ปรับใบเรือตามกระแสลมและความต้องการของลูกค้าอย่างต่อเนื่อง ส่งมอบฟีเจอร์ที่ใช้งานได้จริง (Working Software) อย่างสม่ำเสมอ
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Scrum Ceremonies -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-process); color: #fff;">01</div>
+                <h2>4 พิธีกรรมหลักของ Scrum (Scrum Events)</h2>
+            </div>
+
+            <div class="grid grid-2 mb-lg">
+                <div class="card">
+                    <h3 style="color: var(--accent-primary); margin-bottom: 6px;">📅 1. Sprint Planning</h3>
+                    <p class="text-sm">• ทีม Dev, PO (Product Owner), และ Scrum Master ร่วมกันเลือก User Stories จาก Product Backlog เข้าสู่ Sprint Backlog<br>
+                    • ประเมินความยากด้วย <strong>Story Points (Fibonacci: 1, 2, 3, 5, 8, 13)</strong> และแตกเป็น Subtasks ทางเทคนิค</p>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--accent-success); margin-bottom: 6px;">☀️ 2. Daily Standup (15 นาที)</h3>
+                    <p class="text-sm">ประชุมสั้นๆ ทุกเช้าเพื่ออัปเดต 3 คำถาม:<br>
+                    1. <i>เมื่อวานทำอะไรเสร็จไปบ้าง?</i><br>
+                    2. <i>วันนี้มีแผนจะทำอะไรต่อ?</i><br>
+                    3. <i>มีปัญหาติดขัด (Blocker / Impediment) อะไรไหมที่ต้องการความช่วยเหลือ?</i></p>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--accent-warning); margin-bottom: 6px;">🎯 3. Sprint Review & Demo</h3>
+                    <p class="text-sm">• นำเสนอระบบหรือฟีเจอร์ที่พัฒนาเสร็จใน Sprint ให้ Stakeholders และ PO ดูเพื่อรับ Feedback ทันที</p>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--accent-info); margin-bottom: 6px;">🔍 4. Sprint Retrospective</h3>
+                    <p class="text-sm">• ทบทวนกระบวนการทำงานในทีม: <strong>What went well</strong> (สิ่งที่ดีทำต่อ), <strong>What can be improved</strong> (จุดที่ต้องปรับปรุง), และ <strong>Action Items</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: User Story & Acceptance Criteria -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-process); color: #fff;">02</div>
+                <h2>โครงสร้าง User Story & Acceptance Criteria (DoD)</h2>
+            </div>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> ตัวอย่าง User Story จาก Business Analyst (BA)</div>
+                </div>
+                <div class="code-block-body">
+<pre class="language-text"><code>[User Story]
+As a (ในฐานะ): สมาชิก VIP ของร้านค้า
+I want to (ฉันต้องการ): สามารถดูประวัติการสั่งซื้อย้อนหลัง 6 เดือนได้
+So that (เพื่อที่): ฉันสามารถตรวจสอบยอดสะสมแต้มและพิมพ์ใบเสร็จย้อนหลังได้
+
+[Acceptance Criteria (เงื่อนไขการตรวจรับของ QA)]
+Given: ผู้ใช้ล็อกอินเข้าสู่ระบบด้วยบัญชีสมาชิก VIP
+When: กดเปิดหน้า "ประวัติการสั่งซื้อ"
+Then: ระบบต้องแสดงรายการสั่งซื้อเรียงจากล่าสุดไปเก่าสุด พร้อมสถานะการชำระเงิน
+And: หากไม่มีรายการสั่งซื้อ ต้องแสดงข้อความ "ยังไม่มีประวัติการสั่งซื้อ"
+And: ต้องตอบสนองภายใน 1.5 วินาที (Performance requirement)</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Quiz -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-warning); color: #000;">🎯</div>
+                <h2>แบบทดสอบความเข้าใจ: SDLC & Agile</h2>
+            </div>
+            <div id="sdlc-agile-quiz"></div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/quiz-engine.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'ในการประชุม Daily Standup ข้อใดไม่ใช่ 1 ใน 3 คำถามหลัก?',
+                options: [
+                    'เมื่อวานทำอะไรเสร็จไปบ้าง',
+                    'วันนี้จะทำอะไรต่อ',
+                    'ใครเขียนโค้ดช้าที่สุดในทีม',
+                    'มีปัญหาติดขัด (Blocker) อะไรไหม'
+                ],
+                answer: 2,
+                explanation: 'Daily Standup เน้นการประสานงานและการช่วยปลดบล็อกงาน ไม่ใช่การประเมินหรือจับผิดบุคคล',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'พิธีกรรมใดใน Scrum ที่จัดขึ้นเพื่อทบทวน "กระบวนการทำงานและปฏิสัมพันธ์ในทีม" เพื่อนำไปปรับปรุงใน Sprint ถัดไป?',
+                options: ['Sprint Retrospective', 'Sprint Planning', 'Sprint Review', 'Daily Standup'],
+                answer: 0,
+                explanation: 'Sprint Retrospective เป็นพื้นที่ปลอดภัยสำหรับทีมในการสะท้อนปัญหาและสร้าง Action Items เพื่อปรับปรุงกระบวนการทำงาน',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Definition of Done (DoD) ใน Agile มีความสำคัญอย่างไร?',
+                options: [
+                    'เป็นข้อตกลงร่วมกันว่างานจะถือว่าเสร็จสมบูรณ์เมื่อผ่านเกณฑ์ใดบ้าง (เช่น Code Passed, Unit Tested, Code Reviewed, QA Verified)',
+                    'เป็นวันหมดอายุของสัญญาจ้าง',
+                    'เป็นเวลาเลิกงานของโปรแกรมเมอร์',
+                    'เป็นจำนวนเงินงบประมาณ'
+                ],
+                answer: 0,
+                explanation: 'DoD คือเกณฑ์คุณภาพมาตรฐานที่งานทุกชิ้นต้องผ่านก่อนจะส่งมอบสู่ Production',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'บทบาทใดใน Scrum มีหน้าที่รับผิดชอบในการจัดลำดับความสำคัญของ Product Backlog ตามมูลค่าทางธุรกิจ?',
+                options: ['Product Owner (PO)', 'Scrum Master', 'Junior Developer', 'DevOps Engineer'],
+                answer: 0,
+                explanation: 'Product Owner (PO) เป็นตัวแทนของธุรกิจและลูกค้า มีหน้าที่ตัดสินใจและเรียงลำดับ Value ของงานใน Backlog',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'เมื่อ Junior Developer เจอปัญหาติดขัด (Blocker) ที่ทำให้งานไม่เดินหน้าเกินกว่า 2 ชั่วโมง ควรทำอย่างไร?',
+                options: [
+                    'นั่งเงียบๆ พยายามแก้คนเดียวต่อไปอีก 3 วัน',
+                    'แจ้งใน Daily Standup หรือขอคำปรึกษาจาก Senior Developer / Tech Lead ทันที',
+                    'แอบลบ Task ทิ้ง',
+                    'โทษทีม QA'
+                ],
+                answer: 1,
+                explanation: 'การสื่อสารและขอความช่วยเหลืออย่างรวดเร็ว (Fail fast, ask early) เป็นคุณสมบัติสำคัญของ Junior Developer มืออาชีพ',
+                difficulty: 'basic'
+            }
+        ];
+
+        QuizEngine.start('sdlc-agile-quiz', questions, {
+            quizId: 'sdlc-agile',
+            onComplete: () => {
+                Progress.completeLesson('sdlc-agile');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

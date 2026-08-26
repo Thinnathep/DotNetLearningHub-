@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Review & SOLID Principles — DotNet Learning Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">👀</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน</a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP</a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections & LINQ</a>
+    <a href="./csharp-advanced.html" class="sidebar-link"><span class="link-icon">📕</span> C# ขั้นสูง</a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET</a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection</a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware</a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-link"><span class="link-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link"><span class="link-icon">🎮</span> SQL Playground</a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link"><span class="link-icon">🧩</span> Blazor Components</a>
+    <a href="./xaml-basics.html" class="sidebar-link"><span class="link-icon">📐</span> XAML พื้นฐาน</a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML & JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps & Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git & CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link"><span class="link-icon">🛡️</span> Secure Coding</a>
+
+    <div class="sidebar-section-title">🟡 Web & คุณภาพ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link active"><span class="link-icon">👀</span> Code Review <span class="link-badge badge-mid">กลาง</span></a>
+    <a href="./sdlc-agile.html" class="sidebar-link"><span class="link-icon">📋</span> SDLC & Agile</a>
+    <a href="./tech-docs.html" class="sidebar-link"><span class="link-icon">📝</span> Technical Docs</a>
+    <a href="./architecture.html" class="sidebar-link"><span class="link-icon">🏛️</span> Architecture</a>
+
+    <div class="sidebar-section-title">🎮 Games & Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> เตรียมสัมภาษณ์</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header reveal">
+            <div class="breadcrumb">
+                <a href="../index.html">🏠 หน้าแรก</a>
+                <span>/</span>
+                <span>Quality Track</span>
+                <span>/</span>
+                <span>Code Review & SOLID</span>
+            </div>
+            <div class="page-title">
+                <div class="title-icon" style="background: var(--cat-testing); color: #fff;">👀</div>
+                <h1>Code Review, Clean Code & SOLID Principles</h1>
+            </div>
+            <p class="page-description">
+                มาตรฐานการรีวิวโค้ดในทีมระดับมืออาชีพ, 5 เสาหลัก SOLID Principles ในภาษา C#, Clean Code Guidelines และการสร้างวัฒนธรรม Constructive Feedback
+            </p>
+            <div class="page-meta">
+                <span class="meta-item">⭐ ระดับ: กลาง</span>
+                <span class="meta-item">⏱️ เวลา: ~45 นาที</span>
+                <span class="meta-item">⚡ รางวัล: +100 XP</span>
+                <span class="meta-item">🏷️ SOLID / Clean Code / PR Checklist</span>
+            </div>
+        </div>
+
+        <!-- Analogy Section -->
+        <div class="concept-card reveal">
+            <div class="concept-header">
+                <span class="concept-emoji">👥</span>
+                <span class="concept-title">เปรียบเทียบให้เห็นภาพ: การตรวจทานบทความวิชาการ (Peer Review)</span>
+            </div>
+            <div class="concept-body">
+                <div class="analogy-box">
+                    <div class="analogy-label">💡 Analogy</div>
+                    <p class="analogy-text">
+                        • <strong>Code Review:</strong> ไม่ใช่ "การจับผิดเพื่อตำหนิ" แต่เหมือน <strong>นักบินผู้ช่วย (Co-Pilot) ที่ช่วยตรวจเช็ค Checklists ก่อนเครื่องขึ้น</strong> เพื่อความปลอดภัยของผู้โดยสารทุกคน<br>
+                        • <strong>SOLID Principles:</strong> เหมือน <strong>มาตรฐานโครงสร้างตึกระฟ้า</strong> ที่ออกแบบให้แต่ละห้องซ่อมแซม ต่อเติมระบบไฟฟ้า โดยไม่ต้องทุบเสาหลักของตึกทิ้ง
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: SOLID Principles -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-testing); color: #fff;">01</div>
+                <h2>5 เสาหลัก SOLID Principles ในภาษา C#</h2>
+            </div>
+
+            <div class="grid grid-2 mb-lg">
+                <div class="card">
+                    <h3 style="color: var(--accent-primary); margin-bottom: 6px;">🎯 S - Single Responsibility (SRP)</h3>
+                    <p class="text-sm">1 คลาสควรมี <strong>หน้าที่รับผิดชอบเพียงอย่างเดียว</strong> (1 เหตุผลในการแก้ไข)<br>
+                    ❌ <code>UserService</code> ที่ทั้งสร้าง User, ส่งอีเมล, และเขียน Log ลง Text file<br>
+                    ✅ แยกเป็น <code>UserService</code>, <code>EmailService</code>, <code>AppLogger</code></p>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--accent-success); margin-bottom: 6px;">🔓 O - Open/Closed (OCP)</h3>
+                    <p class="text-sm">เปิดรับการขยาย (Open for extension) แต่ <strong>ปิดการแก้ไขโค้ดเดิม (Closed for modification)</strong><br>
+                    ✅ ใช้ Interface หรือ Strategy Pattern เพิ่มวิธีคิดส่วนลดใหม่ๆ โดยไม่ต้องแก้ <code>switch/case</code> เดิม</p>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--accent-warning); margin-bottom: 6px;">🔄 L - Liskov Substitution (LSP)</h3>
+                    <p class="text-sm">คลาสลูก (Subclass) ต้องสามารถ <strong>ใช้แทนคลาสแม่ (Base Class) ได้อย่างสมบูรณ์</strong> โดยไม่ทำให้โปรแกรมทำงานผิดพลาดหรือโยน Unexpected Exception</p>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--accent-info); margin-bottom: 6px;">✂️ I - Interface Segregation (ISP)</h3>
+                    <p class="text-sm"><strong>แยก Interface ให้เล็กและเฉพาะทาง</strong> ดีกว่า Interface ขนาดใหญ่ที่บังคับให้ Class ต้อง Implement เมธอดที่ตัวเองไม่ได้ใช้งาน (เช่น แยก <code>IReadable</code> และ <code>IWritable</code>)</p>
+                </div>
+            </div>
+
+            <div class="card mb-lg" style="border-left: 3px solid var(--accent-primary);">
+                <h3 style="color: var(--accent-primary); margin-bottom: 6px;">💉 D - Dependency Inversion Principle (DIP)</h3>
+                <p class="text-sm">Module ระดับสูงและระดับต่ำ <strong>ต้องขึ้นต่อ Abstraction (Interface) ไม่ใช่ขึ้นต่อ Concrete Class ตรงๆ</strong> (หัวใจหลักของ Dependency Injection)</p>
+            </div>
+        </section>
+
+        <!-- Section 2: Code Review Checklist -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-testing); color: #fff;">02</div>
+                <h2>Pull Request (PR) Review Checklist สำหรับ Junior .NET</h2>
+            </div>
+
+            <table class="comparison-table mb-lg">
+                <thead>
+                    <tr>
+                        <th>มิติการตรวจเช็ค</th>
+                        <th>คำถามสำคัญในการรีวิวโค้ด</th>
+                        <th>เกณฑ์ผ่าน (Pass Criteria)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>🛡️ Security</strong></td>
+                        <td>มี Hardcoded Secrets, SQL Injection หรือ IDOR หรือไม่?</td>
+                        <td>ไม่มีรหัสผ่านใน Git, ใช้ Parameterized Query, มี `[Authorize]`</td>
+                    </tr>
+                    <tr>
+                        <td><strong>⚡ Performance</strong></td>
+                        <td>มีปัญหา N+1 Query หรือบล็อก Thread ด้วย `.Result` หรือไม่?</td>
+                        <td>ใช้ `AsNoTracking()`, Eager Loading `.Include()`, Async/Await ตลอดสาย</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🧪 Testability</strong></td>
+                        <td>มี Unit Test ครอบคลุม Logic ใหม่และกรณี Edge Cases หรือไม่?</td>
+                        <td>xUnit Test รันผ่าน 100% ใน CI Pipeline</td>
+                    </tr>
+                    <tr>
+                        <td><strong>📖 Readability</strong></td>
+                        <td>ตั้งชื่อตัวแปรสื่อความหมาย (No Magic Numbers/Strings) หรือไม่?</td>
+                        <td>อ่านโค้ดเข้าใจได้โดยไม่ต้องมี Comment อธิบายยาว</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Section 3: Quiz -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-warning); color: #000;">🎯</div>
+                <h2>แบบทดสอบความเข้าใจ: Code Review & SOLID</h2>
+            </div>
+            <div id="code-review-quiz"></div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/quiz-engine.js"></script>
+<script src="../js/code-visualizer.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'หลักการ Single Responsibility Principle (SRP) แนะนำให้คลาสมีลักษณะอย่างไร?',
+                options: [
+                    'มีฟังก์ชันให้มากที่สุดเท่าที่จะทำได้ในไฟล์เดียว',
+                    'มีหน้าที่ความรับผิดชอบเพียงอย่างเดียว และมีเพียงเหตุผลเดียวที่จะต้องแก้ไขคลาสนั้น',
+                    'ห้ามใช้ตัวแปรแบบ private',
+                    'ต้องมีขนาดไม่เกิน 50 บรรทัด'
+                ],
+                answer: 1,
+                explanation: 'SRP กำหนดให้แต่ละคลาสทำหน้าที่เฉพาะเจาะจง เพื่อให้แก้ไขและทดสอบได้ง่ายโดยไม่กระทบส่วนอื่น',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Interface Segregation Principle (ISP) ช่วยแก้ปัญหาอะไร?',
+                options: [
+                    'แก้ปัญหา Interface ขนาดใหญ่ (Fat Interface) ที่บังคับให้คลาสต้อง Implement เมธอดที่ตัวเองไม่ได้ใช้งาน',
+                    'แก้ปัญหาคอมพิวเตอร์ทำงานช้า',
+                    'แก้ปัญหาการเชื่อมต่อฐานข้อมูลไม่ได้',
+                    'ป้องกันการเขียนโค้ดซ้ำซ้อน'
+                ],
+                answer: 0,
+                explanation: 'ISP แนะนำให้แยก Interface ออกเป็น Interface เล็กๆ ที่เฉพาะทาง เช่น แยก IReadRepository และ IWriteRepository',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'เมื่อทำ Code Review ในฐานะผู้รีวิว (Reviewer) ทัศนคติที่ถูกต้องคือข้อใด?',
+                options: [
+                    'มุ่งเน้นจับผิดเพื่อแสดงความเหนือกว่าของผู้ตรวจ',
+                    'เน้นการแลกเปลี่ยนความรู้ ป้องกันข้อผิดพลาดก่อนขึ้น Production และให้คำแนะนำเชิงสร้างสรรค์ (Constructive Feedback)',
+                    'กด Approve ทันทีโดยไม่ต้องอ่านโค้ดเพื่อความรวดเร็ว',
+                    'ปฏิเสธทุก PR ที่ไม่เขียนโค้ดตามสไตล์ที่ตัวเองชอบ'
+                ],
+                answer: 1,
+                explanation: 'Code Review คือกระบวนการร่วมมือเพื่อรักษาคุณภาพซอฟต์แวร์และแชร์ความรู้ภายในทีม',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'ข้อใดเป็นตัวอย่างของการละเมิด Open/Closed Principle (OCP)?',
+                options: [
+                    'การต้องมาคอยแก้เงื่อนไข switch/case ในเมธอดเดิมทุกครั้งที่มีการเพิ่มประเภทการชำระเงินใหม่',
+                    'การสร้างคลาสใหม่ที่ implement interface',
+                    'การใช้ Dependency Injection',
+                    'การเขียน Unit Test'
+                ],
+                answer: 0,
+                explanation: 'การต้องแก้โค้ดเดิมซ้ำๆ เมื่อมีฟีเจอร์ใหม่ขัดกับหลักการ Open for Extension, Closed for Modification ควรใช้ Strategy Pattern หรือ Polymorphism แทน',
+                difficulty: 'mid'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Magic Number ในโค้ดหมายถึงอะไร และควรแก้อย่างไร?',
+                options: [
+                    'ตัวเลขที่ใส่ไว้ลอยๆ โดยไม่มีชื่อบอกความหมาย ควรแก้โดยการประกาศเป็น const หรือ enum ที่สื่อความหมายชัดเจน',
+                    'ตัวเลขที่เป็นจำนวนเฉพาะ',
+                    'ตัวเลขสุ่มที่สร้างจาก Random',
+                    'ตัวเลขที่มีค่ามากกว่า 1 ล้าน'
+                ],
+                answer: 0,
+                explanation: 'Magic Number เช่น if (status == 3) ทำให้อ่านยาก ควรเปลี่ยนเป็น if (status == OrderStatus.Completed)',
+                difficulty: 'basic'
+            }
+        ];
+
+        QuizEngine.start('code-review-quiz', questions, {
+            quizId: 'code-review',
+            onComplete: () => {
+                Progress.completeLesson('code-review');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

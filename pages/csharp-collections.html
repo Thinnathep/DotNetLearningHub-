@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C# Collections &amp; LINQ (Level 3) — DotNet Learning Hub</title>
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <style>
+    /* ─── Custom Page Styling for Collections & LINQ ─── */
+    .collection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+
+    .collection-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .collection-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .collection-badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-sm);
+    }
+
+    .collection-card-icon {
+      font-size: 2rem;
+    }
+
+    .collection-name {
+      font-family: var(--font-code);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--syn-type);
+      margin-bottom: 4px;
+    }
+
+    .collection-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: var(--space-md);
+      flex: 1;
+    }
+
+    .complexity-tag {
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-muted);
+      color: var(--syn-variable);
+      font-weight: 600;
+    }
+
+    /* Lambda Anatomy Breakdown */
+    .lambda-breakdown {
+      display: flex;
+      align-items: stretch;
+      gap: var(--space-sm);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 768px) {
+      .lambda-breakdown {
+        flex-direction: column;
+      }
+    }
+
+    .lambda-part {
+      flex: 1;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      text-align: center;
+      position: relative;
+    }
+
+    .lambda-part.param { border-top: 3px solid var(--syn-variable); }
+    .lambda-part.arrow { border-top: 3px solid var(--syn-keyword); flex: 0.6; }
+    .lambda-part.body { border-top: 3px solid var(--accent-success); flex: 1.4; }
+
+    .lambda-code {
+      font-family: var(--font-code);
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .lambda-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .lambda-explanation {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* LINQ Pipeline Visualizer */
+    .linq-pipeline {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin: var(--space-lg) 0;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 900px) {
+      .linq-pipeline {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .pipeline-arrow {
+        transform: rotate(90deg);
+        text-align: center;
+        margin: var(--space-xs) 0;
+      }
+    }
+
+    .pipeline-step {
+      flex: 1;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      text-align: center;
+    }
+
+    .pipeline-step-title {
+      font-family: var(--font-code);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--syn-method);
+      margin-bottom: 4px;
+    }
+
+    .pipeline-step-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .pipeline-arrow {
+      color: var(--accent-primary);
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    /* Execution Mode Cards */
+    .execution-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+
+    @media (max-width: 768px) {
+      .execution-comparison {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .exec-box {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      border: 1px solid var(--border-default);
+    }
+
+    .exec-box.deferred {
+      border-left: 4px solid var(--accent-warning);
+    }
+
+    .exec-box.immediate {
+      border-left: 4px solid var(--accent-success);
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-md) 0;
+      font-size: 0.88rem;
+    }
+
+    .matrix-table th, .matrix-table td {
+      border: 1px solid var(--border-default);
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    .matrix-table th {
+      background: var(--bg-tertiary);
+      font-family: var(--font-heading);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .matrix-table tr:hover td {
+      background: var(--bg-hover);
+    }
+
+    .tag-ok { color: var(--accent-success); font-weight: 600; }
+    .tag-null { color: var(--accent-warning); font-weight: 600; font-family: var(--font-code); }
+    .tag-throw { color: var(--accent-danger); font-weight: 700; font-family: var(--font-code); }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <a href="../index.html" class="site-logo">
+      <div class="logo-icon">🟣</div>
+      <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าหลัก (Dashboard)</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="./csharp-basics.html" class="sidebar-link">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="./csharp-oop.html" class="sidebar-link">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="./csharp-collections.html" class="sidebar-link active">
+        <span class="link-icon">⚡</span>
+        <span>LINQ &amp; Collections (Level 3)</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="./csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>Async/Await &amp; Advanced (Lv 4)</span>
+        <span class="sidebar-badge badge-new">Lv 4</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🌐 Track .NET &amp; Web API</div>
+      <a href="./dotnet-overview.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 &amp; CLI Overview</span>
+      </a>
+      <a href="./aspnet-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>ASP.NET Core Web API</span>
+      </a>
+      <a href="./ef-core.html" class="sidebar-link">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+      </a>
+      <a href="./blazor.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Blazor Web Apps</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🛠️ Track Database &amp; Quality</div>
+      <a href="./sql-basics.html" class="sidebar-link">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; T-SQL</span>
+      </a>
+      <a href="./architecture.html" class="sidebar-link">
+        <span class="link-icon">🏛️</span>
+        <span>Clean Architecture &amp; Patterns</span>
+      </a>
+      <a href="./testing.html" class="sidebar-link">
+        <span class="link-icon">🧪</span>
+        <span>Unit Testing &amp; xUnit</span>
+      </a>
+      <a href="./devops.html" class="sidebar-link">
+        <span class="link-icon">🐳</span>
+        <span>Docker &amp; CI/CD</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header animate-fade-in">
+        <div class="breadcrumb">
+          <a href="../index.html">หน้าหลัก</a>
+          <span>/</span>
+          <span>C# Track</span>
+          <span>/</span>
+          <span class="text-primary">Collections &amp; LINQ</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(227, 98, 9, 0.25); color: #ffa657; border: 1px solid rgba(227, 98, 9, 0.4);">📙</div>
+          <div>
+            <h1>C# Collections &amp; LINQ — Level 3</h1>
+            <div class="page-description">เจาะลึกโครงสร้างข้อมูลชุด (Collections) และพลังแห่งการคิวรีข้อมูลความเร็วสูงด้วย LINQ ในภาษา C# และ .NET 8</div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="level-tag level-mid">⭐⭐ กลาง</span></span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>เวลาเรียน: <strong>~50 นาที</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>รางวัล: <strong>+100 XP</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>💻</span>
+            <span>รองรับ .NET 8 / C# 12</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Master Analogy: คลังเก็บของและเครื่องกรองน้ำวิเศษ ─── -->
+      <div class="concept-card reveal" style="border-left: 4px solid var(--accent-info);">
+        <div class="concept-header">
+          <span class="concept-emoji">🏭</span>
+          <div>
+            <div class="concept-title">เปรียบเทียบให้เห็นภาพ: "คลังเก็บของอัจฉริยะและเครื่องกรองน้ำวิเศษ"</div>
+            <div class="text-muted" style="font-size: 0.8rem;">ทำความเข้าใจ Collections และ LINQ ผ่านสิ่งของในโลกความเป็นจริง</div>
+          </div>
+        </div>
+        <div class="concept-body">
+          <div class="analogy-box">
+            <div class="analogy-label">📦 Collections = ภาชนะจัดเก็บสิ่งของหลากหลายประเภท</div>
+            <p class="analogy-text">
+              ในการเขียนโปรแกรม เรามีข้อมูลจำนวนมากที่ต้องจัดเก็บไว้ในหน่วยความจำ แต่ละงานต้องการ "ภาชนะ" ที่มีคุณสมบัติไม่เหมือนกัน:
+            </p>
+            <ul style="margin-top: 8px; margin-bottom: 0; padding-left: 20px; line-height: 1.7;">
+              <li><strong><code>List&lt;T&gt;</code></strong> เหมือน <em>"ชั้นวางของอเนกประสงค์"</em> — วางของเรียงกัน ปรับความยาวได้อัตโนมัติ ชี้หยิบตามลำดับช่องที่ 0, 1, 2 ได้ทันที</li>
+              <li><strong><code>Dictionary&lt;TKey, TValue&gt;</code></strong> เหมือน <em>"สมุดพจนานุกรม หรือตู้ล็อกเกอร์ที่มีป้ายชื่อ"</em> — แปะคีย์รหัสไว้ อยากได้ของชิ้นไหน แค่บอกชื่อคีย์ก็หยิบได้ในเสี้ยววินาที ($O(1)$) โดยไม่ต้องเปิดดูทีละตู้</li>
+              <li><strong><code>HashSet&lt;T&gt;</code></strong> เหมือน <em>"ถุงลูกบอลวิเศษ"</em> — ใครโยนลูกบอลลายซ้ำลงไป มันจะดูดกลืนทิ้งอัตโนมัติ รับประกันว่าของข้างในจะไม่ซ้ำกันเลยแม้แต่ชิ้นเดียว</li>
+              <li><strong><code>Queue&lt;T&gt;</code></strong> เหมือน <em>"แถวคิวกดบัตรคิวซื้อชานม (FIFO)"</em> — ใครมาก่อนได้ก่อน ของที่เข้าคิวก่อนจะได้ออกจากคิวไปประมวลผลก่อน</li>
+              <li><strong><code>Stack&lt;T&gt;</code></strong> เหมือน <em>"กองจานซ้อนกันในร้านอาหาร (LIFO)"</em> — จานที่วางบนสุดทีหลังสุด จะถูกหยิบไปใช้งานก่อน เหมือนฟังก์ชัน Undo ในโปรแกรม</li>
+            </ul>
+          </div>
+
+          <div class="analogy-box" style="background: rgba(63, 185, 80, 0.08); border-color: rgba(63, 185, 80, 0.25);">
+            <div class="analogy-label" style="color: var(--accent-success);">✨ LINQ = เครื่องกรองน้ำและสายพานแปรรูปข้อมูลวิเศษ</div>
+            <p class="analogy-text">
+              เมื่อเรามีคลังของ (Collections) มหาศาล ถ้าเป็นยุคเก่า เราต้องเขียน loop <code>for</code> / <code>foreach</code> ซ้อน <code>if-else</code> นับสิบบรรทัดเพื่อคัดแยกของ<br>
+              แต่ <strong>LINQ (Language Integrated Query)</strong> ทำหน้าที่เป็นท่อกรองน้ำอัจฉริยะ คุณแค่สั่งว่า:
+              <br><em>"กรองเอาเฉพาะสินค้าที่ราคา &gt; 100 บาท, เรียงจากขายดีไปน้อย, แล้วหยิบมาแค่ 5 อันแรก"</em> — ทำทั้งหมดนี้เสร็จได้ใน <strong>บรรทัดเดียว!</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Section 1: Generic Collections ─── -->
+      <section class="lesson-section reveal" id="generic-collections">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(227, 98, 9, 0.2); color: var(--syn-variable); border: 1px solid var(--syn-variable);">01</div>
+          <div>
+            <h2>Generic Collections ใน C# (.NET)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">รู้จักโครงสร้างข้อมูลพื้นฐานที่ใช้บ่อยที่สุดใน <code>System.Collections.Generic</code></p>
+          </div>
+        </div>
+
+        <p>
+          ใน C# ยุคใหม่ เราจะใช้ <strong>Generic Collections</strong> (มีสัญลักษณ์ <code>&lt;T&gt;</code>) เสมอ เพราะช่วยเรื่อง <strong>Type Safety</strong> (คอมไพเลอร์ช่วยตรวจสอบประเภทข้อมูลตั้งแต่ตอนเขียนโค้ด) และป้องกันปัญหาประสิทธิภาพจากการทำ <strong>Boxing / Unboxing</strong> ของ Value Types เมื่อเทียบกับคอลเลกชันยุคเก่าอย่าง <code>ArrayList</code> หรือ <code>Hashtable</code>
+        </p>
+
+        <!-- 4 Major Collections Grid -->
+        <div class="collection-grid">
+          <!-- List<T> -->
+          <div class="collection-card">
+            <div class="collection-badge-row">
+              <span class="collection-card-icon">📋</span>
+              <span class="complexity-tag">Index: O(1) | Search: O(N)</span>
+            </div>
+            <div class="collection-name">List&lt;T&gt;</div>
+            <div class="collection-desc">
+              อาร์เรย์ยืดหยุ่นปรับขนาดได้อัตโนมัติ (Dynamic Array) เข้าถึงข้อมูลด้วย Index เลขลำดับได้ทันที นิยมใช้เป็นค่าเริ่มต้นสำหรับเก็บข้อมูลแบบรายการทั่วไป
+            </div>
+            <div class="text-muted" style="font-size: 0.78rem; border-top: 1px solid var(--border-muted); padding-top: 8px;">
+              <strong>เมธอดหลัก:</strong> Add(), AddRange(), Remove(), Contains(), Count
+            </div>
+          </div>
+
+          <!-- Dictionary<TKey, TValue> -->
+          <div class="collection-card">
+            <div class="collection-badge-row">
+              <span class="collection-card-icon">📖</span>
+              <span class="complexity-tag">Lookup: O(1) | Add: O(1)</span>
+            </div>
+            <div class="collection-name">Dictionary&lt;TKey, TValue&gt;</div>
+            <div class="collection-desc">
+              จับคู่ Key กับ Value ด้วยโครงสร้างแบบ Hash Table ค้นหาข้อมูลได้เร็วระดับ $O(1)$ โดยตรงผ่าน Key ห้ามมีคีย์ซ้ำกันในตาราง
+            </div>
+            <div class="text-muted" style="font-size: 0.78rem; border-top: 1px solid var(--border-muted); padding-top: 8px;">
+              <strong>เมธอดหลัก:</strong> TryGetValue(), ContainsKey(), Remove(), Keys, Values
+            </div>
+          </div>
+
+          <!-- HashSet<T> -->
+          <div class="collection-card">
+            <div class="collection-badge-row">
+              <span class="collection-card-icon">🎯</span>
+              <span class="complexity-tag">Lookup: O(1) | Unique Only</span>
+            </div>
+            <div class="collection-name">HashSet&lt;T&gt;</div>
+            <div class="collection-desc">
+              เก็บเฉพาะข้อมูลที่ไม่ซ้ำกัน (Set) ตรวจสอบการมีอยู่ด้วย <code>Contains()</code> ได้เร็วระดับ $O(1)$ และรองรับการทำ Set Operations ทางคณิตศาสตร์
+            </div>
+            <div class="text-muted" style="font-size: 0.78rem; border-top: 1px solid var(--border-muted); padding-top: 8px;">
+              <strong>เมธอดหลัก:</strong> Add(), Contains(), UnionWith(), IntersectWith(), ExceptWith()
+            </div>
+          </div>
+
+          <!-- Queue & Stack -->
+          <div class="collection-card">
+            <div class="collection-badge-row">
+              <span class="collection-card-icon">🔄</span>
+              <span class="complexity-tag">FIFO / LIFO: O(1)</span>
+            </div>
+            <div class="collection-name">Queue&lt;T&gt; &amp; Stack&lt;T&gt;</div>
+            <div class="collection-desc">
+              <code>Queue&lt;T&gt;</code> ลำดับแบบ FIFO (เข้าก่อนออกก่อน) เหมาะกับคิวงานประมวลผล ส่วน <code>Stack&lt;T&gt;</code> ลำดับแบบ LIFO (เข้าหลังออกก่อน) เหมาะกับระบบ Undo/Redo
+            </div>
+            <div class="text-muted" style="font-size: 0.78rem; border-top: 1px solid var(--border-muted); padding-top: 8px;">
+              <strong>เมธอดหลัก:</strong> Enqueue/Dequeue (Queue), Push/Pop (Stack), Peek
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Code Demonstration: List, Dictionary, HashSet -->
+        <h3 class="mt-xl">1.1 การใช้งาน <code>List&lt;T&gt;</code> และ <code>Dictionary&lt;TKey, TValue&gt;</code></h3>
+        <p>มาดูตัวอย่างการประกาศ เพิ่มข้อมูล และการค้นหาอย่างปลอดภัยในชีวิตจริง:</p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚡</span>
+              <span>CollectionsDemo.cs</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='คัดลอกแล้ว!'; setTimeout(()=>this.innerText='Copy', 2000);">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+// ─── 1. List&lt;T&gt;: รายการยืดหยุ่น ───
+List&lt;string&gt; products = new() { "โน้ตบุ๊ก", "เมาส์ไร้สาย", "คีย์บอร์ดกลไก" };
+products.Add("จอภาพ 4K");
+products.Remove("เมาส์ไร้สาย");
+
+Console.WriteLine($"จำนวนสินค้าทั้งหมด: {products.Count}");
+Console.WriteLine($"สินค้าชิ้นแรก: {products[0]}"); // เข้าถึงด้วย Index
+
+// ─── 2. Dictionary&lt;TKey, TValue&gt;: ตารางค้นหาด้วยคีย์ ───
+Dictionary&lt;string, decimal&gt; priceLookup = new()
+{
+    { "PROD-001", 25900.00m },
+    { "PROD-002", 1290.00m },
+    { "PROD-003", 3490.00m }
+};
+
+// เพิ่มข้อมูลแบบปลอดภัย (ถ้ามีคีย์อยู่แล้วจะอัปเดต ถ้ายังไม่มีจะเพิ่มใหม่)
+priceLookup["PROD-004"] = 14900.00m;
+
+// ⚠️ ข้อควรระวัง: การเรียก priceLookup["INVALID-KEY"] โดยตรงจะโยน KeyNotFoundException!
+// ✅ แนวทางปฏิบัติที่ดี: ใช้ TryGetValue ในการค้นหาอย่างปลอดภัย
+string searchSku = "PROD-002";
+if (priceLookup.TryGetValue(searchSku, out decimal price))
+{
+    Console.WriteLine($"ราคาของ {searchSku}: {price:N2} บาท");
+}
+else
+{
+    Console.WriteLine($"ไม่พบรหัสสินค้า {searchSku} ในระบบ");
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">🖥️ Output:</span>
+            <span class="output-text">จำนวนสินค้าทั้งหมด: 3
+สินค้าชิ้นแรก: โน้ตบุ๊ก
+ราคาของ PROD-002: 1,290.00 บาท</span>
+          </div>
+        </div>
+
+        <!-- HashSet, Queue & Stack Demonstration -->
+        <h3 class="mt-xl">1.2 การใช้งาน <code>HashSet&lt;T&gt;</code>, <code>Queue&lt;T&gt;</code> และ <code>Stack&lt;T&gt;</code></h3>
+        <p>ตัวอย่างการกรองค่าที่ไม่ซ้ำด้วย Set และการบริหารจัดการลำดับงานด้วย Queue และ Stack:</p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚡</span>
+              <span>AdvancedCollections.cs</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='คัดลอกแล้ว!'; setTimeout(()=>this.innerText='Copy', 2000);">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">// ─── 3. HashSet&lt;T&gt;: ป้องกันข้อมูลซ้ำ &amp; เช็ค Contains ได้เร็ว O(1) ───
+HashSet&lt;string&gt; activeUserTokens = new();
+activeUserTokens.Add("token_abc123");
+activeUserTokens.Add("token_xyz789");
+bool addedDuplicate = activeUserTokens.Add("token_abc123"); // คืนค่า false เพราะมีอยู่แล้ว
+
+Console.WriteLine($"เพิ่มค่าซ้ำสำเร็จไหม? : {addedDuplicate}"); // false
+Console.WriteLine($"Token ออนไลน์ทั้งหมด : {activeUserTokens.Count}"); // 2
+
+// ─── 4. Queue&lt;T&gt;: เข้าก่อน-ออกก่อน (FIFO) เช่น คิวส่งอีเมล ───
+Queue&lt;string&gt; emailQueue = new();
+emailQueue.Enqueue("welcome_user1@mail.com"); // 1st
+emailQueue.Enqueue("invoice_order42@mail.com"); // 2nd
+
+string nextEmail = emailQueue.Dequeue(); // ดึง welcome_user1 ออกมาประมวลผล
+Console.WriteLine($"กำลังส่งอีเมลไปยัง: {nextEmail}");
+
+// ─── 5. Stack&lt;T&gt;: เข้าหลัง-ออกก่อน (LIFO) เช่น ระบบ Undo การพิมพ์ ───
+Stack&lt;string&gt; actionHistory = new();
+actionHistory.Push("พิมพ์: Hello");
+actionHistory.Push("พิมพ์: World");
+actionHistory.Push("เปลี่ยนสีฟอนต์: Red");
+
+string lastAction = actionHistory.Pop(); // ดึงการกระทำล่าสุดออกเพื่อ Undo
+Console.WriteLine($"ยกเลิกคำสั่ง (Undo): {lastAction}"); // เปลี่ยนสีฟอนต์: Red</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">🖥️ Output:</span>
+            <span class="output-text">เพิ่มค่าซ้ำสำเร็จไหม? : False
+Token ออนไลน์ทั้งหมด : 2
+กำลังส่งอีเมลไปยัง: welcome_user1@mail.com
+ยกเลิกคำสั่ง (Undo): เปลี่ยนสีฟอนต์: Red</span>
+          </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <h3 class="mt-xl">1.3 ตารางเปรียบเทียบ Time Complexity และ Use Cases</h3>
+        <p>สรุปการเลือกใช้ Collection ให้เหมาะสมกับลักษณะงานเพื่อประสิทธิภาพสูงสุด:</p>
+
+        <div style="overflow-x: auto;">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Collection Type</th>
+                <th>Access (Index/Key)</th>
+                <th>Insert / Add</th>
+                <th>Search / Contains</th>
+                <th>จุดเด่น &amp; สถานการณ์ที่ควรเลือกใช้</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>List&lt;T&gt;</code></td>
+                <td><span class="badge badge-success">O(1)</span> (By Index)</td>
+                <td><span class="badge badge-success">O(1)</span> (ท้ายตาราง)</td>
+                <td><span class="badge badge-warning">O(N)</span> (วนหาทีละตัว)</td>
+                <td>ต้องการเก็บข้อมูลเรียงลำดับ ลูปแสดงผลบนหน้าจอ หรือไม่รู้ขนาดข้อมูลล่วงหน้า</td>
+              </tr>
+              <tr>
+                <td><code>Dictionary&lt;K, V&gt;</code></td>
+                <td><span class="badge badge-success">O(1)</span> (By Key)</td>
+                <td><span class="badge badge-success">O(1)</span> (เฉลี่ย)</td>
+                <td><span class="badge badge-success">O(1)</span> (ContainsKey)</td>
+                <td>ต้องการค้นหาข้อมูลด้วยรหัส ID, SKU, Username, หรือทำ Caching ในหน่วยความจำ</td>
+              </tr>
+              <tr>
+                <td><code>HashSet&lt;T&gt;</code></td>
+                <td><span class="text-muted">N/A (ไม่มี Index)</span></td>
+                <td><span class="badge badge-success">O(1)</span> (เฉลี่ย)</td>
+                <td><span class="badge badge-success">O(1)</span> (เช็คการมีอยู่)</td>
+                <td>ต้องการคัดกรองค่าไม่ให้ซ้ำ เช่น แท็กสินค้า, ตรวจสอบสิทธิ์ผู้ใช้, หรือหาเซตผลต่าง</td>
+              </tr>
+              <tr>
+                <td><code>Queue&lt;T&gt;</code></td>
+                <td><span class="badge badge-success">O(1)</span> (Peek หัวแถว)</td>
+                <td><span class="badge badge-success">O(1)</span> (Enqueue)</td>
+                <td><span class="badge badge-warning">O(N)</span></td>
+                <td>งานประมวลผลตามลำดับก่อน-หลัง เช่น Message Queue, Job Scheduling, Print Spooler</td>
+              </tr>
+              <tr>
+                <td><code>Stack&lt;T&gt;</code></td>
+                <td><span class="badge badge-success">O(1)</span> (Peek ยอดกอง)</td>
+                <td><span class="badge badge-success">O(1)</span> (Push)</td>
+                <td><span class="badge badge-warning">O(N)</span></td>
+                <td>ระบบย้อนกลับ (Undo/Redo), คำนวณนิพจน์คณิตศาสตร์ (RPN), ประวัติเปิดหน้าเว็บ (Back)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ─── Section 2: Lambda Expressions & Delegates ─── -->
+      <section class="lesson-section reveal" id="lambdas-delegates">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(163, 113, 247, 0.2); color: var(--syn-method); border: 1px solid var(--syn-method);">02</div>
+          <div>
+            <h2>Lambda Expressions &amp; Delegates เบื้องต้น</h2>
+            <p class="text-muted" style="margin-bottom: 0;">กุญแจสำคัญสู่การเขียน LINQ และ Functional Programming ใน C#</p>
+          </div>
+        </div>
+
+        <p>
+          ก่อนที่เราจะใช้ LINQ ได้อย่างเชี่ยวชาญ เราต้องเข้าใจว่า <strong>Lambda Expression</strong> คืออะไร ในภาษา C# แลมบ์ดาคือ <em>"ฟังก์ชันนิรนาม (Anonymous Function)"</em> ขนาดกะทัดรัดที่สามารถส่งเข้าไปเป็นพารามิเตอร์ของฟังก์ชันอื่นได้ทันที
+        </p>
+
+        <!-- Lambda Anatomy Card -->
+        <div class="card mt-md mb-lg">
+          <h4 style="margin-top: 0; margin-bottom: var(--space-md); color: var(--accent-info);">🔬 ผ่าโครงสร้าง Lambda Expression: <code>x =&gt; x.Price &gt; 100</code></h4>
+          <div class="lambda-breakdown">
+            <div class="lambda-part param">
+              <div class="lambda-code" style="color: var(--syn-variable);">x</div>
+              <div class="lambda-label">Input Parameter</div>
+              <div class="lambda-explanation">สมาชิก 1 ตัวที่ไหลเข้ามาจาก Collection (C# Infer Type ให้อัตโนมัติ)</div>
+            </div>
+            <div class="lambda-part arrow">
+              <div class="lambda-code" style="color: var(--syn-keyword);">&equals;&gt;</div>
+              <div class="lambda-label">Lambda Operator</div>
+              <div class="lambda-explanation">อ่านว่า "goes to" หรือ "ส่งไปประมวลผลเป็น"</div>
+            </div>
+            <div class="lambda-part body">
+              <div class="lambda-code" style="color: var(--accent-success);">x.Price &gt; 100</div>
+              <div class="lambda-label">Expression / Body</div>
+              <div class="lambda-explanation">เงื่อนไขหรือการคำนวณที่ต้องการคืนค่า (เช่น คืนค่า <code>true/false</code>)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Built-in Delegates: Func & Action -->
+        <h3>2.1 Standard Delegates ใน C#: <code>Func</code> vs <code>Action</code></h3>
+        <p>
+          ในเบื้องหลัง Lambda Expression จะถูกแปลงให้กลายเป็น <strong>Delegate</strong> (ตัวแทนฟังก์ชันที่มีความปลอดภัยของ Type):
+        </p>
+
+        <div class="grid-2-col" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); margin-bottom: var(--space-lg);">
+          <div class="card" style="padding: var(--space-lg);">
+            <div style="font-family: var(--font-code); font-weight: 700; color: var(--syn-type); font-size: 1.05rem; margin-bottom: 6px;">
+              Func&lt;T, TResult&gt;
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: var(--space-sm);">
+              รับพารามิเตอร์ <code>T</code> และ <strong>ต้องคืนค่าผลลัพธ์</strong> เป็น <code>TResult</code> เสมอ (LINQ ส่วนใหญ่ เช่น <code>.Where()</code>, <code>.Select()</code> ใช้ตัวนี้)
+            </p>
+            <div class="type-example">Func&lt;int, bool&gt; isEven = n =&gt; n % 2 == 0;</div>
+          </div>
+
+          <div class="card" style="padding: var(--space-lg);">
+            <div style="font-family: var(--font-code); font-weight: 700; color: var(--syn-method); font-size: 1.05rem; margin-bottom: 6px;">
+              Action&lt;T&gt;
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: var(--space-sm);">
+              รับพารามิเตอร์ <code>T</code> เข้าไปทำงานแต่ <strong>ไม่คืนค่าใดๆ กลับมา (void)</strong> เหมาะกับงานเช่น Print หรือ Log
+            </p>
+            <div class="type-example">Action&lt;string&gt; print = msg =&gt; Console.WriteLine(msg);</div>
+          </div>
+        </div>
+
+        <!-- Code Example: Lambda evolution -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚡</span>
+              <span>LambdaSyntaxDemo.cs</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='คัดลอกแล้ว!'; setTimeout(()=>this.innerText='Copy', 2000);">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">// ─── 1. พารามิเตอร์เดี่ยว (Single Parameter) ไม่ต้องใส่วงเล็บ ───
+Func&lt;int, int&gt; square = x =&gt; x * x;
+Console.WriteLine($"5 ยกกำลังสอง = {square(5)}"); // 25
+
+// ─── 2. หลายพารามิเตอร์ (Multiple Parameters) ต้องมีวงเล็บ (a, b) ───
+Func&lt;int, int, int&gt; add = (a, b) =&gt; a + b;
+Console.WriteLine($"10 + 20 = {add(10, 20)}"); // 30
+
+// ─── 3. ทำงานหลายบรรทัด (Statement Body) ใช้ปีกกา { ... return ...; } ───
+Func&lt;decimal, decimal&gt; calculateVatIncluded = price =&gt;
+{
+    decimal vatRate = 0.07m;
+    decimal vatAmount = price * vatRate;
+    return price + vatAmount;
+};
+Console.WriteLine($"ราคารวม VAT 7% ของ 1,000 บาท: {calculateVatIncluded(1000m)} บาท");</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">🖥️ Output:</span>
+            <span class="output-text">5 ยกกำลังสอง = 25
+10 + 20 = 30
+ราคารวม VAT 7% ของ 1,000 บาท: 1070.00 บาท</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 3: LINQ Methods in Real Life ─── -->
+      <section class="lesson-section reveal" id="linq-methods">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(63, 185, 80, 0.2); color: var(--accent-success); border: 1px solid var(--accent-success);">03</div>
+          <div>
+            <h2>LINQ (Language Integrated Query) Methods สำคัญในชีวิตจริง</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ประมวลผล คัดกรอง แปลงรูปข้อมูล และสรุปผลในรูปแบบ Fluent Method Chaining</p>
+          </div>
+        </div>
+
+        <p>
+          <strong>LINQ</strong> คือสุดยอดฟีเจอร์ของ .NET ที่เปิดโอกาสให้เรา Query ข้อมูลจาก Collections ใน RAM (LINQ to Objects) หรือส่งคำสั่งแปลงเป็น SQL ไปรันบน Database (Entity Framework Core) ด้วยไวยากรณ์ชุดเดียวกัน!
+        </p>
+
+        <!-- Pipeline Diagram -->
+        <div class="linq-pipeline">
+          <div class="pipeline-step">
+            <div class="pipeline-step-title">1. Raw Data</div>
+            <div class="pipeline-step-desc">List&lt;Product&gt; 1,000 รายการ</div>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-step">
+            <div class="pipeline-step-title">2. .Where()</div>
+            <div class="pipeline-step-desc">กรองเฉพาะ Price &gt; 500</div>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-step">
+            <div class="pipeline-step-title">3. .OrderBy()</div>
+            <div class="pipeline-step-desc">เรียงตามยอดขายสูงสุด</div>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-step">
+            <div class="pipeline-step-title">4. .Select()</div>
+            <div class="pipeline-step-desc">สกัดเอาเฉพาะ Name, Price</div>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-step">
+            <div class="pipeline-step-title">5. .ToList()</div>
+            <div class="pipeline-step-desc">สร้างผลลัพธ์เป็น List ใหม่</div>
+          </div>
+        </div>
+
+        <!-- Sample Model -->
+        <div class="callout callout-info">
+          <div class="callout-title">📦 ข้อมูลจำลองสำหรับตัวอย่างทั้งหมดในส่วนนี้:</div>
+          <p style="margin-bottom: 0;">เราจะใช้ Class <code>Product(int Id, string Name, string Category, decimal Price, int Stock, bool IsActive)</code> ในการทดลอง Query ข้อมูล</p>
+        </div>
+
+        <!-- Categories of LINQ Methods -->
+        <h3 class="mt-xl">3.1 กรองข้อมูล (Filtering) &amp; แปลงข้อมูล (Projection)</h3>
+        <p>
+          <code>.Where()</code> ใช้สำหรับคัดกรองสมาชิกตามเงื่อนไข ส่วน <code>.Select()</code> ใช้สำหรับแปลงรูปร่างของออบเจกต์ (Projection) และ <code>.SelectMany()</code> ใช้สำหรับคลี่ (Flatten) รายการที่ซ้อนกันออกมา:
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚡</span>
+              <span>FilterAndProject.cs</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='คัดลอกแล้ว!'; setTimeout(()=>this.innerText='Copy', 2000);">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">record Product(int Id, string Name, string Category, decimal Price, int Stock, bool IsActive);
+
+List&lt;Product&gt; catalog = new()
+{
+    new(1, "Gaming Laptop", "IT", 39900m, 5, true),
+    new(2, "Wireless Mouse", "IT", 890m, 25, true),
+    new(3, "Ergonomic Chair", "Furniture", 6500m, 0, false), // สินค้าหมด &amp; ไม่ active
+    new(4, "Mechanical Keyboard", "IT", 2990m, 12, true),
+    new(5, "Desk Lamp", "Furniture", 750m, 8, true)
+};
+
+// ─── 1. .Where(): กรองเฉพาะสินค้า IT ที่พร้อมขาย (IsActive == true และ Stock > 0) ───
+var availableIT = catalog
+    .Where(p =&gt; p.Category == "IT" &amp;&amp; p.IsActive &amp;&amp; p.Stock &gt; 0)
+    .ToList();
+
+// ─── 2. .Select(): สกัดเฉพาะชื่อสินค้าและราคา (แปลงเป็น DTO หรือ Anonymous Type) ───
+var priceTags = catalog
+    .Select(p =&gt; new { p.Name, FormattedPrice = $"{p.Price:N0} บาท" })
+    .ToList();
+
+foreach (var item in priceTags)
+{
+    Console.WriteLine($"🏷️ {item.Name} — {item.FormattedPrice}");
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">🖥️ Output:</span>
+            <span class="output-text">🏷️ Gaming Laptop — 39,900 บาท
+🏷️ Wireless Mouse — 890 บาท
+🏷️ Ergonomic Chair — 6,500 บาท
+🏷️ Mechanical Keyboard — 2,990 บาท
+🏷️ Desk Lamp — 750 บาท</span>
+          </div>
+        </div>
+
+        <!-- Element Operators: First, FirstOrDefault, Single, SingleOrDefault -->
+        <h3 class="mt-xl">3.2 ค้นหาตัวแรกและตัวเดียว: First vs FirstOrDefault vs Single vs SingleOrDefault</h3>
+        <p>
+          นี่คือจุดที่โปรแกรมเมอร์พบ <strong>Run-time Exception</strong> บ่อยที่สุด! มาดูความแตกต่างและกติกาของแต่ละเมธอด:
+        </p>
+
+        <div style="overflow-x: auto;">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>LINQ Method</th>
+                <th>เมื่อไม่พบข้อมูล (0 รายการ)</th>
+                <th>เมื่อพบข้อมูลพอดี 1 รายการ</th>
+                <th>เมื่อพบข้อมูลหลายรายการ (&ge; 2)</th>
+                <th>คำแนะนำการใช้งานจริง</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong><code>.First()</code></strong></td>
+                <td><span class="tag-throw">💥 InvalidOperationException</span></td>
+                <td><span class="tag-ok">✅ ได้รายการแรก</span></td>
+                <td><span class="tag-ok">✅ ได้รายการแรก</span></td>
+                <td>ใช้เมื่อมั่นใจ 100% ว่าต้องมีข้อมูลแน่นอน</td>
+              </tr>
+              <tr>
+                <td><strong><code>.FirstOrDefault()</code></strong></td>
+                <td><span class="tag-null">🛡️ คืนค่า null (หรือ default)</span></td>
+                <td><span class="tag-ok">✅ ได้รายการแรก</span></td>
+                <td><span class="tag-ok">✅ ได้รายการแรก</span></td>
+                <td><strong>🌟 นิยมที่สุด!</strong> สำหรับการค้นหาที่อาจไม่พบข้อมูล</td>
+              </tr>
+              <tr>
+                <td><strong><code>.Single()</code></strong></td>
+                <td><span class="tag-throw">💥 InvalidOperationException</span></td>
+                <td><span class="tag-ok">✅ ได้รายการนั้น</span></td>
+                <td><span class="tag-throw">💥 InvalidOperationException</span></td>
+                <td>ใช้ค้นหาข้อมูลที่เป็น Unique แน่นอน (เช่น ค้นหาด้วย Primary Key ID)</td>
+              </tr>
+              <tr>
+                <td><strong><code>.SingleOrDefault()</code></strong></td>
+                <td><span class="tag-null">🛡️ คืนค่า null (หรือ default)</span></td>
+                <td><span class="tag-ok">✅ ได้รายการนั้น</span></td>
+                <td><span class="tag-throw">💥 InvalidOperationException</span></td>
+                <td>คาดหวังว่าต้องมีไม่เกิน 1 รายการ ถ้ามีซ้ำถือว่าผิดปกติร้ายแรง</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚡</span>
+              <span>ElementOperatorsDemo.cs</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='คัดลอกแล้ว!'; setTimeout(()=>this.innerText='Copy', 2000);">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">// ค้นหาสินค้าตาม ID ด้วย FirstOrDefault (ปลอดภัย ไม่พังเมื่อไม่พบ)
+int searchId = 999;
+Product? foundProduct = catalog.FirstOrDefault(p =&gt; p.Id == searchId);
+
+if (foundProduct != null)
+{
+    Console.WriteLine($"พบสินค้า: {foundProduct.Name}");
+}
+else
+{
+    Console.WriteLine($"⚠️ ไม่พบสินค้า ID: {searchId} (ได้รับค่า null อย่างปลอดภัย)");
+}
+
+// .NET 6+ สามารถระบุค่า Default แบบกำหนดเองได้ถ้าไม่เจอ!
+Product fallbackProduct = catalog.FirstOrDefault(
+    p =&gt; p.Id == 999,
+    defaultValue: new Product(0, "สินค้าไม่ระบุ", "None", 0m, 0, false)
+);
+Console.WriteLine($"Fallback Name: {fallbackProduct.Name}");</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">🖥️ Output:</span>
+            <span class="output-text">⚠️ ไม่พบสินค้า ID: 999 (ได้รับค่า null อย่างปลอดภัย)
+Fallback Name: สินค้าไม่ระบุ</span>
+          </div>
+        </div>
+
+        <!-- Quantifiers & Aggregations -->
+        <h3 class="mt-xl">3.3 การตรวจสอบเงื่อนไข (Quantifiers) &amp; รวมค่าทางสถิติ (Aggregation)</h3>
+        <p>
+          กลุ่มเมธอดสำหรับเช็ค <code>bool</code> และการคำนวณตัวเลขทางสถิติ เช่น ยอดรวม, ค่าเฉลี่ย, สูงสุด/ต่ำสุด:
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚡</span>
+              <span>QuantifiersAndAggregations.cs</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='คัดลอกแล้ว!'; setTimeout(()=>this.innerText='Copy', 2000);">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">// ─── 1. Any() และ All(): ตรวจสอบความถูกต้อง ───
+bool hasOutOfStock = catalog.Any(p =&gt; p.Stock == 0); // มีสินค้าชิ้นไหนหมดไหม? -> true
+bool allActive = catalog.All(p =&gt; p.IsActive);         // สินค้าทุกตัวเปิดขายอยู่ไหม? -> false
+
+Console.WriteLine($"มีสินค้าของหมดหรือไม่: {hasOutOfStock}");
+Console.WriteLine($"สินค้าทุกชิ้น Active หรือไม่: {allActive}");
+
+// ─── 2. สรุปผลทางสถิติ (Aggregation) ───
+int totalProductCount = catalog.Count();
+decimal totalStockValue = catalog.Sum(p =&gt; p.Price * p.Stock);
+decimal averagePrice = catalog.Average(p =&gt; p.Price);
+decimal maxPrice = catalog.Max(p =&gt; p.Price);
+
+Console.WriteLine($"จำนวนรายการสินค้า: {totalProductCount} ชิ้น");
+Console.WriteLine($"มูลค่าสินค้ารวมในสต็อก: {totalStockValue:N2} บาท");
+Console.WriteLine($"ราคาเฉลี่ยต่อชิ้น: {averagePrice:N2} บาท");
+Console.WriteLine($"สินค้าราคาสูงสุด: {maxPrice:N2} บาท");</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">🖥️ Output:</span>
+            <span class="output-text">มีสินค้าของหมดหรือไม่: True
+สินค้าทุกชิ้น Active หรือไม่: False
+จำนวนรายการสินค้า: 5 ชิ้น
+มูลค่าสินค้ารวมในสต็อก: 263,750.00 บาท
+ราคาเฉลี่ยต่อชิ้น: 10,206.00 บาท
+สินค้าราคาสูงสุด: 39,900.00 บาท</span>
+          </div>
+        </div>
+
+        <!-- GroupBy, Ordering & Pagination -->
+        <h3 class="mt-xl">3.4 การจัดกลุ่ม (GroupBy), เรียงลำดับ (OrderBy) และแบ่งหน้า (Pagination)</h3>
+        <p>
+          สำหรับการทำระบบ API หรือ Dashboard ที่ต้องจัดกลุ่มสินค้าตามหมวดหมู่ และตัดแบ่งข้อมูลเป็นหน้าๆ (Pagination):
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚡</span>
+              <span>GroupingAndPaging.cs</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='คัดลอกแล้ว!'; setTimeout(()=>this.innerText='Copy', 2000);">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">// ─── 1. GroupBy(): จัดกลุ่มสินค้าตามหมวดหมู่ (Category) ───
+var groupedByCategory = catalog.GroupBy(p =&gt; p.Category);
+
+foreach (var group in groupedByCategory)
+{
+    Console.WriteLine($"\n📁 หมวดหมู่: {group.Key} (จำนวน {group.Count()} รายการ)");
+    foreach (var product in group)
+    {
+        Console.WriteLine($"   - {product.Name} : {product.Price:N0} บาท");
+    }
+}
+
+// ─── 2. OrderByDescending() + Skip() + Take(): ทำระบบ Pagination ───
+int pageNumber = 1; // หน้าที่ 1
+int pageSize = 2;   // ดึงหน้าละ 2 รายการ
+
+var pagedProducts = catalog
+    .OrderByDescending(p =&gt; p.Price) // เรียงจากราคาแพงสุดลงไป
+    .Skip((pageNumber - 1) * pageSize) // ข้ามรายการของหน้าก่อนหน้า
+    .Take(pageSize)                   // ดึงมาเฉพาะจำนวนหน้าปัจจุบัน
+    .ToList();
+
+Console.WriteLine($"\n📄 ผลลัพธ์สินค้าหน้า {pageNumber} (หน้าละ {pageSize} ชิ้น):");
+foreach (var p in pagedProducts)
+{
+    Console.WriteLine($"⭐ {p.Name} — {p.Price:N0} บาท");
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">🖥️ Output:</span>
+            <span class="output-text">📁 หมวดหมู่: IT (จำนวน 3 รายการ)
+   - Gaming Laptop : 39,900 บาท
+   - Wireless Mouse : 890 บาท
+   - Mechanical Keyboard : 2,990 บาท
+
+📁 หมวดหมู่: Furniture (จำนวน 2 รายการ)
+   - Ergonomic Chair : 6,500 บาท
+   - Desk Lamp : 750 บาท
+
+📄 ผลลัพธ์สินค้าหน้า 1 (หน้าละ 2 ชิ้น):
+⭐ Gaming Laptop — 39,900 บาท
+⭐ Ergonomic Chair — 6,500 บาท</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 4: Deferred Execution vs Immediate Execution ─── -->
+      <section class="lesson-section reveal" id="deferred-execution">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(210, 153, 34, 0.2); color: var(--accent-warning); border: 1px solid var(--accent-warning);">04</div>
+          <div>
+            <h2>Deferred Execution vs Immediate Execution</h2>
+            <p class="text-muted" style="margin-bottom: 0;">เข้าใจเบื้องหลังการทำงานแบบผัดผ่อน และป้องกันหายนะจาก Multiple Enumeration</p>
+          </div>
+        </div>
+
+        <p>
+          หัวใจสำคัญที่ทำให้ LINQ มีประสิทธิภาพสูงคือกลไก <strong>Deferred (Lazy) Execution</strong> หรือการ <em>"ผัดผ่อนการประมวลผล"</em> คำสั่ง LINQ จะยังไม่เริ่มลูปคำนวณข้อมูลจริงจนกว่าผลลัพธ์นั้นจะถูกร้องขอ (Enumerated)!
+        </p>
+
+        <!-- Execution Modes Visual Box -->
+        <div class="execution-comparison">
+          <div class="exec-box deferred">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 1.3rem;">⏳</span>
+              <h4 style="margin: 0; color: var(--accent-warning);">Deferred Execution (Lazy)</h4>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-secondary);">
+              คืนค่ากลับมาเป็นโครงสร้าง <code>IEnumerable&lt;T&gt;</code> ยังไม่มีการคำนวณเกิดขึ้นจริงในหน่วยความจำตอนประกาศตัวแปร
+            </p>
+            <div style="font-size: 0.8rem; font-family: var(--font-code); color: var(--syn-method); background: var(--bg-primary); padding: 8px; border-radius: var(--radius-sm);">
+              .Where(), .Select(), .OrderBy(), .Take(), .Skip()
+            </div>
+          </div>
+
+          <div class="exec-box immediate">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 1.3rem;">⚡</span>
+              <h4 style="margin: 0; color: var(--accent-success);">Immediate Execution (Eager)</h4>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-secondary);">
+              บังคับให้ประมวลผลทันทีและจัดเก็บผลลัพธ์ลงในหน่วยความจำ RAM (Snapshot ณ เวลานั้น)
+            </p>
+            <div style="font-size: 0.8rem; font-family: var(--font-code); color: var(--accent-success); background: var(--bg-primary); padding: 8px; border-radius: var(--radius-sm);">
+              .ToList(), .ToArray(), .ToDictionary(), .Count(), .First(), .Sum()
+            </div>
+          </div>
+        </div>
+
+        <!-- Multiple Enumeration Warning -->
+        <div class="callout callout-danger">
+          <div class="callout-title">⚠️ หลุมพรางอันตราย: ปัญหา Multiple Enumeration</div>
+          <p>
+            หากคุณส่ง <code>IEnumerable&lt;T&gt;</code> ที่สร้างจาก LINQ ไปใช้หลายครั้ง เช่น เช็ค <code>query.Any()</code> แล้วต่อด้วย <code>query.Count()</code> แล้ววน <code>foreach (var x in query)</code> — <strong>LINQ จะวนลูปคำนวณใหม่ทุกครั้ง!</strong>
+          </p>
+          <p style="margin-bottom: 0;">
+            และหาก Query นั้นเชื่อมต่อกับ Database (EF Core) มันจะทำการส่งคำสั่ง SQL ไปยิง Database ใหม่ทุกรอบ ทำให้ระบบหน่วงและช้าลงอย่างมาก
+            <br><strong>วิธีแก้ไข:</strong> ให้เติม <code>.ToList()</code> หรือ <code>.ToArray()</code> ตั้งแต่รอบแรกเพื่อเก็บผลลัพธ์ลงใน RAM
+          </p>
+        </div>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚡</span>
+              <span>DeferredExecutionProof.cs</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='คัดลอกแล้ว!'; setTimeout(()=>this.innerText='Copy', 2000);">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">List&lt;int&gt; numbers = new() { 1, 2, 3 };
+
+// ประกาศ Query แบบ Deferred (ยังไม่คำนวณตอนบรรทัดนี้!)
+var query = numbers.Where(n =&gt;
+{
+    Console.WriteLine($"-> ประมวลผลเลข: {n}");
+    return n &gt; 1;
+});
+
+Console.WriteLine("เพิ่มเลข 4 และ 5 เข้าไปใน List ต้นฉบับ...");
+numbers.Add(4);
+numbers.Add(5);
+
+Console.WriteLine("\nเริ่มวนลูป foreach เพื่ออ่านค่า (Enumeration เกิดขึ้นตรงนี้!):");
+foreach (var num in query)
+{
+    Console.WriteLine($"✅ ผลลัพธ์: {num}");
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">🖥️ Output:</span>
+            <span class="output-text">เพิ่มเลข 4 และ 5 เข้าไปใน List ต้นฉบับ...
+
+เริ่มวนลูป foreach เพื่ออ่านค่า (Enumeration เกิดขึ้นตรงนี้!):
+-> ประมวลผลเลข: 1
+-> ประมวลผลเลข: 2
+✅ ผลลัพธ์: 2
+-> ประมวลผลเลข: 3
+✅ ผลลัพธ์: 3
+-> ประมวลผลเลข: 4
+✅ ผลลัพธ์: 4
+-> ประมวลผลเลข: 5
+✅ ผลลัพธ์: 5</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 5: Inline Quiz ─── -->
+      <section class="lesson-section reveal" id="quiz-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(227, 98, 9, 0.2); color: var(--syn-variable); border: 1px solid var(--syn-variable);">05</div>
+          <div>
+            <h2>แบบทดสอบวัดความเข้าใจ (Level 3 Quiz)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ทดสอบความเชี่ยวชาญเรื่อง Collections, Lambda, และ LINQ Methods จำนวน 5 ข้อ</p>
+          </div>
+        </div>
+
+        <!-- Quiz Container rendered by QuizEngine -->
+        <div id="csharp-collections-quiz"></div>
+      </section>
+
+      <!-- ─── Next Lesson Banner ─── -->
+      <div class="card mt-2xl reveal" style="border-color: var(--border-active); background: linear-gradient(135deg, rgba(227, 98, 9, 0.15) 0%, rgba(22, 27, 34, 0.8) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge badge-success mb-xs">🎉 ยอดเยี่ยม! ผ่านบทเรียน LINQ &amp; Collections</span>
+            <h3 style="margin-top: 4px; margin-bottom: 4px;">พร้อมไปต่อกับ Level 4: Async/Await &amp; Advanced C# หรือยัง?</h3>
+            <p class="text-muted" style="margin-bottom: 0;">เรียนรู้การเขียนโปรแกรมแบบ Asynchronous (Task, async/await), Record Types, Pattern Matching และฟีเจอร์ระดับสูง</p>
+          </div>
+          <div>
+            <a href="./csharp-advanced.html" class="btn btn-primary btn-lg">
+              <span>ไปบทเรียนถัดไป Level 4 →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Mark this lesson in Progress tracker
+      if (typeof Progress !== 'undefined') {
+        Progress.completeLesson('csharp-collections');
+        Progress.setModuleProgress('csharp', 75);
+      }
+
+      // Quiz Questions Definition (5 Comprehensive Questions on Collections & LINQ)
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'หากระบบต้องการจัดเก็บข้อมูลสินค้า 100,000 ชิ้น และต้องการค้นหารายละเอียดสินค้าด้วย "รหัสบาร์โค้ด (Barcode SKU)" บ่อยครั้งมากๆ ควรเลือกใช้ Collection ชนิดใดเพื่อให้ค้นหาได้เร็วที่สุดในระดับ O(1)?',
+          options: [
+            'List<Product> โดยใช้ .Where(p => p.Barcode == sku)',
+            'Queue<Product> โดยการ Dequeue ออกมาเช็คทีละตัว',
+            'Dictionary<string, Product> โดยใช้รหัส Barcode เป็น Key',
+            'Stack<Product> โดยการ Pop ข้อมูลออกมาหา'
+          ],
+          answer: 2,
+          explanation: 'Dictionary<TKey, TValue> ใช้โครงสร้างแบบ Hash Table ทำให้สามารถเข้าถึงและค้นหาข้อมูลผ่าน Key ได้รวดเร็วระดับ O(1) โดยตรง ในขณะที่ List ต้องทำการวนลูปเทียบทีละตัวแบบ O(N)'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'เมธอด .First() และ .FirstOrDefault() ของ LINQ มีพฤติกรรมแตกต่างกันอย่างไรเมื่อ "ไม่พบข้อมูลที่ตรงตามเงื่อนไข" ใน Collection?',
+          options: [
+            '.First() จะคืนค่า null เสมอ ส่วน .FirstOrDefault() จะโยน NullReferenceException',
+            '.First() จะโยน InvalidOperationException ทันที ส่วน .FirstOrDefault() จะคืนค่า Default (เช่น null หรือ 0) อย่างปลอดภัยโดยไม่เกิด Exception',
+            'ทั้งสองเมธอดคืนค่าผลลัพธ์เหมือนกันทุกประการ ไม่มีข้อแตกต่าง',
+            '.FirstOrDefault() จะทำการเพิ่มข้อมูลใหม่อัตโนมัติถ้าหาไม่เจอ'
+          ],
+          answer: 1,
+          explanation: '.First() จะ Throw InvalidOperationException ("Sequence contains no matching element") หากไม่พบข้อมูล ส่วน .FirstOrDefault() จะคืนค่า Default ของประเภทข้อมูลนั้นๆ (เช่น ออบเจกต์ได้ null, int ได้ 0) จึงปลอดภัยกว่าในการใช้งานทั่วไป'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'หากมี Collection ที่มีข้อมูลตรงตามเงื่อนไข 2 รายการ การเรียกใช้เมธอด .SingleOrDefault() จะส่งผลลัพธ์อย่างไร?',
+          options: [
+            'คืนค่าข้อมูลตัวแรกจาก 2 รายการนั้น',
+            'คืนค่าข้อมูลตัวที่สองจาก 2 รายการนั้น',
+            'คืนค่า null เพราะมีข้อมูลมากกว่า 1 ตัว',
+            'เกิด InvalidOperationException ทันที เพราะ SingleOrDefault คาดหวังข้อมูล 0 หรือ 1 รายการเท่านั้น'
+          ],
+          answer: 3,
+          explanation: '.SingleOrDefault() ยอมให้มีข้อมูล 0 ตัว (ได้ค่า null) หรือ 1 ตัว (ได้ค่านั้น) แต่หากพบข้อมูลตั้งแต่ 2 ตัวขึ้นไป จะถือว่าผิดกฎความเป็น Single และ Throw InvalidOperationException ("Sequence contains more than one matching element") ทันที'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'advanced',
+          question: 'ข้อใดอธิบายปรากฏการณ์ "Deferred Execution" และปัญหา "Multiple Enumeration" ใน LINQ ได้ถูกต้องที่สุด?',
+          options: [
+            'Deferred Execution คือการบังคับให้ LINQ ประมวลผลลง RAM ทันที ส่วน Multiple Enumeration คือการแปลงเป็น Dictionary',
+            'Deferred Execution คือ LINQ จะยังไม่คำนวณจนกว่าจะถูกวนลูป (Enumerated) หากนำตัวแปร Query ไปใช้หลายครั้งจะทำให้เกิดการคำนวณซ้ำซ้อน ควรใช้ .ToList() เพื่อบันทึกผลไว้ก่อน',
+            'Deferred Execution เกิดขึ้นเฉพาะเมื่อใช้ร่วมกับ .ToList() เท่านั้น',
+            'Multiple Enumeration เป็นเทคนิคที่ช่วยเพิ่มความเร็วในการคำนวณของ LINQ ให้เร็วขึ้น 2 เท่า'
+          ],
+          answer: 1,
+          explanation: 'LINQ เป็นแบบ Deferred (Lazy) Execution คือคำสั่งเช่น .Where(), .Select() จะยังไม่ทำงานจริงจนกว่าจะถูก enumerate (เช่น foreach หรือ .Count()) หากเราเรียกใช้ตัวแปร Query เดิมซ้ำหลายครั้ง จะทำให้เกิดการประมวลผลซ้ำ (Multiple Enumeration) การเติม .ToList() จะช่วยรันผลลัพธ์มาเก็บไว้ใน RAM ครั้งเดียว'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'หากต้องการสร้างระบบ "คิวงานพิมพ์เอกสาร (Print Spooler)" หรือ "คิวประมวลผลอีเมลหลังบ้าน" ที่ต้องทำงานตามลำดับ ใครส่งเข้ามาก่อนต้องได้ทำก่อน โครงสร้างข้อมูลใดเหมาะสมที่สุด?',
+          options: [
+            'Stack<T> (LIFO - Last In First Out)',
+            'Queue<T> (FIFO - First In First Out)',
+            'HashSet<T>',
+            'LinkedList<T>'
+          ],
+          answer: 1,
+          explanation: 'Queue<T> ยึดหลัก FIFO (First-In, First-Out) ข้อมูลที่ถูกนำเข้าคิว (Enqueue) ก่อน จะถูกนำออกไปประมวลผล (Dequeue) ก่อนเสมอ เหมาะสมที่สุดสำหรับงานระบบคิว'
+        }
+      ];
+
+      // Initialize Quiz Engine
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('csharp-collections-quiz', quizQuestions, {
+          quizId: 'csharp-collections',
+          showTimer: false,
+          showExplanation: true
+        });
+      }
+    });
+  </script>
+</body>
+</html>

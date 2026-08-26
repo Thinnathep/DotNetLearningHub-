@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Coding & OWASP Top 10 — DotNet Learning Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">🛡️</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน</a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP</a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections & LINQ</a>
+    <a href="./csharp-advanced.html" class="sidebar-link"><span class="link-icon">📕</span> C# ขั้นสูง</a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET</a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection</a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware</a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-link"><span class="link-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link"><span class="link-icon">🎮</span> SQL Playground</a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link"><span class="link-icon">🧩</span> Blazor Components</a>
+    <a href="./xaml-basics.html" class="sidebar-link"><span class="link-icon">📐</span> XAML พื้นฐาน</a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML & JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps & Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git & CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link active"><span class="link-icon">🛡️</span> Secure Coding <span class="link-badge badge-mid">กลาง</span></a>
+
+    <div class="sidebar-section-title">🟡 Web & คุณภาพ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link"><span class="link-icon">👀</span> Code Review</a>
+    <a href="./sdlc-agile.html" class="sidebar-link"><span class="link-icon">📋</span> SDLC & Agile</a>
+    <a href="./tech-docs.html" class="sidebar-link"><span class="link-icon">📝</span> Technical Docs</a>
+    <a href="./architecture.html" class="sidebar-link"><span class="link-icon">🏛️</span> Architecture</a>
+
+    <div class="sidebar-section-title">🎮 Games & Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> เตรียมสัมภาษณ์</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header reveal">
+            <div class="breadcrumb">
+                <a href="../index.html">🏠 หน้าแรก</a>
+                <span>/</span>
+                <span>Security Track</span>
+                <span>/</span>
+                <span>Secure Coding & OWASP Top 10</span>
+            </div>
+            <div class="page-title">
+                <div class="title-icon" style="background: var(--accent-danger); color: #fff;">🛡️</div>
+                <h1>Secure Coding & OWASP Top 10 ใน ASP.NET Core</h1>
+            </div>
+            <p class="page-description">
+                หลักการความปลอดภัยระดับ White-Hat, การป้องกัน SQL Injection, XSS, CSRF, IDOR, การจัดการ Secrets ด้วย Azure Key Vault และกฎเหล็ก Database-First Security
+            </p>
+            <div class="page-meta">
+                <span class="meta-item">⭐ ระดับ: กลาง</span>
+                <span class="meta-item">⏱️ เวลา: ~50 นาที</span>
+                <span class="meta-item">⚡ รางวัล: +100 XP</span>
+                <span class="meta-item">🏷️ OWASP / JWT / White-Hat</span>
+            </div>
+        </div>
+
+        <!-- Analogy Section -->
+        <div class="concept-card reveal">
+            <div class="concept-header">
+                <span class="concept-emoji">🏰</span>
+                <span class="concept-title">เปรียบเทียบให้เห็นภาพ: ปราการป้องกันหลายชั้น (Defense in Depth)</span>
+            </div>
+            <div class="concept-body">
+                <div class="analogy-box">
+                    <div class="analogy-label">💡 Analogy</div>
+                    <p class="analogy-text">
+                        • <strong>UI Validation:</strong> เหมือน <strong>ป้ายห้ามเข้าหน้าประตูรั้ว</strong> — ช่วยกรองผู้ใช้ทั่วไป แต่แฮกเกอร์สามารถกระโดดข้ามรั้ว (ยิง Postman / cURL ตรงเข้า API) ได้ง่ายดาย!<br>
+                        • <strong>API Authorization & Input Sanitization:</strong> เหมือน <strong>ทหารยามเฝ้าประตูห้องโถง</strong> คอยตรวจค้นสัมภาระและขอดูบัตรผ่านตัวจริง<br>
+                        • <strong>Database Row-Level Security (RLS) & Constraints:</strong> เหมือน <strong>ตู้เซฟฝังดินหนาพิเศษ</strong> ที่แม้ทหารยามจะเผลอ ตู้เซฟก็จะไม่ยอมเปิดให้ข้อมูลหลุดออกไปเด็ดขาด (Database-First Rule)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Database-First Rule -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-danger); color: #fff;">01</div>
+                <h2>กฎเหล็ก Database-First Enforcement & Client Bypass</h2>
+            </div>
+
+            <div class="callout callout-danger">
+                <div class="callout-title">🚨 กฎข้อที่ 1: การซ่อนปุ่มบนหน้าจอไม่ใช่ความปลอดภัยที่แท้จริง!</div>
+                <p>
+                    การใช้ <code>@if (user.IsAdmin) { &lt;button&gt;ลบข้อมูล&lt;/button&gt; }</code> บน UI เป็นเพียง "ความสะดวกในการใช้งาน (UI Convenience)" เท่านั้น แฮกเกอร์สามารถกด F12 แก้ DOM หรือส่งคำขอ <code>DELETE /api/users/1</code> ผ่านเครื่องมือยิง API ได้ทันที!<br><br>
+                    <strong>มาตรการที่ถูกต้อง:</strong> ต้องมี <code>[Authorize(Roles = "Admin")]</code> ที่ Controller และมีเงื่อนไขตรวจสอบใน Database (Row-Level Security หรือ Policy) เสมอ
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 2: OWASP Top 10 Defenses -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-danger); color: #fff;">02</div>
+                <h2>แนวทางป้องกันภัยคุกคามยอดฮิตตาม OWASP Top 10</h2>
+            </div>
+
+            <div class="grid grid-2 mb-lg">
+                <div class="card">
+                    <h3 style="color: var(--accent-danger); margin-bottom: 8px;">💉 1. SQL Injection</h3>
+                    <p class="text-sm">• <strong>สาเหตุ:</strong> นำ String จาก User มาต่อใน SQL ตรงๆ<br>
+                    • <strong>วิธีแก้:</strong> ใช้ <strong>Entity Framework Core</strong> หรือ Parameterized Queries ใน Dapper เสมอ ห้ามใช้ <code>$"SELECT * WHERE name = '{userInput}'"</code></p>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--accent-warning); margin-bottom: 8px;">🌐 2. Cross-Site Scripting (XSS)</h3>
+                    <p class="text-sm">• <strong>สาเหตุ:</strong> ยอมให้ User บันทึก JavaScript Tag <code>&lt;script&gt;</code> ลงฐานข้อมูลแล้วนำไปแสดงผลตรงๆ<br>
+                    • <strong>วิธีแก้:</strong> ใช้ HTML Encoding อัตโนมัติใน Razor / Blazor (หลีกเลี่ยง <code>@((MarkupString)rawHtml)</code>)</p>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--accent-info); margin-bottom: 8px;">🔓 3. Broken Access Control / IDOR</h3>
+                    <p class="text-sm">• <strong>สาเหตุ:</strong> User A เปลี่ยนเลข ID ใน URL เช่น <code>GET /api/invoices/999</code> เพื่อแอบดูใบเสร็จของ User B<br>
+                    • <strong>วิธีแก้:</strong> ดึง <code>UserId</code> จาก <strong>Claims/JWT Token</strong> ที่ผ่านการ Sign แล้ว เสมอ (เช่น <code>WHERE id = reqId AND user_id = currentUserId</code>)</p>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--accent-primary); margin-bottom: 8px;">🔑 4. Secrets & Hardcoded Keys</h3>
+                    <p class="text-sm">• <strong>สาเหตุ:</strong> ฝังรหัสผ่าน Database หรือ JWT Secret ในโค้ดหรือ Git Repo<br>
+                    • <strong>วิธีแก้:</strong> ใช้ <strong>dotnet user-secrets</strong> ตอนพัฒนา และ <strong>Azure Key Vault</strong> บน Cloud Production</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: JWT & Role-Based Access Control -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-danger); color: #fff;">03</div>
+                <h2>JWT Authentication & Role-Based Access Control (RBAC)</h2>
+            </div>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> SecureOrdersController.cs</div>
+                    <button class="copy-btn">📋 Copy</button>
+                </div>
+                <div class="code-block-body">
+<pre class="language-csharp"><code>[ApiController]
+[Route("api/v1/[controller]")]
+[Authorize] // 1. ต้อง Login มี JWT Token ที่ถูกต้องจึงจะเข้าถึงได้
+public class OrdersController : ControllerBase
+{
+    private readonly IOrderService _orderService;
+
+    public OrdersController(IOrderService orderService)
+    {
+        _orderService = orderService;
+    }
+
+    [HttpGet("my-orders")]
+    public async Task&lt;IActionResult&gt; GetMyOrders()
+    {
+        // 2. ดึง UserId ที่ปลอดภัยจาก Claims ใน JWT Token
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(userIdString, out var currentUserId))
+        {
+            return Unauthorized();
+        }
+
+        var orders = await _orderService.GetOrdersByUserIdAsync(currentUserId);
+        return Ok(orders);
+    }
+
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")] // 3. บังคับสิทธิ์เฉพาะ Role Admin เท่านั้น
+    public async Task&lt;IActionResult&gt; DeleteOrder(int id)
+    {
+        await _orderService.DeleteAsync(id);
+        return NoContent();
+    }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Quiz -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-warning); color: #000;">🎯</div>
+                <h2>แบบทดสอบความเข้าใจ: Secure Coding</h2>
+            </div>
+            <div id="secure-coding-quiz"></div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/quiz-engine.js"></script>
+<script src="../js/code-visualizer.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'ตามหลักการ Database-First Security การป้องกันการเข้าถึงข้อมูลที่แท้จริงต้องทำที่ระดับใด?',
+                options: [
+                    'ซ่อนปุ่มบนหน้าจอ UI',
+                    'ตรวจสอบสิทธิ์ที่ระดับ API Controller และบังคับใช้ Row-Level Security / Constraints ที่ฐานข้อมูล',
+                    'ตั้งรหัสผ่านเบราว์เซอร์',
+                    'ปิดหน้าต่าง Console'
+                ],
+                answer: 1,
+                explanation: 'การซ่อนปุ่มบน UI เป็นเพียงความสะดวก การรักษาความปลอดภัยที่แท้จริงต้องทำที่ Backend API และ Database เสมอ',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'วิธีป้องกัน SQL Injection ที่มีประสิทธิภาพที่สุดใน ASP.NET Core คือข้อใด?',
+                options: [
+                    'ใช้ Entity Framework Core หรือ Parameterized Queries เสมอ ห้ามนำ String มาต่อกันตรงๆ',
+                    'เขียนโค้ดตรวจสอบคำว่า SELECT ในข้อความ',
+                    'เปลี่ยนพอร์ตของฐานข้อมูล',
+                    'ใช้ตัวแปรแบบ var'
+                ],
+                answer: 0,
+                explanation: 'Parameterized Queries ช่วยแยกโค้ด SQL ออกจาก Data Input ป้องกันไม่ให้คำสั่งแอบแฝงถูก Execute',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'IDOR (Insecure Direct Object Reference) คือช่องโหว่ประเภทใด?',
+                options: [
+                    'การที่ผู้ใช้สามารถเปลี่ยน ID ใน Parameter/URL เพื่อเข้าถึงข้อมูลของผู้อื่นโดยไม่มีการตรวจสิทธิ์ความเป็นเจ้าของ',
+                    'การลืมใส่ HTTPS',
+                    'การใช้งาน JavaScript รุ่นเก่า',
+                    'การที่เซิร์ฟเวอร์ตอบกลับช้า'
+                ],
+                answer: 0,
+                explanation: 'IDOR เกิดเมื่อระบบเชื่อถือ ID ที่ส่งมาจาก Client โดยไม่ได้ตรวจสอบว่า User คนนั้นมีสิทธิ์เป็นเจ้าของ Record นั้นจริงหรือไม่',
+                difficulty: 'mid'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'บนระบบ Cloud Azure เครื่องมือใดเหมาะสมที่สุดสำหรับการจัดเก็บ Connection String และ API Keys?',
+                options: ['Azure Key Vault', 'ไฟล์ appsettings.json ใน Git', 'Hardcode ใน Program.cs', 'คอมเมนต์ในโค้ด'],
+                answer: 0,
+                explanation: 'Azure Key Vault มีระบบเข้ารหัส Hardware Security Module (HSM), Access Policies และการหมุนเวียนกุญแจอัตโนมัติ',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Attribute ใดใน ASP.NET Core Controller ที่ใช้บังคับว่าผู้ใช้ต้องมี Role "Admin" จึงจะเรียกใช้งานได้?',
+                options: ['[Authorize(Roles = "Admin")]', '[RequireAdmin]', '[AdminOnly]', '[CheckRole("Admin")]'],
+                answer: 0,
+                explanation: '[Authorize(Roles = "Admin")] เป็น Attribute มาตรฐานของ ASP.NET Core สำหรับ Role-Based Access Control',
+                difficulty: 'basic'
+            }
+        ];
+
+        QuizEngine.start('secure-coding-quiz', questions, {
+            quizId: 'secure-coding',
+            onComplete: () => {
+                Progress.completeLesson('secure-coding');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

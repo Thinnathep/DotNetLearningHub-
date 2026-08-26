@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Integration &amp; เชื่อมต่อ Third-Party APIs — DotNet Learning Hub</title>
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#0d1117',
+        primaryColor: '#1f6feb',
+        primaryTextColor: '#f0f6fc',
+        primaryBorderColor: '#30363d',
+        lineColor: '#58a6ff',
+        secondaryColor: '#238636',
+        tertiaryColor: '#161b22'
+      }
+    });
+  </script>
+  <style>
+    /* Custom Styling for System Integration page */
+    .integration-accent {
+      color: #58a6ff;
+    }
+    
+    .socket-exhaustion-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+
+    .problem-vs-solution {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+
+    @media (max-width: 860px) {
+      .problem-vs-solution {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pv-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pv-card.danger {
+      border-top: 4px solid var(--accent-danger);
+    }
+
+    .pv-card.success {
+      border-top: 4px solid var(--accent-success);
+    }
+
+    .circuit-state-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: 0.85rem;
+      font-family: var(--font-code);
+    }
+
+    .state-closed {
+      background: rgba(63, 185, 80, 0.15);
+      color: #3fb950;
+      border: 1px solid rgba(63, 185, 80, 0.3);
+    }
+
+    .state-open {
+      background: rgba(248, 81, 73, 0.15);
+      color: #f85149;
+      border: 1px solid rgba(248, 81, 73, 0.3);
+    }
+
+    .state-halfopen {
+      background: rgba(210, 153, 34, 0.15);
+      color: #d29922;
+      border: 1px solid rgba(210, 153, 34, 0.3);
+    }
+
+    .interactive-simulator {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+
+    .sim-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+      align-items: center;
+    }
+
+    .sim-display {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      min-height: 120px;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      overflow-y: auto;
+      max-height: 220px;
+    }
+
+    .sim-log-line {
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+
+    .sim-log-time {
+      color: var(--text-muted);
+      margin-right: 8px;
+    }
+
+    .sim-log-ok { color: var(--accent-success); }
+    .sim-log-err { color: var(--accent-danger); }
+    .sim-log-warn { color: var(--accent-warning); }
+    .sim-log-info { color: var(--accent-primary); }
+
+    .state-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+
+    @media (max-width: 768px) {
+      .state-cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .state-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      text-align: center;
+      transition: all var(--transition-normal);
+    }
+
+    .state-box.active-state {
+      box-shadow: 0 0 15px rgba(88, 166, 255, 0.3);
+      border-color: var(--accent-primary);
+    }
+
+    .webhook-flow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+      padding: var(--space-md);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--accent-primary);
+    }
+
+    .webhook-step-num {
+      width: 28px;
+      height: 28px;
+      background: var(--accent-primary);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .key-value-tag {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      padding: 2px 6px;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: var(--syn-variable);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div style="display: flex; align-items: center; gap: var(--space-md);">
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+      <a href="../index.html" class="site-logo">
+        <div class="logo-icon">🔗</div>
+        <span>DotNet Learning Hub</span>
+      </a>
+    </div>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <a href="./quiz-arena.html" class="btn btn-outline btn-sm" style="border-radius: var(--radius-full);">
+        🎮 Quiz Arena
+      </a>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าหลัก (Dashboard)</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="./csharp-basics.html" class="sidebar-link">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="./csharp-oop.html" class="sidebar-link">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="./csharp-linq.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>LINQ &amp; Collections (Level 3)</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="./csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>Async/Await &amp; Advanced (Lv 4)</span>
+        <span class="sidebar-badge badge-new">Lv 4</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟠 Track REST API &amp; Integration</div>
+      <a href="./rest-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>RESTful API Design</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="./system-integration.html" class="sidebar-link active">
+        <span class="link-icon">🔗</span>
+        <span>System Integration &amp; APIs</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🌐 Track .NET &amp; Web API</div>
+      <a href="./dotnet-overview.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 &amp; CLI Overview</span>
+      </a>
+      <a href="./aspnet-api.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>ASP.NET Core Web API</span>
+      </a>
+      <a href="./ef-core.html" class="sidebar-link">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+      </a>
+      <a href="./blazor.html" class="sidebar-link">
+        <span class="link-icon">🎨</span>
+        <span>Blazor Web Apps</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🛠️ Track Database &amp; Quality</div>
+      <a href="./sql-basics.html" class="sidebar-link">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; T-SQL</span>
+      </a>
+      <a href="./architecture.html" class="sidebar-link">
+        <span class="link-icon">🏛️</span>
+        <span>Clean Architecture &amp; Patterns</span>
+      </a>
+      <a href="./testing.html" class="sidebar-link">
+        <span class="link-icon">🧪</span>
+        <span>Unit Testing &amp; xUnit</span>
+      </a>
+      <a href="./devops.html" class="sidebar-link">
+        <span class="link-icon">🐳</span>
+        <span>Docker &amp; CI/CD</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header animate-fade-in">
+        <div class="breadcrumb">
+          <a href="../index.html">หน้าหลัก</a>
+          <span>/</span>
+          <span>REST API Track</span>
+          <span>/</span>
+          <span class="text-primary">System Integration</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(88, 166, 255, 0.15); color: var(--accent-primary); border: 1px solid rgba(88, 166, 255, 0.3);">🔗</div>
+          <div>
+            <h1>System Integration &amp; เชื่อมต่อ Third-Party APIs</h1>
+            <div class="page-description">เจาะลึกเทคนิคการเชื่อมต่อระบบภายนอกระดับ Production ด้วย IHttpClientFactory, System.Text.Json, Polly Resilience Policies และ Webhook Receiver พร้อมระบบรักษาความปลอดภัย Signature Verification</div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="level-tag level-mid">⭐⭐ กลาง (Intermediate)</span></span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>เวลาเรียน: <strong>~45 นาที</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>รางวัล: <strong>+100 XP</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>💻</span>
+            <span>รองรับ .NET 8 / C# 12</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Analogy Section ─── -->
+      <div class="analogy-box reveal">
+        <div class="analogy-label">💡 เปรียบเทียบให้เห็นภาพ (Analogy)</div>
+        <p class="analogy-text">
+          <strong>"ล่ามแปลภาษาและบริษัทขนส่งพัสดุข้ามชาติ"</strong> 📦🌐<br>
+          ลองจินตนาการว่าบริษัทของคุณต้องการส่งเอกสารหรือสั่งของจากคู่ค้าต่างประเทศ:
+        </p>
+        <ul style="margin: var(--space-sm) 0 0 var(--space-lg); color: var(--text-secondary); line-height: 1.6;">
+          <li><strong>HttpClientFactory (กองยานพาหนะส่วนกลาง):</strong> เหมือนบริษัทโลจิสติกส์ที่มีอู่รถส่วนกลาง จัดการบำรุงรักษารถบรรทุกและคนขับ ไม่ต้องซื้อรถคันใหม่ทุกครั้งที่ส่งจดหมาย (ไม่สร้าง connection ใหม่จน socket หมด) และเมื่อเส้นทางเปลี่ยนก็สามารถปรับเปลี่ยนเส้นทางได้ทันที (DNS refresh)</li>
+          <li><strong>System.Text.Json (ล่ามแปลภาษาและมาตรฐานกล่องพัสดุ):</strong> ก่อนส่งของ เราต้องแพ็กสินค้าลงกล่องตามมาตรฐานสากล (JSON Serialization) และเมื่อได้รับกล่องพัสดุมา ล่ามก็แปลและแกะของออกมาเป็นวัตถุที่เราใช้งานได้ทันที (Deserialization)</li>
+          <li><strong>Polly Resilience (ประกันภัยและแผนรับมือเหตุฉุกเฉิน):</strong> หากถนนปิดหรือฝนตกหนัก ขบวนรถจะรอสักครู่แล้วลองเดินทางใหม่ (Retry with Exponential Backoff) และถ้าสะพานขาดถาวร จะสั่งปิดถนนชั่วคราวไม่ให้รถคันอื่นขับไปติดขัดเปล่าๆ (Circuit Breaker)</li>
+          <li><strong>Webhooks &amp; HMAC Signature (ระบบแจ้งเตือนพัสดุพร้อมตราประทับลับ):</strong> เมื่อคู่ค้าทำงานเสร็จ เขาไม่ต้องรอเราโทรไปถามซ้ำๆ แต่จะส่งรถมาเคาะประตูบ้านเราทันที (Webhook Callback) โดยมีตราประทับครั่งลับพิเศษ (HMAC-SHA256 Signature) เพื่อให้เรามั่นใจ 100% ว่าไม่ใช่พัสดุปลอมจากมิจฉาชีพ!</li>
+        </ul>
+      </div>
+
+      <!-- ─── Section 1: HttpClient vs IHttpClientFactory ─── -->
+      <section class="lesson-section reveal" id="httpclient-vs-factory">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(88, 166, 255, 0.15); color: var(--accent-primary); border: 1px solid var(--accent-primary);">01</div>
+          <div>
+            <h2>HttpClient vs IHttpClientFactory: ปัญหาที่แท้จริงเบื้องหลัง HTTP Connection</h2>
+            <p class="section-desc">ทำไมการเขียน <code>using var client = new HttpClient()</code> ถึงเป็นกับดักทำลาย Production Server และทำไม Singleton HttpClient ก็ไม่ใช่คำตอบที่สมบูรณ์</p>
+          </div>
+        </div>
+
+        <p class="lead-text">
+          นักพัฒนา C# มือใหม่เกือบทุกคนเริ่มต้นด้วยการมองว่า <code>HttpClient</code> สืบทอดมาจาก <code>IDisposable</code> ดังนั้นจึงเขียนครอบด้วยบล็อก <code>using</code> เหมือนกับการเปิดไฟล์หรือเชื่อมต่อ Database แต่ในระดับเครือข่าย OS ระดับต่ำ (TCP Sockets) พฤติกรรมของมันกลับต่างออกไปอย่างสิ้นเชิง!
+        </p>
+
+        <div class="problem-vs-solution">
+          <div class="pv-card danger">
+            <h4 style="color: var(--accent-danger); margin-bottom: 8px;">❌ ปัญหาที่ 1: Socket Exhaustion (เมื่อ new HttpClient บ่อยๆ)</h4>
+            <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary);">
+              เมื่อสั่ง <code>Dispose()</code> ตัว <code>HttpClient</code> ตัว Socket TCP เบื้องล่างจะไม่ถูกปิดในทันที แต่ระบบปฏิบัติการ Windows/Linux จะค้างสถานะไว้ในโหมด <strong><code>TIME_WAIT</code></strong> เป็นเวลา 2-4 นาที เพื่อรอ packet ที่อาจจะตกค้างในเครือข่าย<br><br>
+              หากเซิร์ฟเวอร์ของคุณมี Request เข้ามา 500-1,000 ครั้ง/วินาที พอร์ตเชื่อมต่อ (Outbound Sockets) จะถูกใช้จนเต็มหมดเกลี้ยง ส่งผลให้เกิดข้อผิดพลาดรุนแรง:
+            </p>
+            <div style="background: var(--bg-primary); padding: 8px; border-radius: var(--radius-sm); font-family: var(--font-code); font-size: 0.8rem; color: #ff7b72; margin-top: 8px;">
+              System.Net.Sockets.SocketException: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+            </div>
+          </div>
+
+          <div class="pv-card danger">
+            <h4 style="color: var(--accent-warning); margin-bottom: 8px;">⚠️ ปัญหาที่ 2: DNS Refresh Issue (เมื่อใช้ Singleton HttpClient)</h4>
+            <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary);">
+              หลายคนแก้ปัญหา Socket Exhaustion ด้วยการประกาศ <code>static readonly HttpClient</code> ไว้ตัวเดียวตลอดอายุของแอปพลิเคชัน แต่วิธีนี้ทำให้เกิดปัญหาใหม่!<br><br>
+              <code>HttpClient</code> แบบ Singleton จะเปิด TCP connection แช่ค้างไว้และไม่ยอมทำ <strong>DNS Lookup ซ้ำ</strong> หาก Third-party API หรือ Cloud Service ปลายทาง (เช่น Azure, AWS, Cloudflare) มีการอัปเดต IP หรือ Failover ไปยังเซิร์ฟเวอร์ใหม่ แอปของคุณจะยังยิงไปที่ IP เก่าจน Request พังทั้งหมด (Downtime)
+            </p>
+          </div>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">💡 ทางออกระดับสากล: IHttpClientFactory ใน .NET Core / .NET 8</div>
+          <div class="callout-text">
+            .NET แนะนำให้ใช้ <strong><code>IHttpClientFactory</code></strong> ซึ่งทำหน้าที่แยก Object ของ <code>HttpClient</code> ออกจาก <code>HttpMessageHandler</code> โดย Handler จะถูกบริหารผ่าน <strong>Connection Pool</strong> ที่มีอายุขัย (Default 2 นาที) เมื่อ Handler หมดอายุ Connection ใหม่จะทำการ Re-resolve DNS เสมอ และ Socket จะถูกนำกลับมาใช้ซ้ำได้อย่างมีประสิทธิภาพสูงสุด ป้องกันทั้ง Socket Exhaustion และ DNS Stale ได้แบบ 100%!
+          </div>
+        </div>
+
+        <!-- Mermaid Diagram: HttpMessageHandler Pooling -->
+        <div class="flow-diagram">
+          <div class="mermaid">
+graph LR
+    subgraph ClientRequests ["Application Requests"]
+      R1[Controller / Service]
+      R2[Background Worker]
+      R3[Minimal API Endpoint]
+    end
+
+    subgraph Factory ["IHttpClientFactory Management"]
+      F[HttpClient Instance Pool]
+      HP[HttpMessageHandler Pool]
+      Lifetime[Handler Lifetime: 2 mins<br/>Auto DNS Refresh]
+    end
+
+    subgraph External ["External Third-Party API"]
+      API1[Stripe / Payment Gateway]
+      API2[Notification Service]
+    end
+
+    R1 -->|1. Request Client| F
+    R2 -->|1. Request Client| F
+    R3 -->|1. Request Client| F
+    F -->|2. Lease Handler| HP
+    HP -.->|3. Manage Life & DNS| Lifetime
+    HP -->|4. Reused TCP Socket| API1
+    HP -->|4. Reused TCP Socket| API2
+          </div>
+          <div style="text-align: center; margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">
+            แผนภาพ: สถาปัตยกรรมการแชร์ HttpMessageHandler Pool ของ IHttpClientFactory ใน .NET
+          </div>
+        </div>
+
+        <!-- Interactive Simulation: Socket Exhaustion vs HttpMessageHandler -->
+        <div class="interactive-simulator">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="margin: 0; color: var(--accent-primary);">🧪 Interactive Simulator: เปรียบเทียบ Socket Usage</h4>
+            <span class="badge badge-info">ลองกดรัน Simulation</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--space-md);">
+            ทดสอบยิง 20 Requests ติดต่อกันเพื่อดูความต่างระหว่างการ <code>new HttpClient()</code> ทุกครั้ง กับการใช้ <code>IHttpClientFactory</code> Pool
+          </p>
+
+          <div class="sim-controls">
+            <button id="btn-sim-bad" class="btn btn-danger btn-sm">🔴 จำลอง: new HttpClient() [เสี่ยง Socket หลุด]</button>
+            <button id="btn-sim-good" class="btn btn-success btn-sm">🟢 จำลอง: IHttpClientFactory [Pool Reused]</button>
+            <button id="btn-sim-clear" class="btn btn-outline btn-sm">ล้างผลลัพธ์</button>
+          </div>
+
+          <div class="sim-display" id="sim-output">
+            <div class="sim-log-line"><span class="sim-log-time">[System]</span> กดปุ่มด้านบนเพื่อเริ่มการทดสอบจำลองเครือข่าย...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 2: Registration Patterns ─── -->
+      <section class="lesson-section reveal" id="client-registration">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(88, 166, 255, 0.15); color: var(--accent-primary); border: 1px solid var(--accent-primary);">02</div>
+          <div>
+            <h2>การลงทะเบียน Typed Client และ Named Client ใน Program.cs</h2>
+            <p class="section-desc">เรียนรู้รูปแบบ Best Practice ทั้ง 3 วิธีในการลงทะเบียนและใช้งาน HttpClient ใน ASP.NET Core</p>
+          </div>
+        </div>
+
+        <p class="lead-text">
+          ใน .NET มีรูปแบบการใช้งาน <code>IHttpClientFactory</code> หลักๆ 3 รูปแบบ โดยรูปแบบที่แนะนำที่สุดสำหรับงานระดับ Enterprise คือ <strong>Typed Client</strong>
+        </p>
+
+        <!-- Tabs for Registration Approaches -->
+        <div class="tabs" id="client-tabs">
+          <button class="tab-btn active" onclick="switchClientTab('typed')">1. Typed Client (🌟 แนะนำที่สุด)</button>
+          <button class="tab-btn" onclick="switchClientTab('named')">2. Named Client</button>
+          <button class="tab-btn" onclick="switchClientTab('basic')">3. Basic Factory Pattern</button>
+        </div>
+
+        <!-- Tab 1: Typed Client -->
+        <div id="tab-typed" class="tab-content active">
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            <strong>Typed Client</strong> รวมการตั้งค่า URL, Header, Authorization และตรรกะการเรียก API เข้าไว้ในคลาส Service เฉพาะตัว ทำให้โค้ดสะอาด มี Type-Safety และง่ายต่อการทำ Unit Test
+          </p>
+
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <div class="file-info">
+                <span class="file-icon">📄</span>
+                <span>Services/PaymentClient.cs (การสร้าง Typed Client Class)</span>
+              </div>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="code-block-body">
+              <pre><code class="language-csharp">using System.Net.Http.Json;
+
+namespace DotNetHub.Integration.Services;
+
+// DTO Models
+public record PaymentRequest(string OrderId, decimal Amount, string Currency);
+public record PaymentResponse(string TransactionId, string Status, DateTime ProcessedAt);
+
+public interface IPaymentClient
+{
+    Task<PaymentResponse?> ProcessPaymentAsync(PaymentRequest request, CancellationToken ct = default);
+}
+
+// Typed Client: รับ HttpClient ผ่าน Dependency Injection โดยตรง
+public class PaymentClient : IPaymentClient
+{
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<PaymentClient> _logger;
+
+    public PaymentClient(HttpClient httpClient, ILogger<PaymentClient> logger)
+    {
+        _httpClient = httpClient;
+        _logger = logger;
+    }
+
+    public async Task<PaymentResponse?> ProcessPaymentAsync(PaymentRequest request, CancellationToken ct = default)
+    {
+        _logger.LogInformation("กำลังส่งคำขอชำระเงินสำหรับ Order: {OrderId}", request.OrderId);
+
+        var response = await _httpClient.PostAsJsonAsync("/api/v1/charges", request, ct);
+        
+        // ตรวจสอบว่า HTTP Status สำเร็จหรือไม่ (200-299)
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<PaymentResponse>(cancellationToken: ct);
+    }
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <div class="file-info">
+                <span class="file-icon">⚙️</span>
+                <span>Program.cs (การลงทะเบียน Typed Client ลง DI Container)</span>
+              </div>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="code-block-body">
+              <pre><code class="language-csharp">var builder = WebApplication.CreateBuilder(args);
+
+// ลงทะเบียน Typed Client พร้อมตั้งค่า BaseAddress และ Headers ส่วนกลาง
+builder.Services.AddHttpClient<IPaymentClient, PaymentClient>((serviceProvider, client) =>
+{
+    var config = serviceProvider.GetRequiredService<IConfiguration>();
+    
+    client.BaseAddress = new Uri(config["PaymentGateway:BaseUrl"] ?? "https://api.paymenthub.com");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+    client.DefaultRequestHeaders.Add("X-Api-Key", config["PaymentGateway:ApiKey"]);
+    client.Timeout = TimeSpan.FromSeconds(15);
+});
+
+builder.Services.AddControllers();
+var app = builder.Build();
+app.MapControllers();
+app.Run();</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Named Client -->
+        <div id="tab-named" class="tab-content">
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            <strong>Named Client</strong> เหมาะสำหรับกรณีที่มีการเรียก Third-party หลายตัวหรือคอนฟิกหลายแบบ แต่ไม่ต้องการสร้าง Class Service แยกในแต่ละจุด
+          </p>
+
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <div class="file-info">
+                <span class="file-icon">⚙️</span>
+                <span>Program.cs &amp; การเรียกใช้งาน Named Client</span>
+              </div>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="code-block-body">
+              <pre><code class="language-csharp">// 1. ลงทะเบียนใน Program.cs โดยตั้งชื่อระบุ Client
+builder.Services.AddHttpClient("GitHubClient", client =>
+{
+    client.BaseAddress = new Uri("https://api.github.com/");
+    client.DefaultRequestHeaders.Add("User-Agent", "DotNetLearningHub-App");
+    client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+});
+
+// 2. เรียกใช้งานใน Controller ผ่าน IHttpClientFactory
+[ApiController]
+[Route("api/[controller]")]
+public class RepoController : ControllerBase
+{
+    private readonly IHttpClientFactory _clientFactory;
+
+    public RepoController(IHttpClientFactory clientFactory)
+    {
+        _clientFactory = clientFactory;
+    }
+
+    [HttpGet("{owner}/{repo}")]
+    public async Task<IActionResult> GetRepo(string owner, string repo)
+    {
+        // ดึง client ตามชื่อที่ตั้งไว้
+        var client = _clientFactory.CreateClient("GitHubClient");
+        
+        var response = await client.GetAsync($"repos/{owner}/{repo}");
+        if (!response.IsSuccessStatusCode)
+            return StatusCode((int)response.StatusCode, "GitHub API Error");
+
+        var json = await response.Content.ReadAsStringAsync();
+        return Content(json, "application/json");
+    }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Basic Factory Pattern -->
+        <div id="tab-basic" class="tab-content">
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            <strong>Basic Pattern</strong> เหมาะสำหรับงานง่ายๆ เช่น Ad-hoc Request ที่ไม่มีการตั้งค่าล่วงหน้าใน Program.cs
+          </p>
+
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <div class="file-info">
+                <span class="file-icon">📄</span>
+                <span>Services/AdHocService.cs</span>
+              </div>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="code-block-body">
+              <pre><code class="language-csharp">public class QuickPingService
+{
+    private readonly IHttpClientFactory _factory;
+
+    public QuickPingService(IHttpClientFactory factory)
+    {
+        _factory = factory;
+    }
+
+    public async Task<bool> IsSiteHealthyAsync(string url)
+    {
+        // สร้าง client แบบ default (ยังคงได้ประโยชน์จาก Handler Pool)
+        var client = _factory.CreateClient();
+        try
+        {
+            var response = await client.GetAsync(url);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 3: JSON Serialization with System.Text.Json ─── -->
+      <section class="lesson-section reveal" id="json-serialization">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(88, 166, 255, 0.15); color: var(--accent-primary); border: 1px solid var(--accent-primary);">03</div>
+          <div>
+            <h2>JSON Serialization &amp; Deserialization ด้วย System.Text.Json</h2>
+            <p class="section-desc">การแปลงข้อมูล JSON ประสิทธิภาพสูง ไม่เปลือง Memory (Zero-allocation) และการจัดการ Naming Policy ระหว่าง C# PascalCase กับ API snake_case</p>
+          </div>
+        </div>
+
+        <p class="lead-text">
+          <code>System.Text.Json</code> เป็น JSON Library ประจำตัวของ .NET ที่ถูกสร้างขึ้นมาเพื่อเน้นประสิทธิภาพความเร็วสูงกว่า <code>Newtonsoft.Json (Json.NET)</code> หลายเท่าตัว ด้วยการอ่านข้อมูลผ่าน <code>Span&lt;byte&gt;</code> และ UTF-8 โดยตรง
+        </p>
+
+        <div class="card mb-lg">
+          <h4 style="margin-bottom: var(--space-sm); color: var(--accent-primary);">📌 กฎเหล็ก 3 ข้อที่ต้องรู้เมื่อแปลง JSON กับ Third-Party APIs</h4>
+          <ul style="margin: 0 0 0 var(--space-lg); color: var(--text-secondary); line-height: 1.7;">
+            <li><strong>Property Naming:</strong> C# นิยมใช้ <code>PascalCase</code> (เช่น <code>CustomerId</code>) แต่ REST APIs สากลมักใช้ <code>snake_case</code> (เช่น <code>customer_id</code>) หรือ <code>camelCase</code></li>
+            <li><strong>Reusing JsonSerializerOptions:</strong> <code>JsonSerializerOptions</code> ควรประกาศเป็น <code>static readonly</code> เสมอ ห้าม <code>new</code> ทุกรอบ เพราะการสร้าง Options ใหม่จะสูญเสีย Reflection Cache ภายใน ทำให้โปรแกรมทำงานช้าลงอย่างเห็นได้ชัด</li>
+            <li><strong>Async Streaming:</strong> ใช้ <code>DeserializeAsync&lt;T&gt;</code> ร่วมกับ <code>Stream</code> แทนที่จะอ่านเป็นสตริงทั้งหมดเข้า Memory ด้วย <code>ReadAsStringAsync()</code> เพื่อลดการบวมของ LOH (Large Object Heap)</li>
+          </ul>
+        </div>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📦</span>
+              <span>DTOs/UserProfileDto.cs (การตกแต่ง JSON Model ด้วย Attributes)</span>
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">using System.Text.Json.Serialization;
+
+public class UserProfileDto
+{
+    // แมปชื่อจาก snake_case ใน JSON กลับมาเป็น PascalCase ใน C#
+    [JsonPropertyName("user_id")]
+    public required string Id { get; init; }
+
+    [JsonPropertyName("full_name")]
+    public string FullName { get; set; } = string.Empty;
+
+    [JsonPropertyName("email_address")]
+    public string? Email { get; set; }
+
+    // ซ่อนฟิลด์นี้ ไม่ให้ถูก Serialize ส่งออกไปภายนอก
+    [JsonIgnore]
+    public string InternalSecretToken { get; set; } = string.Empty;
+
+    // รองรับการแปลง Format วันที่แบบกำหนดเอง
+    [JsonPropertyName("created_at")]
+    public DateTime CreatedAt { get; set; }
+
+    // กำหนดค่า Default หากฟิลด์ใน JSON ส่งมาเป็น null
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("phone_number")]
+    public string? PhoneNumber { get; set; }
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚡</span>
+              <span>Services/JsonHelperExample.cs (การ Deserialization แบบ High-Performance Stream)</span>
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">using System.Text.Json;
+
+public class ThirdPartyUserService
+{
+    private readonly HttpClient _client;
+    
+    // ตั้งค่า Options เพียงครั้งเดียวแบบ static เพื่อประหยัด CPU & Memory
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true, // รองรับตัวพิมพ์เล็ก-ใหญ่
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower, // แปลง snake_case อัตโนมัติ (.NET 8)
+        WriteIndented = false
+    };
+
+    public ThirdPartyUserService(HttpClient client)
+    {
+        _client = client;
+    }
+
+    public async Task<UserProfileDto?> GetProfileStreamAsync(string userId, CancellationToken ct)
+    {
+        using var response = await _client.GetAsync($"/api/users/{userId}", HttpCompletionOption.ResponseHeadersRead, ct);
+        response.EnsureSuccessStatusCode();
+
+        // ดึง Stream โดยตรง ไม่ต้องอ่านเป็นสตริงทั้งหมดก่อน
+        using var stream = await response.Content.ReadAsStreamAsync(ct);
+        
+        // Deserialize ตรงจาก Network Stream ทันที (Memory Footprint ต่ำมาก)
+        return await JsonSerializer.DeserializeAsync<UserProfileDto>(stream, _jsonOptions, ct);
+    }
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 4: Polly Resilience & Fault Handling ─── -->
+      <section class="lesson-section reveal" id="polly-resilience">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(88, 166, 255, 0.15); color: var(--accent-primary); border: 1px solid var(--accent-primary);">04</div>
+          <div>
+            <h2>การจัดการ Resiliency &amp; Fault Handling ด้วย Polly</h2>
+            <p class="section-desc">รับมือกับปัญหาเครือข่ายล่มชั่วคราว (Transient Faults) ด้วยกลยุทธ์ Exponential Backoff + Jitter และ Circuit Breaker Pattern</p>
+          </div>
+        </div>
+
+        <p class="lead-text">
+          ในการสื่อสารผ่านเครือข่ายระหว่าง Microservices หรือ Third-Party APIs มีกฎเหล็กข้อหนึ่งคือ <em>"สิ่งใดที่สามารถผิดพลาดได้ มันจะผิดพลาดอย่างแน่นอน"</em> (Network glitches, Server 503 Overloaded, Rate limit 429) เราต้องสร้างแอปที่มีความยืดหยุ่น (Resilient) ไม่พังตามระบบภายนอก
+        </p>
+
+        <!-- 3 Core Resilience Patterns -->
+        <div class="state-cards-grid">
+          <div class="state-box">
+            <div style="font-size: 2rem; margin-bottom: 6px;">🔄</div>
+            <h4 style="margin-bottom: 4px; color: var(--syn-type);">1. Retry Policy</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">
+              เมื่อเกิดข้อผิดพลาดชั่วคราว (เช่น 503 Service Unavailable) ให้ลองยิงซ้ำตามจำนวนรอบที่กำหนด
+            </p>
+          </div>
+          <div class="state-box">
+            <div style="font-size: 2rem; margin-bottom: 6px;">⏳</div>
+            <h4 style="margin-bottom: 4px; color: var(--syn-variable);">2. Exponential Backoff</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">
+              เว้นระยะห่างการลองใหม่แบบทวีคูณ (2s ➔ 4s ➔ 8s) พร้อมสุ่มเศษเสี้ยวเวลา (Jitter) ป้องกันคลื่น Request ถล่ม Server พร้อมกัน (Thundering Herd)
+            </p>
+          </div>
+          <div class="state-box">
+            <div style="font-size: 2rem; margin-bottom: 6px;">⚡</div>
+            <h4 style="margin-bottom: 4px; color: var(--accent-danger);">3. Circuit Breaker</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">
+              เมื่อพังติดต่อกันเกินเกณฑ์ ให้ตัดวงจรทันที (Fail Fast) ไม่ส่ง Request ไปรบกวน Server ปลายทางที่กำลังล่ม
+            </p>
+          </div>
+        </div>
+
+        <!-- Circuit Breaker State Transition Diagram -->
+        <div class="flow-diagram">
+          <div class="mermaid">
+stateDiagram-v2
+    [*] --> Closed
+    
+    Closed --> Open: Failures exceed threshold<br/>(e.g., 5 consecutive errors)
+    note right of Closed: สถานะปกติ (วงจรปิด)<br/>Request ไหลผ่านได้ตามปกติ
+    
+    Open --> HalfOpen: Sleep duration expires<br/>(e.g., after 30 seconds)
+    note right of Open: ตัดวงจร (วงจรเปิด)<br/>ดีด Request กลับทันที (Fail-Fast)<br/>ไม่ยิงไปภายนอก
+    
+    HalfOpen --> Closed: Trial request SUCCEEDS
+    HalfOpen --> Open: Trial request FAILS
+    note right of HalfOpen: ทดลองส่ง (กึ่งเปิด)<br/>ส่ง Request ตัวอย่าง 1-2 ตัว<br/>เพื่อเช็กว่าระบบปลายทางฟื้นหรือยัง
+          </div>
+          <div style="text-align: center; margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">
+            แผนภาพ: วงจรชีวิตและสถานะ 3 แบบของ Circuit Breaker Pattern
+          </div>
+        </div>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">🛡️</span>
+              <span>Program.cs (การติดตั้ง Polly Resilience Pipeline ใน .NET 8)</span>
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">using Polly;
+using Polly.Extensions.Http;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// วิธีที่ 1: ติดตั้ง Policy ผ่าน Microsoft.Extensions.Http.Polly
+builder.Services.AddHttpClient<IExternalWeatherClient, ExternalWeatherClient>(client =>
+{
+    client.BaseAddress = new Uri("https://api.weather-service.com");
+})
+// 1. นโยบาย Retry: ทำซ้ำ 3 ครั้ง แบบ Exponential Backoff (2s, 4s, 8s) เฉพาะกรณี Transient Error (5xx, 408, Network Error)
+.AddTransientHttpErrorPolicy(policyBuilder => 
+    policyBuilder.WaitAndRetryAsync(
+        retryCount: 3,
+        sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
+    )
+)
+// 2. นโยบาย Circuit Breaker: ถ้าพังติดต่อกัน 5 ครั้ง ให้เปิดสวิตช์ตัดวงจรเป็นเวลา 30 วินาที
+.AddTransientHttpErrorPolicy(policyBuilder =>
+    policyBuilder.CircuitBreakerAsync(
+        handledEventsAllowedBeforeBreaking: 5,
+        durationOfBreak: TimeSpan.FromSeconds(30)
+    )
+);
+
+// 🌟 วิธีที่ 2 (.NET 8 Standard Resilience Handler แนะนำใหม่ล่าสุด):
+// ติดตั้ง Package: Microsoft.Extensions.Http.Resilience
+// builder.Services.AddHttpClient<IOrderClient, OrderClient>()
+//                .AddStandardResilienceHandler(); // มาพร้อม Retry, Circuit Breaker, Timeout, RateLimiter ครบเซ็ต!</code></pre>
+          </div>
+        </div>
+
+        <!-- Interactive Circuit Breaker Simulator -->
+        <div class="interactive-simulator">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="margin: 0; color: var(--accent-primary);">⚡ Interactive Circuit Breaker Demo</h4>
+            <div id="cb-status-badge" class="circuit-state-badge state-closed">STATE: CLOSED (วงจรปกติ)</div>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--space-md);">
+            ทดลองกดส่งคำขอสำเร็จ หรือจำลองข้อผิดพลาด (Failed Request) เพื่อดูว่า Circuit Breaker ทำการตัดวงจร (Open) และลองเชื่อมต่อใหม่ (Half-Open) อย่างไร (เงื่อนไขจำลอง: พัง 3 ครั้งติดตัดวงจรทันที)
+          </p>
+
+          <div class="sim-controls">
+            <button id="btn-cb-success" class="btn btn-success btn-sm">✅ ส่ง Request สำเร็จ (HTTP 200)</button>
+            <button id="btn-cb-fail" class="btn btn-danger btn-sm">❌ ส่ง Request พัง (HTTP 503)</button>
+            <button id="btn-cb-reset" class="btn btn-outline btn-sm">รีเซ็ตระบบ</button>
+            <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: auto;" id="cb-fail-counter">ความล้มเหลวสะสม: 0/3</span>
+          </div>
+
+          <div class="sim-display" id="cb-log">
+            <div class="sim-log-line"><span class="sim-log-time">[System]</span> Circuit Breaker พร้อมทำงาน (สถานะปัจจุบัน: CLOSED - ยิงคำขอได้ตามปกติ)</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 5: Webhooks Integration ─── -->
+      <section class="lesson-section reveal" id="webhooks-integration">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(88, 166, 255, 0.15); color: var(--accent-primary); border: 1px solid var(--accent-primary);">05</div>
+          <div>
+            <h2>Webhooks Integration &amp; การตรวจสอบ HMAC-SHA256 Signature</h2>
+            <p class="section-desc">เทคนิคการสร้าง Webhook Receiver Endpoint ที่ปลอดภัย ป้องกัน Replay Attack และการปลอมแปลงข้อมูลจากบุคคลภายนอก</p>
+          </div>
+        </div>
+
+        <p class="lead-text">
+          <strong>Webhook</strong> คือระบบ "Reverse API" แทนที่ระบบของเราจะต้องคอย Polling ไปถามเซิร์ฟเวอร์ภายนอกทุกๆ 5 นาทีว่า <em>"ลูกค้าจ่ายเงินหรือยัง?"</em> เมื่อเกิดเหตุการณ์ขึ้น เซิร์ฟเวอร์ต้นทาง (เช่น Stripe, Omise, GitHub, LINE Pay) จะเป็นผู้ยิง HTTP POST มาหา Endpoint ของเราโดยตรงทันทีแบบ Real-Time
+        </p>
+
+        <div class="webhook-flow-step">
+          <div class="webhook-step-num">1</div>
+          <div>
+            <strong style="color: var(--text-primary);">ผู้ให้บริการสร้าง Digital Signature:</strong><br>
+            <span style="font-size: 0.85rem; color: var(--text-secondary);">
+              ก่อนส่งข้อมูล JSON ผู้ให้บริการจะนำ Raw JSON Body มารวมกับรหัสลับ (Shared Secret Key) แล้วคำนวณ Hash ด้วย <strong>HMAC-SHA256</strong> จากนั้นแนบผลลัพธ์มาใน HTTP Header (เช่น <code>X-Signature</code> หรือ <code>Stripe-Signature</code>)
+            </span>
+          </div>
+        </div>
+
+        <div class="webhook-flow-step">
+          <div class="webhook-step-num">2</div>
+          <div>
+            <strong style="color: var(--text-primary);">Receiver รับและคำนวณเปรียบเทียบ:</strong><br>
+            <span style="font-size: 0.85rem; color: var(--text-secondary);">
+              เมื่อ Endpoint ของเราได้รับ Request เราจะอ่าน Raw Body ที่แท้จริง แล้วนำมา Hash ด้วย Secret เดียวกัน หากผลลัพธ์ตรงกัน 100% จึงมั่นใจได้ว่าข้อมูลมาจากผู้ให้บริการตัวจริงและไม่มีการแก้ไขระหว่างทาง
+            </span>
+          </div>
+        </div>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">🔒</span>
+              <span>Controllers/PaymentWebhookController.cs (Webhook Receiver ที่สมบูรณ์แบบ)</span>
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
+
+[ApiController]
+[Route("api/webhooks")]
+public class PaymentWebhookController : ControllerBase
+{
+    private readonly IConfiguration _config;
+    private readonly ILogger<PaymentWebhookController> _logger;
+
+    public PaymentWebhookController(IConfiguration config, ILogger<PaymentWebhookController> logger)
+    {
+        _config = config;
+        _logger = logger;
+    }
+
+    [HttpPost("payment-callback")]
+    public async Task<IActionResult> HandlePaymentWebhook()
+    {
+        // 1. ดึง Signature Header ที่ส่งมาจาก Third-Party Gateway
+        if (!Request.Headers.TryGetValue("X-Signature", out var signatureHeader))
+        {
+            _logger.LogWarning("ปฏิเสธคำขอ: ไม่พบ X-Signature Header");
+            return Unauthorized("Missing signature header");
+        }
+
+        // 2. อ่าน Raw Body แบบดิบๆ (ต้องเป็น Bytes เดิมเป๊ะๆ ห้ามแปลงเป็น Object ก่อน)
+        using var reader = new StreamReader(Request.Body, Encoding.UTF8);
+        var rawPayload = await reader.ReadToEndAsync();
+
+        // 3. ตรวจสอบความถูกต้องของ Signature ด้วย HMAC-SHA256
+        var secretKey = _config["PaymentGateway:WebhookSecret"] ?? "super_secret_webhook_key";
+        if (!VerifyHmacSignature(rawPayload, signatureHeader!, secretKey))
+        {
+            _logger.LogWarning("คำขอถูกแฮกหรือปลอมแปลง: Signature ไม่ตรงกัน!");
+            return Unauthorized("Invalid signature");
+        }
+
+        // 4. เมื่อผ่านการยืนยันตัวตนแล้ว จึงนำ Payload ไปประมวลผลทางธุรกิจ
+        var eventData = JsonSerializer.Deserialize<JsonElement>(rawPayload);
+        var eventType = eventData.GetProperty("event_type").GetString();
+        var orderId = eventData.GetProperty("data").GetProperty("order_id").GetString();
+
+        _logger.LogInformation("รับ Webhook สำเร็จ! Event: {EventType}, OrderId: {OrderId}", eventType, orderId);
+
+        // ตอบกลับ 200 OK ทันที เพื่อบอก Gateway ว่ารับของเรียบร้อย
+        return Ok(new { received = true });
+    }
+
+    private static bool VerifyHmacSignature(string payload, string expectedSignature, string secret)
+    {
+        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret));
+        var hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
+        var computedSignature = Convert.ToHexString(hashBytes).ToLowerInvariant();
+
+        // ใช้ CryptographicOperations.FixedTimeEquals เพื่อป้องกัน Timing Attack
+        return CryptographicOperations.FixedTimeEquals(
+            Encoding.UTF8.GetBytes(computedSignature),
+            Encoding.UTF8.GetBytes(expectedSignature.ToLowerInvariant())
+        );
+    }
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- Interactive HMAC Verification Playground -->
+        <div class="interactive-simulator">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="margin: 0; color: var(--accent-primary);">🔐 Webhook Signature Tester (ทดลองคำนวณ HMAC-SHA256 สดๆ)</h4>
+            <span class="badge badge-success">Client-Side HMAC Tool</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--space-md);">
+            พิมพ์ข้อความ JSON Payload และ Secret Key ด้านล่างเพื่อดูการสร้าง HMAC Signature เสมือนจริงในฝั่ง Gateway
+          </p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); margin-bottom: var(--space-md);">
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Webhook Raw Payload (JSON):</label>
+              <textarea id="hmac-payload" style="width: 100%; height: 90px; background: var(--bg-primary); border: 1px solid var(--border-default); border-radius: var(--radius-sm); color: var(--text-primary); font-family: var(--font-code); font-size: 0.8rem; padding: 8px;">{"event_type":"payment.succeeded","data":{"order_id":"ORD-9988","amount":1500.00}}</textarea>
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Shared Secret Key:</label>
+              <input type="text" id="hmac-secret" value="my_secret_token_123" style="width: 100%; background: var(--bg-primary); border: 1px solid var(--border-default); border-radius: var(--radius-sm); color: var(--text-primary); font-family: var(--font-code); font-size: 0.85rem; padding: 8px; margin-bottom: 12px;">
+              
+              <button id="btn-calc-hmac" class="btn btn-primary btn-sm btn-block">⚡ คำนวณ HMAC-SHA256 Signature</button>
+            </div>
+          </div>
+
+          <div style="background: var(--bg-primary); padding: var(--space-md); border-radius: var(--radius-sm); border: 1px solid var(--border-default);">
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">X-Signature ผลลัพธ์ที่คำนวณได้:</div>
+            <div id="hmac-result" style="font-family: var(--font-code); font-size: 0.85rem; color: var(--accent-success); word-break: break-all;">กดปุ่มคำนวณเพื่อดู Signature</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 6: Interactive Inline Quiz ─── -->
+      <section class="lesson-section reveal" id="quiz">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(88, 166, 255, 0.15); color: var(--accent-primary); border: 1px solid var(--accent-primary);">06</div>
+          <div>
+            <h2>แบบทดสอบท้ายบทเรียน: System Integration Mastery</h2>
+            <p class="section-desc">ทดสอบความเข้าใจเกี่ยวกับ HttpClientFactory, System.Text.Json, Polly Resilience และ Webhook Signature (5 ข้อ)</p>
+          </div>
+        </div>
+
+        <!-- Quiz Container rendered by QuizEngine -->
+        <div id="system-integration-quiz"></div>
+      </section>
+
+      <!-- ─── Next Lesson Navigation ─── -->
+      <div class="card mt-2xl reveal" style="border-color: var(--border-active); background: linear-gradient(135deg, rgba(88, 166, 255, 0.12) 0%, rgba(22, 27, 34, 0.8) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge badge-success mb-xs">🎉 ยอดเยี่ยม! ผ่านบทเรียน System Integration</span>
+            <h3 style="margin-top: 4px; margin-bottom: 4px;">พร้อมไปต่อกับบทเรียน Architecture &amp; Clean Architecture หรือยัง?</h3>
+            <p class="text-muted" style="margin-bottom: 0;">เรียนรู้การออกแบบโครงสร้างโปรเจกต์ระดับมืออาชีพ Clean Architecture, Repository Pattern และ CQRS</p>
+          </div>
+          <div>
+            <a href="./architecture.html" class="btn btn-primary btn-lg">
+              <span>ไปบทเรียนถัดไป Architecture →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <script>
+    // Tab switching for Client Registration section
+    function switchClientTab(tabName) {
+      document.querySelectorAll('#client-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      const targetContent = document.getElementById('tab-' + tabName);
+      if (targetContent) {
+        targetContent.classList.add('active');
+      }
+      
+      const activeBtn = Array.from(document.querySelectorAll('#client-tabs .tab-btn')).find(b => b.getAttribute('onclick').includes(tabName));
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+      }
+    }
+
+    // Copy Code snippet handler
+    function copyCode(btn) {
+      const codeBlock = btn.closest('.code-block-wrapper').querySelector('pre code');
+      if (codeBlock) {
+        navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+          const orig = btn.innerText;
+          btn.innerText = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.innerText = orig;
+            btn.classList.remove('copied');
+          }, 2000);
+        });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Mark lesson completion
+      if (typeof Progress !== 'undefined') {
+        Progress.completeLesson('system-integration');
+        Progress.setModuleProgress('api', 50);
+      }
+
+      // 2. Interactive Simulator: Socket Exhaustion
+      const simOutput = document.getElementById('sim-output');
+      const btnSimBad = document.getElementById('btn-sim-bad');
+      const btnSimGood = document.getElementById('btn-sim-good');
+      const btnSimClear = document.getElementById('btn-sim-clear');
+
+      function appendLog(text, type = 'info') {
+        if (!simOutput) return;
+        const time = new Date().toLocaleTimeString();
+        const line = document.createElement('div');
+        line.className = 'sim-log-line';
+        let typeClass = 'sim-log-info';
+        if (type === 'err') typeClass = 'sim-log-err';
+        if (type === 'ok') typeClass = 'sim-log-ok';
+        if (type === 'warn') typeClass = 'sim-log-warn';
+        line.innerHTML = `<span class="sim-log-time">[${time}]</span> <span class="${typeClass}">${text}</span>`;
+        simOutput.appendChild(line);
+        simOutput.scrollTop = simOutput.scrollHeight;
+      }
+
+      if (btnSimBad) {
+        btnSimBad.addEventListener('click', () => {
+          appendLog('🚀 เริ่มส่ง 10 Requests ด้วย "new HttpClient()" แยกตัว...', 'warn');
+          let port = 49152;
+          for (let i = 1; i <= 10; i++) {
+            setTimeout(() => {
+              port += Math.floor(Math.random() * 5) + 1;
+              if (i < 8) {
+                appendLog(`Req #${i}: สร้าง new Socket -> LocalPort:${port} -> ส่งสำเร็จ -> Dispose() [ค้างสถานะ TIME_WAIT!]`, 'warn');
+              } else {
+                appendLog(`Req #${i}: ❌ CRITICAL SocketException: OS Outbound Port Pool Exhausted!`, 'err');
+              }
+            }, i * 150);
+          }
+        });
+      }
+
+      if (btnSimGood) {
+        btnSimGood.addEventListener('click', () => {
+          appendLog('🚀 เริ่มส่ง 10 Requests ด้วย "IHttpClientFactory Pool"...', 'info');
+          const fixedPort = 51200;
+          for (let i = 1; i <= 10; i++) {
+            setTimeout(() => {
+              appendLog(`Req #${i}: ยืม HttpMessageHandler Pool -> Reused TCP Socket LocalPort:${fixedPort} -> ตอบกลับ HTTP 200 OK (Zero Socket Leak)`, 'ok');
+            }, i * 120);
+          }
+        });
+      }
+
+      if (btnSimClear) {
+        btnSimClear.addEventListener('click', () => {
+          if (simOutput) simOutput.innerHTML = '<div class="sim-log-line"><span class="sim-log-time">[System]</span> เคลียร์ประวัติการทดสอบเรียบร้อย</div>';
+        });
+      }
+
+      // 3. Circuit Breaker Simulator
+      let cbState = 'CLOSED'; // 'CLOSED', 'OPEN', 'HALF_OPEN'
+      let failCount = 0;
+      const cbBadge = document.getElementById('cb-status-badge');
+      const cbLog = document.getElementById('cb-log');
+      const cbFailCounter = document.getElementById('cb-fail-counter');
+      const btnCbSuccess = document.getElementById('btn-cb-success');
+      const btnCbFail = document.getElementById('btn-cb-fail');
+      const btnCbReset = document.getElementById('btn-cb-reset');
+
+      function updateCbDisplay() {
+        if (!cbBadge || !cbFailCounter) return;
+        cbFailCounter.textContent = `ความล้มเหลวสะสม: ${failCount}/3`;
+        if (cbState === 'CLOSED') {
+          cbBadge.className = 'circuit-state-badge state-closed';
+          cbBadge.textContent = 'STATE: CLOSED (วงจรปกติ)';
+        } else if (cbState === 'OPEN') {
+          cbBadge.className = 'circuit-state-badge state-open';
+          cbBadge.textContent = 'STATE: OPEN (ตัดวงจร Fail-Fast!)';
+        } else if (cbState === 'HALF_OPEN') {
+          cbBadge.className = 'circuit-state-badge state-halfopen';
+          cbBadge.textContent = 'STATE: HALF-OPEN (ทดลองปล่อย 1 Request)';
+        }
+      }
+
+      function logCb(msg, type = 'info') {
+        if (!cbLog) return;
+        const time = new Date().toLocaleTimeString();
+        const line = document.createElement('div');
+        line.className = 'sim-log-line';
+        let cls = 'sim-log-info';
+        if (type === 'err') cls = 'sim-log-err';
+        if (type === 'ok') cls = 'sim-log-ok';
+        if (type === 'warn') cls = 'sim-log-warn';
+        line.innerHTML = `<span class="sim-log-time">[${time}]</span> <span class="${cls}">${msg}</span>`;
+        cbLog.appendChild(line);
+        cbLog.scrollTop = cbLog.scrollHeight;
+      }
+
+      if (btnCbSuccess) {
+        btnCbSuccess.addEventListener('click', () => {
+          if (cbState === 'OPEN') {
+            logCb('⛔ ถูกบล็อกโดย Circuit Breaker! (Fail-Fast: ไม่ส่งออกเครือข่าย ประหยัดทรัพยากร)', 'err');
+            return;
+          }
+          if (cbState === 'HALF_OPEN') {
+            cbState = 'CLOSED';
+            failCount = 0;
+            updateCbDisplay();
+            logCb('🎉 Request ทดลองสำเร็จ! Circuit Breaker เปลี่ยนกลับเป็น [CLOSED] ระบบกลับสู่สภาวะปกติ', 'ok');
+            return;
+          }
+          failCount = 0;
+          updateCbDisplay();
+          logCb('✅ HTTP 200 OK — คำขอส่งผ่านไปยัง Third-Party API สำเร็จ', 'ok');
+        });
+      }
+
+      if (btnCbFail) {
+        btnCbFail.addEventListener('click', () => {
+          if (cbState === 'OPEN') {
+            logCb('⛔ ถูกบล็อกโดย Circuit Breaker! (Fail-Fast ดีดกลับทันที)', 'err');
+            return;
+          }
+          failCount++;
+          logCb(`⚠️ HTTP 503 Service Unavailable (พังครั้งที่ ${failCount})`, 'warn');
+          
+          if (failCount >= 3 || cbState === 'HALF_OPEN') {
+            cbState = 'OPEN';
+            updateCbDisplay();
+            logCb('🚨 เกิดข้อผิดพลาดครบเกณฑ์! Circuit Breaker สั่งตัดวงจรเป็น [OPEN] ทันที (จะเปิดไว้ 5 วินาที)', 'err');
+            
+            // Auto Half-Open after 5 seconds
+            setTimeout(() => {
+              if (cbState === 'OPEN') {
+                cbState = 'HALF_OPEN';
+                updateCbDisplay();
+                logCb('⏳ ครบกำหนดเวลาคูลดาวน์! ปรับสถานะเป็น [HALF-OPEN] รอรับ Trial Request ตรวจเช็กสุขภาพ...', 'warn');
+              }
+            }, 5000);
+          } else {
+            updateCbDisplay();
+          }
+        });
+      }
+
+      if (btnCbReset) {
+        btnCbReset.addEventListener('click', () => {
+          cbState = 'CLOSED';
+          failCount = 0;
+          updateCbDisplay();
+          if (cbLog) cbLog.innerHTML = '<div class="sim-log-line"><span class="sim-log-time">[System]</span> รีเซ็ตสถานะ Circuit Breaker เป็น CLOSED แล้ว</div>';
+        });
+      }
+
+      // 4. Webhook HMAC Generator Simulator
+      const btnCalcHmac = document.getElementById('btn-calc-hmac');
+      const hmacPayload = document.getElementById('hmac-payload');
+      const hmacSecret = document.getElementById('hmac-secret');
+      const hmacResult = document.getElementById('hmac-result');
+
+      async function computeHMAC(message, secret) {
+        const enc = new TextEncoder();
+        const key = await crypto.subtle.importKey(
+          'raw',
+          enc.encode(secret),
+          { name: 'HMAC', hash: 'SHA-256' },
+          false,
+          ['sign']
+        );
+        const signature = await crypto.subtle.sign('HMAC', key, enc.encode(message));
+        return Array.from(new Uint8Array(signature))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+      }
+
+      if (btnCalcHmac && hmacPayload && hmacSecret && hmacResult) {
+        btnCalcHmac.addEventListener('click', async () => {
+          try {
+            const payloadText = hmacPayload.value;
+            const secretText = hmacSecret.value;
+            if (!secretText) {
+              hmacResult.textContent = 'กรุณาระบุ Secret Key';
+              return;
+            }
+            const hash = await computeHMAC(payloadText, secretText);
+            hmacResult.innerHTML = `sha256=${hash}`;
+          } catch (e) {
+            hmacResult.textContent = 'เกิดข้อผิดพลาดในการคำนวณ: ' + e.message;
+          }
+        });
+      }
+
+      // 5. Quiz Questions Definition (5 Comprehensive Questions)
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'เหตุใดการเขียน `using var client = new HttpClient()` ในระดับ High-throughput Application ถึงทำให้เกิดปัญหา Socket Exhaustion ได้?',
+          options: [
+            'เพราะ HttpClient ไม่ยอมปล่อยหน่วยความจำ RAM ของเครื่องเซิร์ฟเวอร์',
+            'เพราะเมื่อ Dispose() แล้ว TCP Socket เบื้องล่างจะยังค้างอยู่ในสถานะ TIME_WAIT ของระบบปฏิบัติการเป็นเวลา 2-4 นาที ทำให้ Outbound Port หมด',
+            'เพราะ HttpClient ส่งคำขอได้สูงสุดเพียง 10 ครั้งต่อนาทีเท่านั้น',
+            'เพราะ .NET Runtime บังคับให้ใช้เฉพาะ WebClient เท่านั้น'
+          ],
+          answer: 1,
+          explanation: 'เมื่อ Dispose() ตัว HttpClient ตัว TCP Socket จะไม่ถูกปิดทันที แต่ระบบปฏิบัติการจะคงสถานะ TIME_WAIT ไว้ 2-4 นาที การ new บ่อยๆ จึงทำให้พอร์ตส่งข้อมูลหมดเกลี้ยง (Socket Exhaustion)'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'IHttpClientFactory แก้ปัญหาเรื่อง DNS Refresh Issue ที่มักเกิดกับ Singleton HttpClient ได้อย่างไร?',
+          options: [
+            'IHttpClientFactory ทำการรีสตาร์ตเซิร์ฟเวอร์ใหม่ทุก 5 นาที',
+            'IHttpClientFactory บังคับให้ Third-party API ทุกตัวต้องใช้ IP คงที่ห้ามเปลี่ยน',
+            'IHttpClientFactory บริหาร HttpMessageHandler ผ่าน Pool และกำหนดอายุขัย (Default 2 นาที) เมื่อหมดอายุจะสร้าง Handler ใหม่ที่ทำ DNS Lookup สดใหม่เสมอ',
+            'IHttpClientFactory ปิดการทำงานของ DNS Cache ใน Windows ทั้งหมด'
+          ],
+          answer: 2,
+          explanation: 'IHttpClientFactory ควบคุมวงจรชีวิตของ HttpMessageHandler ให้มีอายุตามที่กำหนด (Default 2 นาที) ทำให้เมื่อเปิดการเชื่อมต่อรอบใหม่ ระบบจะ Resolve IP จาก DNS ใหม่อัตโนมัติ ป้องกันปัญหา Stale DNS'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'ในการแปลง JSON ด้วย `System.Text.Json` หาก API ปลายทางส่งชื่อฟิลด์มาเป็น snake_case เช่น `user_id` แต่ใน C# DTO ของเราตั้งชื่อว่า `UserId` เราควรจัดการอย่างไรอย่างมีประสิทธิภาพที่สุด?',
+          options: [
+            'เปลี่ยนชื่อ Property ใน C# ให้เป็นตัวพิมพ์เล็ก user_id ทั้งหมดเพื่อไม่ให้ผิดหลัก C# naming',
+            'ใช้ Attribute `[JsonPropertyName("user_id")]` บน Property หรือตั้งค่า `PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower` ใน JsonSerializerOptions',
+            'เขียน Regex ตัดเครื่องหมาย underscore ออกจาก JSON String ก่อน Deserialization',
+            'System.Text.Json ไม่รองรับ snake_case ต้องติดตั้ง Newtonsoft.Json เสมอ'
+          ],
+          answer: 1,
+          explanation: 'เราสามารถใช้ [JsonPropertyName("user_id")] บนแต่ละ Property หรือตั้งค่า PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower (.NET 8) ใน JsonSerializerOptions ได้อย่างง่ายดายและมีประสิทธิภาพสูงสุด'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'เมื่อ Circuit Breaker อยู่ในสถานะ "OPEN" (ตัดวงจร) พฤติกรรมของระบบจะเป็นอย่างไรเมื่อมี Request ใหม่เข้ามา?',
+          options: [
+            'ระบบจะยิง Request ซ้ำๆ 100 รอบจนกว่าเซิร์ฟเวอร์ปลายทางจะตอบกลับ',
+            'ระบบจะดีดคำขอกลับทันที (Fail-Fast) โดยไม่ส่ง Request ออกไปยังระบบภายนอกเลย เพื่อไม่ให้ระบบปลายทางที่กำลังล่มถูกถล่มหนักขึ้น',
+            'ระบบจะปิดโปรแกรม ASP.NET Core ทันที',
+            'ระบบจะเปลี่ยนเส้นทาง Request ไปยัง Google โดยอัตโนมัติ'
+          ],
+          answer: 1,
+          explanation: 'เมื่อสถานะเป็น OPEN วงจรจะถูกตัด ระบบจะปฏิเสธคำขอทันที (Fail-Fast) โดยไม่ยิงไปภายนอก ช่วยป้องกัน Cascading Failures และให้เวลาเซิร์ฟเวอร์ปลายทางได้ฟื้นฟูตัวเอง'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'ในการสร้าง Webhook Receiver เพื่อรับข้อมูลจาก Payment Gateway เหตุใดเราจึงต้องใช้ `CryptographicOperations.FixedTimeEquals` ในการตรวจสอบ HMAC Signature แทนการใช้ตัวดำเนินการ `==` ปกติ?',
+          options: [
+            'เพราะตัวดำเนินการ == ทำงานช้ากว่า 1,000 เท่า',
+            'เพราะ FixedTimeEquals ช่วยป้องกันการโจมตีแบบ Timing Attack ที่แฮกเกอร์อาจจับเวลาการเปรียบเทียบสตริงเพื่อสุ่มเดา Signature ทีละไบต์',
+            'เพราะ C# ไม่อนุญาตให้ใช้ == กับสตริงที่มีความยาวเกิน 16 ตัวอักษร',
+            'เพราะ FixedTimeEquals ทำการแปลง JSON เป็น Object ให้ทันที'
+          ],
+          answer: 1,
+          explanation: 'การเปรียบเทียบแบบ Fixed-Time ใช้เวลาคงที่เสมอในการตรวจสอบค่าทุกไบต์ จึงช่วยป้องกัน Timing Attack ซึ่งเป็นช่องโหว่ด้านความปลอดภัยในการตรวจสอบลายเซ็นดิจิทัล'
+        }
+      ];
+
+      // 6. Initialize Quiz with QuizEngine
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('system-integration-quiz', quizQuestions, {
+          quizId: 'system-integration',
+          showTimer: false,
+          showExplanation: true
+        });
+      }
+    });
+  </script>
+</body>
+</html>

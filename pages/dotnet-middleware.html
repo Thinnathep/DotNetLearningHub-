@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Middleware &amp; Request Pipeline — DotNet Learning Hub</title>
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <style>
+    /* ─── Middleware Pipeline Custom Styling ─── */
+    .pipeline-hero-card {
+      background: radial-gradient(circle at top right, rgba(88, 166, 255, 0.12) 0%, rgba(22, 27, 34, 0.95) 75%);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-2xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pipeline-hero-card::after {
+      content: '';
+      position: absolute;
+      bottom: -60px;
+      right: -60px;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(163, 113, 247, 0.2) 0%, transparent 70%);
+      pointer-events: none;
+      filter: blur(35px);
+    }
+
+    /* Analogy Airport Security Flow */
+    .airport-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+
+    .airport-step {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      transition: all var(--transition-normal);
+      position: relative;
+    }
+
+    .airport-step:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .airport-step-num {
+      font-size: 0.75rem;
+      font-family: var(--font-code);
+      font-weight: 700;
+      color: var(--accent-primary);
+      background: rgba(88, 166, 255, 0.12);
+      border: 1px solid rgba(88, 166, 255, 0.25);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      display: inline-block;
+      margin-bottom: var(--space-xs);
+    }
+
+    .airport-step-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .airport-step-tech {
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: var(--syn-method);
+      background: var(--bg-primary);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      border: 1px solid var(--border-muted);
+    }
+
+    .airport-step-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Pipeline Order Flow Chart Items */
+    .flow-steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      margin: var(--space-lg) 0;
+    }
+
+    .flow-step-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) var(--space-lg);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-left: 4px solid var(--accent-primary);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-fast);
+    }
+
+    .flow-step-item:hover {
+      border-color: var(--accent-info);
+      background: rgba(88, 166, 255, 0.04);
+      transform: translateX(4px);
+    }
+
+    .flow-step-item.critical { border-left-color: var(--accent-danger); }
+    .flow-step-item.security { border-left-color: var(--accent-warning); }
+    .flow-step-item.endpoint { border-left-color: var(--accent-success); background: rgba(63, 185, 80, 0.05); }
+
+    .step-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .step-badge-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    .step-name {
+      font-family: var(--font-code);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .step-role {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .step-badge-type {
+      font-size: 0.72rem;
+      font-family: var(--font-heading);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+    }
+
+    /* Comparison 3 Methods Grid */
+    .method-compare-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+
+    .method-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition-normal);
+    }
+
+    .method-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .method-card.use-card { border-top: 3px solid var(--accent-primary); }
+    .method-card.run-card { border-top: 3px solid var(--accent-danger); }
+    .method-card.map-card { border-top: 3px solid var(--accent-warning); }
+
+    .method-badge {
+      font-family: var(--font-code);
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: var(--radius-md);
+      display: inline-block;
+      margin-bottom: var(--space-sm);
+      width: fit-content;
+    }
+
+    .use-card .method-badge { background: rgba(88, 166, 255, 0.15); color: var(--accent-primary); border: 1px solid rgba(88, 166, 255, 0.3); }
+    .run-card .method-badge { background: rgba(248, 81, 73, 0.15); color: var(--accent-danger); border: 1px solid rgba(248, 81, 73, 0.3); }
+    .map-card .method-badge { background: rgba(210, 153, 34, 0.15); color: var(--accent-warning); border: 1px solid rgba(210, 153, 34, 0.3); }
+
+    .method-type-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Mermaid container neon styling */
+    .mermaid-box {
+      background: #090d13;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <a href="../index.html" class="site-logo">
+      <div class="logo-icon">🟣</div>
+      <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าหลัก (Dashboard)</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="./csharp-basics.html" class="sidebar-link">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="./csharp-oop.html" class="sidebar-link">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="./csharp-linq.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>LINQ &amp; Collections (Level 3)</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="./csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>Async/Await &amp; Advanced (Lv 4)</span>
+        <span class="sidebar-badge badge-new">Lv 4</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🌐 Track .NET &amp; Web API</div>
+      <a href="./dotnet-overview.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 &amp; CLI Overview</span>
+      </a>
+      <a href="./dotnet-di.html" class="sidebar-link">
+        <span class="link-icon">💉</span>
+        <span>Dependency Injection (DI)</span>
+        <span class="sidebar-badge badge-mid">Lv 2</span>
+      </a>
+      <a href="./dotnet-middleware.html" class="sidebar-link active">
+        <span class="link-icon">🛡️</span>
+        <span>Middleware &amp; Pipeline</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="./aspnet-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>ASP.NET Core Web API</span>
+      </a>
+      <a href="./ef-core.html" class="sidebar-link">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+      </a>
+      <a href="./blazor.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Blazor Web Apps</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🛠️ Track Database &amp; Quality</div>
+      <a href="./html-css-js.html" class="sidebar-link">
+        <span class="link-icon">🌐</span>
+        <span>Web Frontend Basics</span>
+      </a>
+      <a href="./sql-basics.html" class="sidebar-link">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; T-SQL</span>
+      </a>
+      <a href="./architecture.html" class="sidebar-link">
+        <span class="link-icon">🏛️</span>
+        <span>Clean Architecture &amp; Patterns</span>
+      </a>
+      <a href="./testing.html" class="sidebar-link">
+        <span class="link-icon">🧪</span>
+        <span>Unit Testing &amp; xUnit</span>
+      </a>
+      <a href="./devops.html" class="sidebar-link">
+        <span class="link-icon">🐳</span>
+        <span>Docker &amp; CI/CD</span>
+      </a>
+      <a href="./quiz-arena.html" class="sidebar-link">
+        <span class="link-icon">⚔️</span>
+        <span>Quiz Arena (รวมข้อสอบ)</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header animate-fade-in">
+        <div class="breadcrumb">
+          <a href="../index.html">หน้าหลัก</a>
+          <span>/</span>
+          <span>Track .NET &amp; Web API</span>
+          <span>/</span>
+          <span class="text-primary">Middleware &amp; Request Pipeline</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(88, 166, 255, 0.18); color: var(--accent-primary); border: 1px solid rgba(88, 166, 255, 0.4);">🛡️</div>
+          <div>
+            <h1>Middleware &amp; Request Pipeline</h1>
+            <div class="page-description">เจาะลึกกลไกสายพานลำเลียงคำขอ HTTP Request Pipeline ใน ASP.NET Core, กฎการเรียงลำดับ Built-in Middleware และการสร้าง Custom Middleware สไตล์โปรดักชัน</div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="level-tag level-mid">⭐⭐ กลาง</span></span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>เวลาเรียน: <strong>~40 นาที</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>รางวัล: <strong>+100 XP</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>💻</span>
+            <span>รองรับ .NET 8 / C# 12</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Concept & Analogy Section ─── -->
+      <div class="concept-card reveal">
+        <div class="concept-header">
+          <div class="concept-emoji">🛫</div>
+          <div>
+            <div class="concept-title">เปรียบเทียบให้เห็นภาพ: ด่านตรวจคนเข้าเมืองและสนามบินนานาชาติ (Airport Security Checkpoints)</div>
+            <div class="text-muted" style="font-size: 0.8rem;">ทำความเข้าใจการทำงานแบบ Two-Way Russian Doll Pipeline ผ่านโมเดลผู้โดยสารเครื่องบิน</div>
+          </div>
+        </div>
+        <div class="concept-body">
+          <div class="analogy-box">
+            <div class="analogy-label">💡 Analogy: การเดินทางของ HTTP Request เปรียบเสมือนผู้โดยสารในสนามบิน</div>
+            <p class="analogy-text">
+              ลองจินตนาการว่า <strong>HTTP Request</strong> คือ <strong>"ผู้โดยสารเครื่องบิน"</strong> ที่ต้องการเดินทางไปถึง <strong>"เครื่องบิน (Endpoint / Controller Action)"</strong> เพื่อทำภารกิจ 
+              ผู้โดยสารไม่สามารถเดินตรงดิ่งขึ้นเครื่องได้ทันที แต่ต้องเดินผ่าน <strong>"ด่านตรวจคัดกรองตามลำดับ" (Middleware Pipeline)</strong> ทีละด่าน:
+            </p>
+          </div>
+
+          <!-- Airport Checkpoint Step Cards -->
+          <div class="airport-grid">
+            <div class="airport-step">
+              <div class="airport-step-num">Checkpoint 01</div>
+              <div class="airport-step-title">🧯 ด่านกู้ภัย &amp; ประกันภัย</div>
+              <div class="airport-step-tech">app.UseExceptionHandler()</div>
+              <div class="airport-step-desc">
+                คอยเฝ้าระวังเหตุด่วนเหตุร้าย หากเกิดความผิดพลาดใดๆ ตลอดการเดินทาง ด่านนี้จะเข้าควบคุมสถานการณ์และแจ้งผู้โดยสารอย่างสุภาพ
+              </div>
+            </div>
+
+            <div class="airport-step">
+              <div class="airport-step-num">Checkpoint 02</div>
+              <div class="airport-step-title">🔒 ทางเดินเข้าระบบความปลอดภัย</div>
+              <div class="airport-step-tech">app.UseHttpsRedirection()</div>
+              <div class="airport-step-desc">
+                บังคับให้ผู้โดยสารทุกคนเดินผ่านช่องทางปลอดภัยที่มีเกราะกำบัง (HTTPS) ไม่อนุญาตให้ใช้ทางเปิดโล่งธรรมดา (HTTP)
+              </div>
+            </div>
+
+            <div class="airport-step">
+              <div class="airport-step-num">Checkpoint 03</div>
+              <div class="airport-step-title">🗺️ ป้ายบอกทางไปยัง Gate</div>
+              <div class="airport-step-tech">app.UseRouting()</div>
+              <div class="airport-step-desc">
+                จับคู่ตั๋วเดินทางของผู้โดยสารกับ Gate ปลายทาง เพื่อให้ด่านถัดไปรู้ว่าผู้โดยสารคนนี้กำลังจะมุ่งหน้าไปที่ประตูขึ้นเครื่องไหน
+              </div>
+            </div>
+
+            <div class="airport-step">
+              <div class="airport-step-num">Checkpoint 04</div>
+              <div class="airport-step-title">🌐 ด่านตรวจพันธมิตรสายการบิน</div>
+              <div class="airport-step-tech">app.UseCors()</div>
+              <div class="airport-step-desc">
+                ตรวจสอบว่าผู้โดยสารเดินทางมาจากเว็บไซต์หรือโดเมนที่ได้รับอนุญาตให้เชื่อมต่อกับสนามบินแห่งนี้หรือไม่ (Cross-Origin)
+              </div>
+            </div>
+
+            <div class="airport-step">
+              <div class="airport-step-num">Checkpoint 05</div>
+              <div class="airport-step-title">🛂 ด่านตรวจหนังสือเดินทาง (Passport)</div>
+              <div class="airport-step-tech">app.UseAuthentication()</div>
+              <div class="airport-step-desc">
+                ตรวจสอบตัวตนว่า <em>"คุณคือใคร?"</em> โดยการอ่าน JWT Token หรือ Cookie ประจำตัวผู้โดยสาร
+              </div>
+            </div>
+
+            <div class="airport-step">
+              <div class="airport-step-num">Checkpoint 06</div>
+              <div class="airport-step-title">🎫 ด่านตรวจสิทธิ์ขึ้นเครื่อง (Boarding Pass)</div>
+              <div class="airport-step-tech">app.UseAuthorization()</div>
+              <div class="airport-step-desc">
+                ตรวจสอบว่า <em>"คุณมีสิทธิ์เข้า Gate นี้ไหม?"</em> เช่น ตั๋ว Economy จะถูกปฏิเสธไม่ให้เข้าเลานจ์ VIP (403 Forbidden)
+              </div>
+            </div>
+          </div>
+
+          <!-- Important Note about Short-Circuiting & Return Journey -->
+          <div class="callout callout-info">
+            <div class="callout-title">⚡ จุดสำคัญที่ต้องจดจำ: การ Short-Circuiting และขากลับ (Response Outbound)</div>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.88rem; line-height: 1.6;">
+              <li><strong>การ Short-circuit (ปฏิเสธส่งกลับทันที):</strong> หากผู้โดยสารไม่ผ่านด่านตรวจ Passport หรือไม่มีสิทธิ์ ด่าน Middleware นั้นจะสร้าง Response ส่งกลับทันที (เช่น <code>401 Unauthorized</code> หรือ <code>403 Forbidden</code>) โดย<strong>ไม่ส่งต่อ</strong>ไปยังด่านถัดไป และ<strong>ไม่เรียก Endpoint</strong></li>
+              <li><strong>ขากลับ (Two-way Pipeline):</strong> เมื่อ Endpoint รันเสร็จและสร้าง Response ข้อมูลจะไหลย้อนกลับผ่าน Middleware เดิมในทิศทางย้อนกลับ (เช่น ดักจับเวลาประมวลผล, บีบอัดข้อมูล GZip, หรือแทรก Security Headers ก่อนส่งถึงมือ Client)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Section 1: Request Pipeline Flow Diagram ─── -->
+      <section class="lesson-section reveal" id="pipeline-order">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(88, 166, 255, 0.2); color: var(--accent-primary); border: 1px solid var(--accent-primary);">01</div>
+          <div>
+            <h2 class="section-title">สถาปัตยกรรม Request Pipeline &amp; ลำดับการทำงาน</h2>
+            <div class="section-subtitle">ทำความเข้าใจโครงสร้าง Matryoshka (ตุ๊กตาแม่ลูกดก) และเหตุผลที่ลำดับของ Middleware มีผลชี้ขาดต่อความปลอดภัย</div>
+          </div>
+        </div>
+
+        <p>
+          ใน ASP.NET Core ลำดับการลงทะเบียน Middleware ในไฟล์ <code>Program.cs</code> <strong>มีความสำคัญสูงสุด</strong> เพราะ Middleware แต่ละตัวจะถูกเรียกทำงานเรียงตามลำดับจากบนลงล่างในขาเข้า (Inbound Request) และไหลย้อนกลับจากล่างขึ้นบนในขาออก (Outbound Response)
+        </p>
+
+        <!-- Mermaid Diagram Container -->
+        <div class="mermaid-box">
+          <div style="font-family: var(--font-heading); font-weight: 700; color: var(--accent-primary); margin-bottom: var(--space-md); font-size: 0.95rem;">
+            📊 แผนผัง HTTP Request &amp; Response Pipeline Flow
+          </div>
+          <pre class="mermaid">
+flowchart LR
+    subgraph Client["🌐 HTTP Client"]
+        Req["HTTP Request 📥"]
+        Res["HTTP Response 📤"]
+    end
+
+    subgraph Pipeline["🛡️ ASP.NET Core Request Pipeline"]
+        direction LR
+        M1["1. ExceptionHandler<br><small>(Error Trap)</small>"]
+        M2["2. HTTPS Redirection<br><small>(Port 443)</small>"]
+        M3["3. Static Files<br><small>(wwwroot cache)</small>"]
+        M4["4. Routing<br><small>(Endpoint Selector)</small>"]
+        M5["5. CORS<br><small>(Cross-Origin)</small>"]
+        M6["6. Authentication<br><small>(Who are you?)</small>"]
+        M7["7. Authorization<br><small>(Allowed?)</small>"]
+    end
+
+    subgraph AppCore["🎯 Core Application"]
+        EP["8. Endpoint Execution<br><small>Controller / Minimal API</small>"]
+    end
+
+    Req --> M1 --> M2 --> M3 --> M4 --> M5 --> M6 --> M7 --> EP
+    EP -->|Response Returns| M7 --> M6 --> M5 --> M4 --> M3 --> M2 --> M1 --> Res
+
+    style Client fill:#161b22,stroke:#30363d,stroke-width:2px,color:#f0f6fc
+    style Pipeline fill:#0d1117,stroke:#58a6ff,stroke-width:2px,color:#c9d1d9
+    style AppCore fill:#1b2838,stroke:#3fb950,stroke-width:2px,color:#7ee787
+    style EP fill:#1c2d1b,stroke:#3fb950,stroke-width:2px,color:#aff5b4
+          </pre>
+        </div>
+
+        <!-- Detailed Pipeline Step-by-Step Explanation -->
+        <h3 class="mt-xl mb-md">📋 กฎเหล็ก 5 ประการในการจัดลำดับ Middleware</h3>
+
+        <div class="flow-steps-container">
+          <div class="flow-step-item critical">
+            <div class="step-left">
+              <div class="step-badge-num" style="border-color: var(--accent-danger); color: var(--accent-danger);">1</div>
+              <div>
+                <div class="step-name">app.UseExceptionHandler() / UseDeveloperExceptionPage()</div>
+                <div class="step-role">ต้องอยู่อันดับ 1 บนสุดเสมอ เพื่อให้บล็อก <code>try-catch</code> ภายในครอบคลุม Middleware ทุกตัวและ Endpoint ทั้งหมด</div>
+              </div>
+            </div>
+            <span class="badge badge-danger">Critical Top</span>
+          </div>
+
+          <div class="flow-step-item">
+            <div class="step-left">
+              <div class="step-badge-num">2</div>
+              <div>
+                <div class="step-name">app.UseHttpsRedirection() &amp; app.UseHsts()</div>
+                <div class="step-role">ควรอยู่ลำดับต้นๆ เพื่อเปลี่ยน HTTP ธรรมดาเป็น HTTPS ทันที ก่อนส่งข้อมูลสำคัญไปยัง Middleware ถัดไป</div>
+              </div>
+            </div>
+            <span class="badge badge-primary">Security</span>
+          </div>
+
+          <div class="flow-step-item">
+            <div class="step-left">
+              <div class="step-badge-num">3</div>
+              <div>
+                <div class="step-name">app.UseStaticFiles()</div>
+                <div class="step-role">ควรอยู่ก่อน Routing และ Auth เพื่อให้ Request ที่ขอไฟล์ <code>.css</code>, <code>.js</code>, <code>.png</code> สามารถส่งไฟล์กลับได้ทันทีโดยไม่ต้องผ่าน Logic คำนวณความปลอดภัยที่สิ้นเปลือง CPU</div>
+              </div>
+            </div>
+            <span class="badge badge-warning">Performance</span>
+          </div>
+
+          <div class="flow-step-item">
+            <div class="step-left">
+              <div class="step-badge-num">4</div>
+              <div>
+                <div class="step-name">app.UseRouting()</div>
+                <div class="step-role">ทำหน้าที่วิเคราะห์ URL และเลือก Endpoint ปลายทาง — ต้องอยู่<strong>ก่อน</strong> CORS, Authentication และ Authorization เพื่อให้ Middleware เหล่านั้นอ่าน Metadata เช่น <code>[Authorize]</code> ได้</div>
+              </div>
+            </div>
+            <span class="badge badge-info">Routing</span>
+          </div>
+
+          <div class="flow-step-item security">
+            <div class="step-left">
+              <div class="step-badge-num" style="border-color: var(--accent-warning); color: var(--accent-warning);">5</div>
+              <div>
+                <div class="step-name">app.UseAuthentication() ➔ app.UseAuthorization()</div>
+                <div class="step-role"><strong>กฎทอง:</strong> Authentication ต้องมาก่อน Authorization เสมอ! เพราะต้องระบุว่า <em>"เขาคือใคร"</em> ให้สำเร็จก่อน จึงจะตรวจสิทธิ์ได้ว่า <em>"เขามีสิทธิ์ทำสิ่งนี้หรือไม่"</em></div>
+              </div>
+            </div>
+            <span class="badge badge-success">Auth Pair</span>
+          </div>
+        </div>
+
+        <div class="callout callout-danger">
+          <div class="callout-title">⚠️ ข้อผิดพลาดร้ายแรงที่พบบ่อย (Common Pitfall)</div>
+          <p style="margin: 0;">
+            หากคุณวาง <code>app.UseAuthorization()</code> <strong>ไว้ก่อน</strong> <code>app.UseAuthentication()</code> ตัวระบบจะตรวจสิทธิ์บน <code>HttpContext.User</code> ที่ยังว่างเปล่า (Anonymous) เสมอ ทำให้ API ทั้งหมดถูกปฏิเสธด้วยสถานะ <code>401 Unauthorized</code> แม้ว่า Client จะแนบ JWT Token มาถูกต้องก็ตาม!
+          </p>
+        </div>
+      </section>
+
+      <!-- ─── Section 2: Built-in Middlewares สำคัญ ─── -->
+      <section class="lesson-section reveal" id="builtin-middleware">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(163, 113, 247, 0.2); color: var(--syn-method); border: 1px solid var(--syn-method);">02</div>
+          <div>
+            <h2 class="section-title">Built-in Middlewares สำคัญใน ASP.NET Core</h2>
+            <div class="section-subtitle">ศึกษารายละเอียด หน้าที่ และการใช้งาน Middleware พื้นฐานที่มาพร้อมกับ .NET 8</div>
+          </div>
+        </div>
+
+        <p>ASP.NET Core เตรียม Built-in Middleware สำหรับงานสถาปัตยกรรมเว็บมาตรฐานมาให้อย่างครบถ้วน ดังตารางสรุปด้านล่างนี้:</p>
+
+        <!-- Comparison Table of Built-in Middlewares -->
+        <table class="comparison-table mt-md mb-xl">
+          <thead>
+            <tr>
+              <th style="width: 28%;">Extension Method</th>
+              <th style="width: 32%;">หน้าที่หลัก (Responsibilities)</th>
+              <th style="width: 25%;">Package / Namespace</th>
+              <th style="width: 15%;">ตำแหน่งใน Pipeline</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>app.UseExceptionHandler()</code></td>
+              <td>ดักจับ Unhandled Exceptions ทั้งหมดในระบบ แล้วแปลงเป็น ProblemDetails หรือแสดง Error Page</td>
+              <td><code>Microsoft.AspNetCore.Diagnostics</code></td>
+              <td><span class="badge badge-danger">บนสุด (อันดับ 1)</span></td>
+            </tr>
+            <tr>
+              <td><code>app.UseHttpsRedirection()</code></td>
+              <td>Redirect ทุกคำขอที่ไม่ปลอดภัย (HTTP) ไปยัง HTTPS (พอร์ต 443/5001) ด้วยรหัส 307 หรือ 308</td>
+              <td><code>Microsoft.AspNetCore.HttpsPolicy</code></td>
+              <td><span class="badge badge-primary">อันดับ 2</span></td>
+            </tr>
+            <tr>
+              <td><code>app.UseStaticFiles()</code></td>
+              <td>ให้บริการไฟล์ Static จากโฟลเดอร์ <code>wwwroot</code> เช่น รูปภาพ, CSS, JS, HTML โดยไม่ต้องผ่าน Controller</td>
+              <td><code>Microsoft.AspNetCore.StaticFiles</code></td>
+              <td><span class="badge badge-warning">ก่อน Routing</span></td>
+            </tr>
+            <tr>
+              <td><code>app.UseRouting()</code></td>
+              <td>จับคู่ HTTP Request กับ Route Template และแนบ Endpoint Metadata ลงใน <code>HttpContext</code></td>
+              <td><code>Microsoft.AspNetCore.Routing</code></td>
+              <td><span class="badge badge-info">ก่อน CORS &amp; Auth</span></td>
+            </tr>
+            <tr>
+              <td><code>app.UseCors("PolicyName")</code></td>
+              <td>ตั้งค่า Cross-Origin Resource Sharing เพื่ออนุญาตให้ Single Page App (React, Vue, Angular) เรียกใช้งาน API ข้ามโดเมนได้</td>
+              <td><code>Microsoft.AspNetCore.Cors</code></td>
+              <td><span class="badge badge-warning">หลัง Routing</span></td>
+            </tr>
+            <tr>
+              <td><code>app.UseAuthentication()</code></td>
+              <td>อ่าน Credentials (JWT Bearer, Cookies, API Key) แล้วสร้าง <code>ClaimsPrincipal</code> บรรจุใน <code>HttpContext.User</code></td>
+              <td><code>Microsoft.AspNetCore.Authentication</code></td>
+              <td><span class="badge badge-success">ก่อน Authorization</span></td>
+            </tr>
+            <tr>
+              <td><code>app.UseAuthorization()</code></td>
+              <td>ตรวจสอบ Roles, Claims, และ Authorization Policies ว่าผู้ใช้มีสิทธิ์เข้าถึง Endpoint นั้นๆ หรือไม่</td>
+              <td><code>Microsoft.AspNetCore.Authorization</code></td>
+              <td><span class="badge badge-success">หลัง Authentication</span></td>
+            </tr>
+            <tr>
+              <td><code>app.UseSwagger()</code><br><code>app.UseSwaggerUI()</code></td>
+              <td>สร้างเอกสาร OpenAPI JSON Specification และหน้าเว็บ Swagger UI สำหรับทดสอบ API (มักใช้เฉพาะใน Development Environment)</td>
+              <td><code>Swashbuckle.AspNetCore</code></td>
+              <td><span class="badge badge-primary">ใน if (IsDev)</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Complete Program.cs Pipeline Example -->
+        <h3 class="mt-lg mb-sm">💻 ตัวอย่างไฟล์ Program.cs ฉบับมาตรฐานสมบูรณ์ (.NET 8 Minimal API)</h3>
+        <p class="text-secondary">โครงสร้างการจัดวาง Middleware ในลำดับที่ถูกต้องตาม Best Practice ของ Microsoft:</p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>Program.cs — Standard ASP.NET Core Request Pipeline</span>
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">📋 คัดลอกโค้ด</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">var builder = WebApplication.CreateBuilder(args);
+
+// ─────────────────────────────────────────────────────────────
+// 1. DI SERVICE REGISTRATION (กำหนดบริการลงใน IoC Container)
+// ─────────────────────────────────────────────────────────────
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// ลงทะเบียน CORS Policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontendApp", policy =>
+    {
+        policy.WithOrigins("https://localhost:3000", "https://myapp.com")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// ลงทะเบียน Authentication & Authorization
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer();
+builder.Services.AddAuthorization();
+
+var app = builder.Build();
+
+// ─────────────────────────────────────────────────────────────
+// 2. HTTP REQUEST PIPELINE (จัดลำดับ Middleware ขาเข้า-ขาออก)
+// ─────────────────────────────────────────────────────────────
+
+// [1] Exception Handling: ดักจับ Error ทั่วทั้งระบบ
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage(); // แสดงหน้ารายละเอียด Error สำหรับ Dev
+}
+else
+{
+    app.UseExceptionHandler("/error"); // ส่งไปที่ Error Endpoint กลางใน Production
+    app.UseHsts(); // บังคับเบราว์เซอร์ใช้ HTTPS อย่างเข้มงวด
+}
+
+// [2] HTTPS Redirection: บังคับเชื่อมต่อแบบปลอดภัย
+app.UseHttpsRedirection();
+
+// [3] Static Files: ส่งไฟล์ wwwroot โดยไม่ต้องคำนวณ Route
+app.UseStaticFiles();
+
+// [4] Routing: จับคู่ Request กับ Route Template
+app.UseRouting();
+
+// [5] CORS: จัดการความปลอดภัยข้ามโดเมน (ต้องอยู่หลัง UseRouting เสมอ)
+app.UseCors("AllowFrontendApp");
+
+// [6] Authentication: แกะ Token ยืนยันตัวตน ("คุณคือใคร?")
+app.UseAuthentication();
+
+// [7] Authorization: ตรวจสอบสิทธิ์การเข้าถึง ("คุณทำได้ไหม?")
+app.UseAuthorization();
+
+// ─────────────────────────────────────────────────────────────
+// 3. ENDPOINTS EXECUTION (ประมวลผลคำสั่งตาม Business Logic)
+// ─────────────────────────────────────────────────────────────
+app.MapGet("/api/profile", (HttpContext context) =>
+{
+    var username = context.User.Identity?.Name ?? "Guest";
+    return Results.Ok(new { Message = $"สวัสดีคุณ {username}", ServerTime = DateTime.UtcNow });
+}).RequireAuthorization(); // บังคับว่าต้องผ่าน Authorization ก่อน
+
+app.Run();</code></pre>
+          </div>
+          <div class="color-legend">
+            <div class="legend-item"><span class="legend-dot" style="background: #ff7b72;"></span><span>Keywords</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background: #79c0ff;"></span><span>Types</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background: #d2a8ff;"></span><span>Methods</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background: #ffa657;"></span><span>Variables</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background: #a5d6ff;"></span><span>Strings</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 3: การเขียน Custom Middleware ─── -->
+      <section class="lesson-section reveal" id="custom-middleware">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(63, 185, 80, 0.2); color: var(--accent-success); border: 1px solid var(--accent-success);">03</div>
+          <div>
+            <h2 class="section-title">การเขียน Custom Middleware ระดับโปรดักชัน</h2>
+            <div class="section-subtitle">สร้าง Middleware ขึ้นมาใช้เองเพื่อดักจับ Performance, ตรวจสอบ Header, และจัดการ Global Error</div>
+          </div>
+        </div>
+
+        <p>
+          ใน ASP.NET Core เราสามารถสร้าง Custom Middleware ได้ 2 วิธีหลัก คือ <strong>Inline Middleware</strong> (เหมาะกับงานเล็กๆ ไม่ซับซ้อน) และ <strong>Class-Based Middleware</strong> (แนะนำสำหรับ Production เพราะโค้ดเป็นระเบียบ Test ได้ง่าย และ Reuse ซ้ำได้)
+        </p>
+
+        <!-- Method 1: Inline Middleware -->
+        <h3 class="mt-lg mb-sm">วิธีที่ 1: Inline Middleware ด้วย <code>app.Use()</code></h3>
+        <p class="text-secondary">ใช้ Lambda Function รับพารามิเตอร์ <code>HttpContext context</code> และ <code>RequestDelegate next</code>:</p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info"><span class="file-icon">⚡</span><span>Program.cs — Inline Logging Middleware</span></div>
+            <button class="copy-btn" onclick="copyCode(this)">📋 คัดลอกโค้ด</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">app.Use(async (HttpContext context, RequestDelegate next) =>
+{
+    // 1. โค้ดส่วนนี้จะทำงานใน "ขาเข้า" (Inbound Request)
+    Console.WriteLine($"[INBOUND] 👉 {context.Request.Method} {context.Request.Path}");
+
+    // 2. เรียก next(context) เพื่อส่งต่อการทำงานไปยัง Middleware ตัวถัดไปใน Pipeline
+    await next(context);
+
+    // 3. โค้ดส่วนนี้จะทำงานใน "ขาออก" (Outbound Response) หลัง Endpoint ทำงานเสร็จ
+    Console.WriteLine($"[OUTBOUND] 👈 Response Status Code: {context.Response.StatusCode}");
+});</code></pre>
+          </div>
+        </div>
+
+        <!-- Method 2: Class-based Middleware -->
+        <h3 class="mt-xl mb-sm">วิธีที่ 2: Class-based Middleware (มาตรฐาน Production)</h3>
+        <p class="text-secondary">
+          การเขียนแบบแยกคลาสจะประกอบด้วย Constructor ที่รับ <code>RequestDelegate _next</code> และเมธอด <code>public async Task InvokeAsync(HttpContext context)</code>:
+        </p>
+
+        <!-- Real-world Example 1: Performance Logger -->
+        <div class="concept-card mt-md">
+          <div class="concept-header" style="background: rgba(88, 166, 255, 0.08);">
+            <div class="concept-emoji">⏱️</div>
+            <div>
+              <div class="concept-title">ตัวอย่างจริงที่ 1: Request Timing &amp; Performance Logging Middleware</div>
+              <div class="text-muted" style="font-size: 0.8rem;">บันทึกเวลาประมวลผลของทุก Request, แนบ Header <code>X-Response-Time-ms</code>, และแจ้งเตือนเมื่อ Request ช้าเกินไป</div>
+            </div>
+          </div>
+          <div class="concept-body">
+            <div class="code-block-wrapper" style="margin-top: 0;">
+              <div class="code-block-header">
+                <div class="file-info"><span class="file-icon">🛡️</span><span>Middlewares/RequestPerformanceMiddleware.cs</span></div>
+                <button class="copy-btn" onclick="copyCode(this)">📋 คัดลอกโค้ด</button>
+              </div>
+              <div class="code-block-body">
+                <pre><code class="language-csharp">using System.Diagnostics;
+
+namespace DotNetHub.Api.Middlewares;
+
+public class RequestPerformanceMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger&lt;RequestPerformanceMiddleware&gt; _logger;
+
+    public RequestPerformanceMiddleware(RequestDelegate next, ILogger&lt;RequestPerformanceMiddleware&gt; logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        // 1. เริ่มจับเวลาด้วย Stopwatch ในขาเข้า
+        var stopwatch = Stopwatch.StartNew();
+
+        // ดักจับ Header ขาออกเพื่อแนบ Response Time Header
+        context.Response.OnStarting(() =>
+        {
+            stopwatch.Stop();
+            var elapsedMs = stopwatch.ElapsedMilliseconds;
+            context.Response.Headers["X-Response-Time-ms"] = elapsedMs.ToString();
+            return Task.CompletedTask;
+        });
+
+        // 2. ส่งต่อให้ Middleware ตัวถัดไปทำงาน
+        await _next(context);
+
+        // 3. ตรวจสอบในขาออก: หากทำงานช้าเกิน 500ms ให้ส่ง Warning Log
+        if (stopwatch.ElapsedMilliseconds > 500)
+        {
+            _logger.LogWarning("⚠️ Slow Request: {Method} {Path} ใช้เวลา {Elapsed} ms!",
+                context.Request.Method,
+                context.Request.Path,
+                stopwatch.ElapsedMilliseconds);
+        }
+        else
+        {
+            _logger.LogInformation("✅ Completed: {Method} {Path} ใน {Elapsed} ms [Status: {StatusCode}]",
+                context.Request.Method,
+                context.Request.Path,
+                stopwatch.ElapsedMilliseconds,
+                context.Response.StatusCode);
+        }
+    }
+}
+
+// Extension Method เพื่อความ Clean ในการเรียกใช้ที่ Program.cs
+public static class RequestPerformanceMiddlewareExtensions
+{
+    public static IApplicationBuilder UseRequestPerformanceLogger(this IApplicationBuilder app)
+    {
+        return app.UseMiddleware&lt;RequestPerformanceMiddleware&gt;();
+    }
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-world Example 2: Global Exception Handling Middleware -->
+        <div class="concept-card mt-xl">
+          <div class="concept-header" style="background: rgba(248, 81, 73, 0.08);">
+            <div class="concept-emoji">🚨</div>
+            <div>
+              <div class="concept-title">ตัวอย่างจริงที่ 2: Global Exception Handling Middleware (RFC 7807)</div>
+              <div class="text-muted" style="font-size: 0.8rem;">ดักจับ Exception ทั่วทั้ง Application แล้วแปลงเป็นโครงสร้าง JSON มาตรฐาน ProblemDetails พร้อมส่ง HTTP Status Code ที่ถูกต้อง</div>
+            </div>
+          </div>
+          <div class="concept-body">
+            <div class="code-block-wrapper" style="margin-top: 0;">
+              <div class="code-block-header">
+                <div class="file-info"><span class="file-icon">🛡️</span><span>Middlewares/GlobalExceptionHandlerMiddleware.cs</span></div>
+                <button class="copy-btn" onclick="copyCode(this)">📋 คัดลอกโค้ด</button>
+              </div>
+              <div class="code-block-body">
+                <pre><code class="language-csharp">using System.Net;
+using System.Text.Json;
+
+namespace DotNetHub.Api.Middlewares;
+
+public class GlobalExceptionHandlerMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger&lt;GlobalExceptionHandlerMiddleware&gt; _logger;
+
+    public GlobalExceptionHandlerMiddleware(RequestDelegate next, ILogger&lt;GlobalExceptionHandlerMiddleware&gt; logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
+        {
+            // พยายามส่งต่อการทำงานตามปกติ
+            await _next(context);
+        }
+        catch (Exception ex)
+        {
+            // ดักจับ Error ที่หลุดออกมาจาก Controller / Service ทั้งหมด
+            _logger.LogError(ex, "❌ Unhandled Exception เกิดข้อผิดพลาดขึ้นในระบบ: {Message}", ex.Message);
+            await HandleExceptionAsync(context, ex);
+        }
+    }
+
+    private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        context.Response.ContentType = "application/problem+json";
+
+        var statusCode = exception switch
+        {
+            KeyNotFoundException => HttpStatusCode.NotFound,             // 404
+            UnauthorizedAccessException => HttpStatusCode.Unauthorized, // 401
+            ArgumentException => HttpStatusCode.BadRequest,              // 400
+            _ => HttpStatusCode.InternalServerError                     // 500
+        };
+
+        context.Response.StatusCode = (int)statusCode;
+
+        var errorResponse = new
+        {
+            Status = (int)statusCode,
+            Title = exception.GetType().Name,
+            Detail = exception.Message,
+            Instance = context.Request.Path.Value,
+            Timestamp = DateTime.UtcNow
+        };
+
+        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        var jsonResponse = JsonSerializer.Serialize(errorResponse, jsonOptions);
+
+        await context.Response.WriteAsync(jsonResponse);
+    }
+}
+
+// Extension Method
+public static class GlobalExceptionHandlerExtensions
+{
+    public static IApplicationBuilder UseGlobalExceptionHandler(this IApplicationBuilder app)
+    {
+        return app.UseMiddleware&lt;GlobalExceptionHandlerMiddleware&gt;();
+    }
+}</code></pre>
+              </div>
+            </div>
+
+            <!-- How to use in Program.cs -->
+            <div class="callout callout-tip mt-md">
+              <div class="callout-title">💡 วิธีเรียกใช้งานใน Program.cs แบบสวยงาม (Clean Syntax)</div>
+              <div style="font-family: var(--font-code); font-size: 0.88rem; color: var(--text-primary); margin-top: 6px;">
+                <code>var app = builder.Build();</code><br>
+                <code style="color: var(--accent-success);">app.UseGlobalExceptionHandler();</code> <span class="text-muted">// ใส่ไว้บนสุดเพื่อดัก Exception ทั้งหมด</span><br>
+                <code style="color: var(--accent-primary);">app.UseRequestPerformanceLogger();</code> <span class="text-muted">// จับเวลาทุก Request</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 4: เปรียบเทียบ app.Use(), app.Run(), app.Map() ─── -->
+      <section class="lesson-section reveal" id="use-run-map">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(210, 153, 34, 0.2); color: var(--accent-warning); border: 1px solid var(--accent-warning);">04</div>
+          <div>
+            <h2 class="section-title">เปรียบเทียบ app.Use(), app.Run(), app.Map()</h2>
+            <div class="section-subtitle">ความแตกต่างระหว่าง Chaining, Terminal และ Branching Middleware</div>
+          </div>
+        </div>
+
+        <p>
+          ในการประกอบ Pipeline เรามี 3 เมธอดหลักในการผูก Middleware เข้าสู่ระบบ ซึ่งแต่ละตัวมีพฤติกรรมและหน้าที่แตกต่างกันอย่างชัดเจน:
+        </p>
+
+        <!-- 3 Cards Grid -->
+        <div class="method-compare-grid">
+          <!-- app.Use -->
+          <div class="method-card use-card">
+            <div class="method-badge">app.Use()</div>
+            <div class="method-type-label">🔗 Chaining Middleware</div>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); flex-grow: 1;">
+              ทำหน้าที่ประมวลผลคำขอ แล้ว<strong>สามารถส่งต่อไปยัง Middleware ถัดไป</strong>ได้โดยการเรียก <code>await next(context)</code> และกลับมาทำงานต่อในขากลับได้
+            </p>
+            <div class="code-block-wrapper" style="margin: var(--space-sm) 0 0 0;">
+              <div class="code-block-body">
+                <pre><code class="language-csharp">app.Use(async (context, next) =>
+{
+    // Do work before
+    await next(context); // ส่งต่อ
+    // Do work after
+});</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- app.Run -->
+          <div class="method-card run-card">
+            <div class="method-badge">app.Run()</div>
+            <div class="method-type-label">🛑 Terminal Middleware</div>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); flex-grow: 1;">
+              ทำหน้าที่เป็น<strong>จุดสิ้นสุดของท่อส่ง (Terminal)</strong> จะไม่มีพารามิเตอร์ <code>next</code> เมื่อทำงานเสร็จจะส่ง Response กลับทันที และไม่มี Middleware ด้านล่างถูกทำงานต่อ
+            </p>
+            <div class="code-block-wrapper" style="margin: var(--space-sm) 0 0 0;">
+              <div class="code-block-body">
+                <pre><code class="language-csharp">app.Run(async (context) =>
+{
+    // จบการทำงาน ส่งผลลัพธ์ทันที
+    await context.Response
+        .WriteAsync("Terminal Point!");
+});</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- app.Map / MapWhen -->
+          <div class="method-card map-card">
+            <div class="method-badge">app.Map() / MapWhen()</div>
+            <div class="method-type-label">🌿 Branching Middleware</div>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); flex-grow: 1;">
+              ทำหน้าที่<strong>แตกแขนงท่อส่ง (Branch Pipeline)</strong> ออกเป็นเส้นทางใหม่ตาม URL Path (เช่น <code>/admin</code>) หรือตามเงื่อนไข Predicate ใน Request Headers
+            </p>
+            <div class="code-block-wrapper" style="margin: var(--space-sm) 0 0 0;">
+              <div class="code-block-body">
+                <pre><code class="language-csharp">app.Map("/admin", adminApp =>
+{
+    adminApp.Use(async (ctx, next) => {
+        // Pipeline เฉพาะของ /admin
+        await next(ctx);
+    });
+    adminApp.Run(async ctx => {
+        await ctx.Response.WriteAsync("Admin Area");
+    });
+});</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison Summary Matrix -->
+        <h3 class="mt-xl mb-md">📊 ตารางสรุปคุณสมบัติ (Comparison Matrix)</h3>
+
+        <table class="comparison-table mb-lg">
+          <thead>
+            <tr>
+              <th>คุณสมบัติ (Feature)</th>
+              <th><code>app.Use()</code></th>
+              <th><code>app.Run()</code></th>
+              <th><code>app.Map() / MapWhen()</code></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ประเภท (Category)</strong></td>
+              <td>Chaining (ต่อท่อส่งต่อ)</td>
+              <td>Terminal (ปลายทางท่อ)</td>
+              <td>Branching (แตกกิ่งก้านสาขา)</td>
+            </tr>
+            <tr>
+              <td><strong>มีพารามิเตอร์ <code>next</code> หรือไม่?</strong></td>
+              <td><span class="badge badge-success">มี (ส่งต่อได้)</span></td>
+              <td><span class="badge badge-danger">ไม่มี (สิ้นสุดทันที)</span></td>
+              <td><span class="badge badge-info">มี Sub-pipeline เฉพาะ</span></td>
+            </tr>
+            <tr>
+              <td><strong>Short-circuit ได้หรือไม่?</strong></td>
+              <td>ทำได้ (หากไม่เรียก <code>await next()</code>)</td>
+              <td>เป็นธรรมชาติของตัวมันเอง</td>
+              <td>ทำได้ภายใน Sub-pipeline</td>
+            </tr>
+            <tr>
+              <td><strong>Use Cases ที่เหมาะสม</strong></td>
+              <td>Logging, CORS, Auth, Header Injection, Error Handling</td>
+              <td>หน้า Fallback, Health Check แบบ Simple, Static Response</td>
+              <td>แยก Pipeline พิเศษสำหรับ <code>/webhooks</code>, <code>/internal</code>, <code>/admin</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ─── Section 5: Inline Quiz ─── -->
+      <section class="lesson-section reveal" id="quiz-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(248, 81, 73, 0.2); color: var(--accent-danger); border: 1px solid var(--accent-danger);">05</div>
+          <div>
+            <h2 class="section-title">แบบทดสอบความเข้าใจ: Middleware &amp; Request Pipeline</h2>
+            <div class="section-subtitle">ทดสอบความรู้ 5 ข้อเกี่ยวกับลำดับการทำงาน, Built-in Middleware และการเขียน Custom Middleware</div>
+          </div>
+        </div>
+
+        <!-- Quiz Container rendered by QuizEngine -->
+        <div id="dotnet-middleware-quiz"></div>
+      </section>
+
+      <!-- ─── Next Lesson Navigation ─── -->
+      <div class="card mt-2xl reveal" style="border-color: var(--border-active); background: linear-gradient(135deg, rgba(88, 166, 255, 0.12) 0%, rgba(22, 27, 34, 0.8) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge badge-success mb-xs">🎉 ยอดเยี่ยม! จบบทเรียน Middleware &amp; Pipeline</span>
+            <h3 style="margin-top: 4px; margin-bottom: 4px;">พร้อมไปต่อกับโมดูลถัดไป: ASP.NET Core Web API แล้วหรือยัง?</h3>
+            <p class="text-muted" style="margin-bottom: 0;">เรียนรู้ Controller-based API, Minimal APIs, Model Binding, Validation, และการส่ง HTTP Status Code</p>
+          </div>
+          <div>
+            <a href="./aspnet-api.html" class="btn btn-primary btn-lg">
+              <span>ไปบทเรียนถัดไป: Web API →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Initialize Mermaid Diagrams
+      if (typeof mermaid !== 'undefined') {
+        mermaid.initialize({
+          startOnLoad: true,
+          theme: 'dark',
+          themeVariables: {
+            darkMode: true,
+            background: '#090d13',
+            primaryColor: '#58a6ff',
+            primaryTextColor: '#c9d1d9',
+            primaryBorderColor: '#30363d',
+            lineColor: '#58a6ff',
+            secondaryColor: '#21262d',
+            tertiaryColor: '#161b22'
+          }
+        });
+      }
+
+      // 2. Mark this lesson as completed in Progress tracker & award XP
+      if (typeof Progress !== 'undefined') {
+        Progress.completeLesson('dotnet-middleware');
+        Progress.setModuleProgress('dotnet', 60);
+      }
+
+      // 3. Quiz Questions Definition
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'ในการจัดเรียงลำดับ Middleware ในไฟล์ Program.cs เหตุใด app.UseAuthentication() จึงต้องถูกประกาศ "ก่อนหน้า" app.UseAuthorization() เสมอ?',
+          options: [
+            'เพื่อให้ระบบจัดสรรหน่วยความจำแบบ Scoped ให้กับ Token ได้ทันท่วงที',
+            'เพื่อให้ระบบถอดรหัสและยืนยันตัวตนว่า "ผู้ใช้คือใคร" ให้เสร็จก่อน จึงจะสามารถตรวจสอบสิทธิ์ได้ว่า "มีสิทธิ์ทำสิ่งนี้หรือไม่"',
+            'เพราะ UseAuthorization เป็น Terminal Middleware ที่ไม่ส่งต่อการทำงานให้ใคร',
+            'เพื่อให้สามารถใช้ Swagger UI ทดสอบ API ข้ามโดเมนได้'
+          ],
+          answer: 1,
+          explanation: 'Authentication คือการระบุตัวตน ("Who are you?") ซึ่งจะสร้าง ClaimsPrincipal บรรจุลงใน HttpContext.User จากนั้น Authorization ("Are you allowed?") จึงจะสามารถนำข้อมูล User ไปตรวจสอบ Roles และ Policies ได้อย่างถูกต้อง หากวางสลับกัน User จะยังคงเป็น Anonymous เสมอ'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ข้อใดอธิบายพฤติกรรมของ "Terminal Middleware" (เช่น app.Run()) ได้ถูกต้องที่สุด?',
+          options: [
+            'เป็น Middleware ที่ทำงานเฉพาะตอนที่โปรแกรมกำลังจะปิดการทำงาน (Application Shutdown)',
+            'เป็น Middleware ที่แยกแขนงเส้นทางตาม URL Path',
+            'เป็น Middleware ที่เป็นจุดสิ้นสุดของ Pipeline จะไม่มีการเรียก next() และจะสร้าง Response ส่งกลับทันทีโดยไม่ส่งต่อไปยัง Middleware ตัวถัดไป',
+            'เป็น Middleware ที่ใช้เชื่อมต่อไปยัง Terminal Shell ของเซิร์ฟเวอร์'
+          ],
+          answer: 2,
+          explanation: 'Terminal Middleware (สร้างผ่าน app.Run()) คือจุดสิ้นสุดของสายพานคำขอ จะไม่มี Delegate `next` ให้เรียกใช้ เมื่อ Request เดินทางมาถึงจุดนี้ จะทำการสร้าง Response แล้วส่งกลับในทันที'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'ปรากฏการณ์ "Short-circuiting" ใน Request Pipeline ของ ASP.NET Core เกิดขึ้นในสถานการณ์ใด?',
+          options: [
+            'เมื่อเซิร์ฟเวอร์เกิดไฟฟ้าดับหรือ CPU ใช้งานเกิน 100%',
+            'เมื่อ Middleware ตัวใดตัวหนึ่งสร้าง HTTP Response ส่งกลับไปยัง Client ทันทีโดย "ไม่เรียกใช้งาน await next(context)" เช่น เมื่อผู้ใช้ล็อกอินไม่ผ่าน (401 Unauthorized)',
+            'เมื่อมีการเรียกใช้งาน Dependency Injection แบบ Singleton ซ้อนกัน',
+            'เมื่อ Controller ส่งผลลัพธ์เป็น Asynchronous Task'
+          ],
+          answer: 1,
+          explanation: 'Short-circuiting คือการที่ Middleware ตัดสินใจไม่ส่ง Request ต่อไปยัง Middleware ด้านล่างใน Pipeline (โดยการละเว้นไม่เรียก await next(context)) และส่ง Response รหัสความผิดพลาด เช่น 401 หรือ 403 กลับไปทันที'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'ใน Custom Middleware แบบ Class-based โค้ดส่วนที่เขียน "หลังคำสั่ง await _next(context);" จะถูกทำงานในจังหวะใดของการประมวลผล?',
+          options: [
+            'ทำงานก่อนที่ Request จะมาถึงเซิร์ฟเวอร์',
+            'ทำงานในขาออก (Outbound Response) หลังจากที่ Endpoint หรือ Middleware ถัดไปทำงานเสร็จสิ้นแล้ว',
+            'ไม่ทำงานเลยเพราะถูก Short-circuit',
+            'ทำงานพร้อมกันแบบ Multithread แบบขนานกับ Endpoint'
+          ],
+          answer: 1,
+          explanation: 'สถาปัตยกรรม Pipeline ของ ASP.NET Core ทำงานแบบ Matryoshka (Russian Doll) โค้ดก่อน await _next(context) จะรันในขาเข้า (Inbound) และโค้ดหลัง await _next(context) จะรันในขาออก (Outbound) ขณะที่ Response กำลังไหลย้อนกลับไปยัง Client'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'หากคุณต้องการสร้างเส้นทางประมวลผลพิเศษที่มีชุด Middleware เฉพาะสำหรับ URL ที่ขึ้นต้นด้วย "/webhooks/stripe" ควรเลือกใช้เมธอดใดในการกำหนด Pipeline?',
+          options: [
+            'app.Use()',
+            'app.Run()',
+            'app.Map("/webhooks/stripe", branch => { ... })',
+            'app.UseDeveloperExceptionPage()'
+          ],
+          answer: 2,
+          explanation: 'app.Map() ใช้สำหรับการสร้าง Branch Pipeline (แตกกิ่งก้านสายพาน) แยกตาม URL Path Prefix เพื่อให้เส้นทางนั้นๆ มีชุด Middleware และ Logic ทำงานเฉพาะตัวแยกจาก Main Pipeline'
+        }
+      ];
+
+      // 4. Initialize Quiz
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('dotnet-middleware-quiz', quizQuestions, {
+          quizId: 'dotnet-middleware',
+          showTimer: false,
+          showExplanation: true
+        });
+      }
+    });
+  </script>
+</body>
+</html>

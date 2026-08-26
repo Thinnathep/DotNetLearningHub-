@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Documentation & Swagger — DotNet Learning Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">📝</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน</a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP</a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections & LINQ</a>
+    <a href="./csharp-advanced.html" class="sidebar-link"><span class="link-icon">📕</span> C# ขั้นสูง</a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET</a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection</a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware</a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-link"><span class="link-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link"><span class="link-icon">🎮</span> SQL Playground</a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link"><span class="link-icon">🧩</span> Blazor Components</a>
+    <a href="./xaml-basics.html" class="sidebar-link"><span class="link-icon">📐</span> XAML พื้นฐาน</a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML & JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps & Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git & CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link"><span class="link-icon">🛡️</span> Secure Coding</a>
+
+    <div class="sidebar-section-title">🟡 Web & คุณภาพ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link"><span class="link-icon">👀</span> Code Review</a>
+    <a href="./sdlc-agile.html" class="sidebar-link"><span class="link-icon">📋</span> SDLC & Agile</a>
+    <a href="./tech-docs.html" class="sidebar-link active"><span class="link-icon">📝</span> Technical Docs <span class="link-badge badge-basic">พื้นฐาน</span></a>
+    <a href="./architecture.html" class="sidebar-link"><span class="link-icon">🏛️</span> Architecture</a>
+
+    <div class="sidebar-section-title">🎮 Games & Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> เตรียมสัมภาษณ์</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header reveal">
+            <div class="breadcrumb">
+                <a href="../index.html">🏠 หน้าแรก</a>
+                <span>/</span>
+                <span>Process Track</span>
+                <span>/</span>
+                <span>Technical Documentation</span>
+            </div>
+            <div class="page-title">
+                <div class="title-icon" style="background: var(--cat-process); color: #fff;">📝</div>
+                <h1>Technical Documentation & Swagger / OpenAPI</h1>
+            </div>
+            <p class="page-description">
+                การเขียนเอกสารทางเทคนิคสำหรับระบบซอฟต์แวร์, การสร้าง API Documentation อัตโนมัติด้วย Swagger/OpenAPI, C# XML Comments และการเขียน README.md ระดับมืออาชีพ
+            </p>
+            <div class="page-meta">
+                <span class="meta-item">⭐ ระดับ: พื้นฐาน</span>
+                <span class="meta-item">⏱️ เวลา: ~35 นาที</span>
+                <span class="meta-item">⚡ รางวัล: +100 XP</span>
+                <span class="meta-item">🏷️ Swagger / XML Comments / Markdown</span>
+            </div>
+        </div>
+
+        <!-- Analogy Section -->
+        <div class="concept-card reveal">
+            <div class="concept-header">
+                <span class="concept-emoji">🗺️</span>
+                <span class="concept-title">เปรียบเทียบให้เห็นภาพ: แผนที่นำทางและคู่มือประกอบเฟอร์นิเจอร์</span>
+            </div>
+            <div class="concept-body">
+                <div class="analogy-box">
+                    <div class="analogy-label">💡 Analogy</div>
+                    <p class="analogy-text">
+                        • <strong>โค้ดที่ไม่มีเอกสาร:</strong> เหมือน <strong>เฟอร์นิเจอร์ IKEA ที่มีแต่น็อต 500 ตัวแต่ไม่มีคู่มือ</strong> — แม้ของจะดีแค่ไหน คนอื่น (หรือตัวเราเองในอีก 6 เดือนข้างหน้า) ก็ไม่รู้ว่าจะประกอบและใช้งานอย่างไร<br>
+                        • <strong>Swagger / OpenAPI:</strong> เหมือน <strong>ตู้จำหน่ายสินค้าอัตโนมัติที่มีเมนูและปุ่มกดทดลองกดได้จริง</strong> — Frontend และ Third-Party สามารถทดลองส่ง Parameter และดู Response Schema ได้ทันทีโดยไม่ต้องถาม Backend Developer
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: XML Documentation in C# -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-process); color: #fff;">01</div>
+                <h2>C# XML Documentation Comments (///)</h2>
+            </div>
+            <p>เมื่อพิมพ์ <code>///</code> เหนือ Class หรือ Method ใน Visual Studio จะสร้างโครงสร้าง XML Document ที่แสดงผลใน IntelliSense และแปลงเป็น Swagger UI อัตโนมัติ:</p>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> ProductsController.cs (XML Documentation)</div>
+                    <button class="copy-btn">📋 Copy</button>
+                </div>
+                <div class="code-block-body">
+<pre class="language-csharp"><code>/// &lt;summary&gt;
+/// ค้นหาข้อมูลสินค้าตามรหัสประจำตัว (ID)
+/// &lt;/summary&gt;
+/// &lt;param name="id"&gt;รหัสประจำตัวของสินค้าที่ต้องการค้นหา&lt;/param&gt;
+/// &lt;returns&gt;ส่งกลับข้อมูล ProductResponseDto พร้อมรหัสสถานะ 200 OK&lt;/returns&gt;
+/// &lt;response code="200"&gt;ค้นพบสินค้าสำเร็จ&lt;/response&gt;
+/// &lt;response code="404"&gt;ไม่พบสินค้าตาม ID ที่ระบุ&lt;/response&gt;
+[HttpGet("{id:int}")]
+[ProducesResponseType(typeof(ProductResponseDto), StatusCodes.Status200OK)]
+[ProducesResponseType(StatusCodes.Status404NotFound)]
+public async Task&lt;ActionResult&lt;ProductResponseDto&gt;&gt; GetById(int id)
+{
+    var product = await _service.GetByIdAsync(id);
+    if (product == null) return NotFound();
+    return Ok(product);
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: README.md Template -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-process); color: #fff;">02</div>
+                <h2>โครงสร้างไฟล์ README.md มาตรฐานสำหรับ Project Repo</h2>
+            </div>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> README.md Template</div>
+                    <button class="copy-btn">📋 Copy</button>
+                </div>
+                <div class="code-block-body">
+<pre class="language-markdown"><code># 🚀 MyShop E-Commerce Web API (.NET 9)
+
+ระบบ Backend RESTful API สำหรับแพลตฟอร์มจำหน่ายสินค้าออนไลน์ พัฒนาด้วย ASP.NET Core 9 และ EF Core
+
+## 🛠️ Tech Stack & Prerequisites
+- .NET SDK 9.0+
+- Microsoft SQL Server 2022 / Azure SQL
+- Docker Desktop
+
+## ⚙️ Getting Started (วิธีรันโปรเจกต์)
+1. Clone Repository:
+   ```bash
+   git clone https://github.com/myorg/myshop-api.git
+   cd myshop-api
+   ```
+2. Restore NuGet Packages & Build:
+   ```bash
+   dotnet restore
+   dotnet build
+   ```
+3. Update Database Migrations:
+   ```bash
+   dotnet ef database update
+   ```
+4. Run Application:
+   ```bash
+   dotnet run --project MyShop.Api
+   ```
+5. เปิดเบราว์เซอร์เข้าใช้งาน Swagger UI: `https://localhost:7001/swagger`</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Quiz -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-warning); color: #000;">🎯</div>
+                <h2>แบบทดสอบความเข้าใจ: Technical Documentation</h2>
+            </div>
+            <div id="tech-docs-quiz"></div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/quiz-engine.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'การเขียน XML Documentation ใน C# เริ่มต้นด้วยการพิมพ์สัญลักษณ์ใด?',
+                options: ['/// (Slash 3 ตัว)', '/* ... */', '#doc', '<!-- -->'],
+                answer: 0,
+                explanation: 'การพิมพ์ /// เหนือคลาสหรือเมธอดจะสร้าง XML Document Tag เช่น <summary>, <param>, <returns> อัตโนมัติ',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Swagger / OpenAPI Specification มีประโยชน์หลักอย่างไรสำหรับทีมพัฒนา?',
+                options: [
+                    'ช่วยสร้างหน้า Interactive API Documentation อัตโนมัติ เพื่อให้ Frontend/QA ทดลองเรียกใช้งานและดู Schema ได้ทันที',
+                    'ช่วยทำให้ฐานข้อมูลทำงานเร็วขึ้น',
+                    'ช่วยเขียนโค้ดแทนโปรแกรมเมอร์',
+                    'ใช้สำหรับวาดภาพกราฟิก'
+                ],
+                answer: 0,
+                explanation: 'Swagger UI เป็นสะพานเชื่อมระหว่าง Backend กับทีมอื่นๆ ให้เข้าใจ API Contract โดยไม่ต้องอ่านซอร์สโค้ด',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'ไฟล์ใดใน Repository ที่ควรมีข้อมูลเกี่ยวกับวิธีติดตั้งและการรันโปรเจกต์ (Getting Started)?',
+                options: ['README.md', 'appsettings.json', 'Program.cs', 'MyProject.csproj'],
+                answer: 0,
+                explanation: 'README.md คือประตูบานแรกของทุกโปรเจกต์ที่อธิบายวัตถุประสงค์ Tech stack และขั้นตอนการ Setup โปรเจกต์',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Attribute ใดใน ASP.NET Core ใช้ระบุว่า Endpoint นี้จะส่ง HTTP Status Code ใดและ Return Type อะไรกลับไปใน Swagger?',
+                options: ['[ProducesResponseType]', '[SwaggerOutput]', '[ApiReturn]', '[HttpCode]'],
+                answer: 0,
+                explanation: '[ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)] ใช้บอก Swagger Schema',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'ข้อใดเป็นแนวทางการเขียน Technical Documentation ที่ดีที่สุด?',
+                options: [
+                    'เขียนให้อัปเดตตรงกับโค้ดจริง กระชับ ชัดเจน มีตัวอย่างคำสั่งและภาพประกอบ',
+                    'เขียนให้ยาวและใช้คำศัพท์ยากๆ ให้มากที่สุด',
+                    'เขียนทิ้งไว้ครั้งเดียวแล้วไม่ต้องอัปเดตอีกเลย',
+                    'ไม่ต้องเขียน ให้คนอื่นมาอ่านโค้ดเอาเอง'
+                ],
+                answer: 0,
+                explanation: 'เอกสารที่ดีต้องชัดเจน กระชับ มีขั้นตอนที่ทำตามได้จริง และได้รับการอัปเดตสม่ำเสมอเมื่อโค้ดเปลี่ยน',
+                difficulty: 'basic'
+            }
+        ];
+
+        QuizEngine.start('tech-docs-quiz', questions, {
+            quizId: 'tech-docs',
+            onComplete: () => {
+                Progress.completeLesson('tech-docs');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

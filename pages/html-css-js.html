@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML, CSS &amp; JavaScript พื้นฐาน — DotNet Learning Hub</title>
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <style>
+    /* ─── Web Basics Category Accents ─── */
+    :root {
+      --cat-web-glow: rgba(247, 223, 30, 0.25);
+      --html-color: #e44d26;
+      --css-color: #264de4;
+      --js-color: #f7df1e;
+    }
+
+    /* ─── 3 Layer Cake Visual ─── */
+    .cake-container {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+
+    .cake-layer {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-default);
+      background: var(--bg-card);
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cake-layer::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+    }
+
+    .cake-layer.layer-html::before { background: var(--html-color); }
+    .cake-layer.layer-css::before { background: var(--css-color); }
+    .cake-layer.layer-js::before { background: var(--js-color); }
+
+    .cake-layer:hover {
+      transform: translateX(6px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .cake-layer.layer-html:hover { border-color: var(--html-color); }
+    .cake-layer.layer-css:hover { border-color: var(--css-color); }
+    .cake-layer.layer-js:hover { border-color: var(--js-color); }
+
+    .layer-icon-badge {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      flex-shrink: 0;
+      font-weight: 800;
+      font-family: var(--font-heading);
+    }
+
+    .layer-html .layer-icon-badge { background: rgba(228, 77, 38, 0.15); color: var(--html-color); border: 1px solid rgba(228, 77, 38, 0.3); }
+    .layer-css .layer-icon-badge { background: rgba(38, 77, 228, 0.15); color: #58a6ff; border: 1px solid rgba(38, 77, 228, 0.3); }
+    .layer-js .layer-icon-badge { background: rgba(247, 223, 30, 0.15); color: var(--js-color); border: 1px solid rgba(247, 223, 30, 0.3); }
+
+    .layer-info { flex: 1; }
+    .layer-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .layer-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 6px;
+    }
+    .layer-analogy {
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      font-weight: 500;
+    }
+    .layer-html .layer-analogy { background: rgba(228, 77, 38, 0.1); color: #ff8566; }
+    .layer-css .layer-analogy { background: rgba(38, 77, 228, 0.1); color: #79c0ff; }
+    .layer-js .layer-analogy { background: rgba(247, 223, 30, 0.1); color: #ffe66d; }
+
+    /* ─── Semantic HTML Mockup ─── */
+    .semantic-wireframe {
+      background: var(--bg-primary);
+      border: 2px dashed var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin: var(--space-lg) 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+    }
+
+    .semantic-box {
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      text-align: center;
+      font-weight: 600;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .semantic-box:hover {
+      filter: brightness(1.2);
+      transform: scale(1.01);
+    }
+
+    .sem-header { background: rgba(255, 123, 114, 0.18); border: 1px solid #ff7b72; color: #ff7b72; }
+    .sem-nav { background: rgba(210, 168, 255, 0.18); border: 1px solid #d2a8ff; color: #d2a8ff; }
+    .sem-body-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 600px) {
+      .sem-body-grid { grid-template-columns: 1fr; }
+    }
+    .sem-main {
+      background: rgba(121, 192, 255, 0.15);
+      border: 1px solid #79c0ff;
+      color: #79c0ff;
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .sem-article { background: rgba(121, 192, 255, 0.25); border: 1px dashed #79c0ff; color: #a5d6ff; padding: 8px; }
+    .sem-section { background: rgba(126, 231, 135, 0.15); border: 1px dashed #7ee787; color: #7ee787; padding: 8px; }
+    .sem-aside { background: rgba(255, 166, 87, 0.18); border: 1px solid #ffa657; color: #ffa657; }
+    .sem-footer { background: rgba(142, 150, 160, 0.18); border: 1px solid #8b949e; color: #8b949e; }
+
+    /* ─── CSS Box Model Diagram ─── */
+    .box-model-diagram {
+      margin: var(--space-lg) auto;
+      max-width: 620px;
+      background: rgba(255, 166, 87, 0.1);
+      border: 2px dashed #ffa657;
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      text-align: center;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      position: relative;
+    }
+    .box-model-border {
+      background: rgba(247, 223, 30, 0.12);
+      border: 2px dashed #f7df1e;
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      margin-top: 8px;
+    }
+    .box-model-padding {
+      background: rgba(126, 231, 135, 0.12);
+      border: 2px dashed #7ee787;
+      border-radius: var(--radius-sm);
+      padding: var(--space-lg);
+      margin-top: 8px;
+    }
+    .box-model-content {
+      background: rgba(121, 192, 255, 0.25);
+      border: 2px solid #79c0ff;
+      border-radius: var(--radius-sm);
+      padding: var(--space-md);
+      color: #79c0ff;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+    .box-label {
+      font-weight: 700;
+      display: inline-block;
+      margin-bottom: 4px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── Interactive Playground Widget ─── */
+    .triad-sandbox {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin: var(--space-lg) 0;
+    }
+    .sandbox-header {
+      background: var(--bg-tertiary);
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sandbox-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    @media (max-width: 768px) {
+      .sandbox-body { grid-template-columns: 1fr; }
+    }
+    .sandbox-preview {
+      padding: var(--space-xl);
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid var(--border-default);
+    }
+    .sandbox-controls {
+      padding: var(--space-xl);
+      background: var(--bg-card);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    /* Interactive Demo Card inside Sandbox */
+    .demo-interactive-card {
+      width: 100%;
+      max-width: 280px;
+      padding: var(--space-lg);
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      text-align: center;
+      transition: all var(--transition-normal);
+      box-shadow: var(--shadow-md);
+    }
+    .demo-avatar {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+      display: inline-block;
+      transition: transform var(--transition-fast);
+    }
+    .demo-title { font-weight: 700; font-size: 1.1rem; color: var(--text-primary); margin-bottom: 4px; }
+    .demo-role { font-size: 0.8rem; color: var(--accent-primary); font-family: var(--font-code); margin-bottom: 12px; }
+    .demo-counter-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent-primary);
+      font-family: var(--font-code);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+
+    /* Flexbox Playground items */
+    .flex-demo-box {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      min-height: 120px;
+      display: flex;
+      gap: var(--space-sm);
+      transition: all var(--transition-fast);
+    }
+    .flex-demo-item {
+      background: rgba(88, 166, 255, 0.2);
+      border: 1px solid var(--accent-primary);
+      border-radius: var(--radius-sm);
+      padding: 10px 16px;
+      font-family: var(--font-code);
+      font-weight: 700;
+      color: var(--accent-primary);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Tag badge helper */
+    .tag-badge {
+      display: inline-block;
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-default);
+      color: var(--syn-tag);
+    }
+
+    .attr-badge {
+      color: var(--syn-attribute);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div style="display: flex; align-items: center; gap: var(--space-md);">
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+      <a href="../index.html" class="site-logo">
+        <div class="logo-icon">🌐</div>
+        <span>DotNet Learning Hub</span>
+      </a>
+    </div>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <a href="quiz-arena.html" class="btn btn-outline btn-sm" style="border-radius: var(--radius-full);">
+        🎮 Quiz Arena
+      </a>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation (All Tracks)
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าแรก (Dashboard)</span>
+      </a>
+    </div>
+
+    <!-- 🟣 Track C# Language -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="csharp-basics.html" class="sidebar-link">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="csharp-oop.html" class="sidebar-link">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="csharp-collections.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Collections &amp; Generics</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>LINQ &amp; Async/Await</span>
+        <span class="sidebar-badge badge-mid">Lv 4</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track .NET & Web API -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track .NET &amp; Web API</div>
+      <a href="dotnet-structure.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 Project Structure</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="dotnet-di.html" class="sidebar-link">
+        <span class="link-icon">💉</span>
+        <span>Dependency Injection</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="dotnet-middleware.html" class="sidebar-link">
+        <span class="link-icon">🛡️</span>
+        <span>Middleware Pipeline</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="rest-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>RESTful API Design</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="system-integration.html" class="sidebar-link">
+        <span class="link-icon">🔄</span>
+        <span>System Integration</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🔴 Track Database & ORM -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔴 Track Database &amp; ORM</div>
+      <a href="sql-basics.html" class="sidebar-link">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; CRUD</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="sql-advanced.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>SQL Advanced &amp; Index</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="sql-playground.html" class="sidebar-link">
+        <span class="link-icon">💻</span>
+        <span>SQL Playground Live</span>
+        <span class="sidebar-badge badge-new">Live</span>
+      </a>
+      <a href="ef-core.html" class="sidebar-link">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🟢 Track Blazor & Frontend -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟢 Track Blazor &amp; Markup</div>
+      <a href="blazor-intro.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Blazor Intro &amp; WASM</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="blazor-components.html" class="sidebar-link">
+        <span class="link-icon">🧩</span>
+        <span>Blazor Components</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="xaml-basics.html" class="sidebar-link">
+        <span class="link-icon">📐</span>
+        <span>XAML Basics (.NET MAUI)</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="xml-json.html" class="sidebar-link">
+        <span class="link-icon">📄</span>
+        <span>XML &amp; JSON Data Formats</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🟡 Track Web Basics (Active Track) -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟡 Track Web Basics</div>
+      <a href="html-css-js.html" class="sidebar-link active">
+        <span class="link-icon">🌐</span>
+        <span>HTML, CSS &amp; JavaScript</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track DevOps & Security -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track DevOps &amp; Security</div>
+      <a href="git-cicd.html" class="sidebar-link">
+        <span class="link-icon">🐙</span>
+        <span>Git &amp; CI/CD Pipelines</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="secure-coding.html" class="sidebar-link">
+        <span class="link-icon">🔒</span>
+        <span>Secure Coding &amp; OWASP</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🟢 Track Quality & Testing -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟢 Track Quality &amp; Process</div>
+      <a href="unit-testing.html" class="sidebar-link">
+        <span class="link-icon">🧪</span>
+        <span>Unit Testing &amp; xUnit</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="code-review.html" class="sidebar-link">
+        <span class="link-icon">👀</span>
+        <span>Code Review Best Practices</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="sdlc-agile.html" class="sidebar-link">
+        <span class="link-icon">🔄</span>
+        <span>SDLC &amp; Agile / Scrum</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="tech-docs.html" class="sidebar-link">
+        <span class="link-icon">📝</span>
+        <span>Technical Documentation</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🔴 Track Architecture -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔴 Track Architecture</div>
+      <a href="architecture.html" class="sidebar-link">
+        <span class="link-icon">🏛️</span>
+        <span>Clean Architecture &amp; CQRS</span>
+        <span class="sidebar-badge badge-new">Adv</span>
+      </a>
+    </div>
+
+    <!-- 🎮 Games & Arena -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🎮 Games &amp; Arena</div>
+      <a href="quiz-arena.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Quiz Arena</span>
+        <span class="sidebar-badge badge-new">Arena</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header animate-fade-in">
+        <div class="breadcrumb">
+          <a href="../index.html">หน้าหลัก</a>
+          <span>/</span>
+          <span>Web Basics Track</span>
+          <span>/</span>
+          <span style="color: var(--cat-web);">HTML, CSS &amp; JavaScript</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(247, 223, 30, 0.15); color: #f7df1e; border: 1px solid rgba(247, 223, 30, 0.4);">🌐</div>
+          <div>
+            <h1>HTML, CSS &amp; JavaScript พื้นฐาน</h1>
+            <div class="page-description">เข้าใจ 3 เสาหลักของโลกเว็บพัฒนา ไวยากรณ์ Semantic HTML5, CSS Box Model &amp; Flexbox, JavaScript DOM, Fetch API และความสัมพันธ์กับ ASP.NET Core &amp; Blazor</div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="level-tag level-basic">⭐ พื้นฐาน (Level 1)</span></span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>เวลาเรียน: <strong>~40 นาที</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>รางวัล: <strong>+100 XP</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>💻</span>
+            <span>รองรับ: HTML5 / CSS3 / ES2024 / ASP.NET Core &amp; Blazor</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Section 1: 3 Layer Cake Analogy ─── -->
+      <section class="lesson-section reveal" id="triad-concept">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(247, 223, 30, 0.2); color: #f7df1e; border: 1px solid #f7df1e;">01</div>
+          <div>
+            <h2>แนวคิด 3 เสาหลักของการสร้างเว็บ (The 3-Layer Cake Analogy)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ทำความเข้าใจหน้าที่และบทบาทของ HTML, CSS และ JavaScript ผ่านการเปรียบเทียบในชีวิตจริง</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">💡</span>
+            <span class="concept-title">เปรียบเทียบให้เห็นภาพ (Analogy: การสร้างบ้าน 1 หลัง)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🏠 บ้าน 1 หลังต้องมีโครงสร้าง ความสวยงาม และระบบไฟฟ้าที่ใช้งานได้จริง</div>
+              <p class="analogy-text">
+                หากเปรียบเทียบหน้าเว็บไซต์ (Web Page) กับการสร้างบ้านหรือร่างกายมนุษย์:
+                <br>• <strong>HTML (Structure / กระดูก &amp; โครงสร้างบ้าน)</strong> — กำหนดเสา คาน อิฐ ผนัง ประตู และหน้าต่าง ว่ามีอะไรอยู่ตรงไหนบ้าง ให้ความหมายและความสมบูรณ์ของเนื้อหา
+                <br>• <strong>CSS (Presentation / ผิวหนัง เสื้อผ้า &amp; สีทาบ้าน)</strong> — กำหนดสีสัน ขนาด ลวดลาย สไตล์ การจัดวางตำแหน่ง (Layout) และความสวยงามน่าใช้งาน
+                <br>• <strong>JavaScript (Behavior / สมอง กล้ามเนื้อ &amp; ระบบไฟฟ้าประปา)</strong> — ทำให้เกิดการเคลื่อนไหว เมื่อกดสวิตช์ไฟจะติด เมื่อเปิดก๊อกน้ำจะไหล สามารถคำนวณและตอบสนองต่อผู้ใช้งานได้แบบ Real-time
+              </p>
+            </div>
+
+            <!-- Visual 3-Layer Stack -->
+            <div class="cake-container">
+              <!-- Layer 1: HTML -->
+              <div class="cake-layer layer-html">
+                <div class="layer-icon-badge">&lt;/&gt;</div>
+                <div class="layer-info">
+                  <div class="layer-title">
+                    <span>1. HTML (HyperText Markup Language)</span>
+                    <span class="sidebar-badge badge-basic">Structure</span>
+                  </div>
+                  <div class="layer-desc">สร้างโครงสร้าง ความหมายของเนื้อหา (Content &amp; Semantics) เช่น หัวข้อ ย่อหน้า รูปภาพ ฟอร์ม และตาราง</div>
+                  <div class="layer-analogy">🧱 เปรียบเสมือน: โครงสร้างคอนกรีต อิฐ เสาเข็ม และกำแพงบ้าน</div>
+                </div>
+              </div>
+
+              <!-- Layer 2: CSS -->
+              <div class="cake-layer layer-css">
+                <div class="layer-icon-badge">🎨</div>
+                <div class="layer-info">
+                  <div class="layer-title">
+                    <span>2. CSS (Cascading Style Sheets)</span>
+                    <span class="sidebar-badge badge-mid">Presentation</span>
+                  </div>
+                  <div class="layer-desc">กำหนดการแสดงผล ความสวยงาม ฟอนต์ สีสัน ระยะห่าง แอนิเมชัน และการจัดหน้าจอ Responsive ทุกขนาด</div>
+                  <div class="layer-analogy">🛋️ เปรียบเสมือน: สีทาบ้าน วอลเปเปอร์ เฟอร์นิเจอร์ตกแต่ง และแสงไฟสร้างบรรยากาศ</div>
+                </div>
+              </div>
+
+              <!-- Layer 3: JavaScript -->
+              <div class="cake-layer layer-js">
+                <div class="layer-icon-badge">⚡</div>
+                <div class="layer-info">
+                  <div class="layer-title">
+                    <span>3. JavaScript (Programming Language)</span>
+                    <span class="sidebar-badge badge-new">Behavior</span>
+                  </div>
+                  <div class="layer-desc">เพิ่มตรรกะ การโต้ตอบ (Interactivity) การดึงข้อมูลจาก API หลังบ้าน การตรวจสอบข้อมูลฟอร์ม และอัปเดตหน้าจอโดยไม่ต้องรีเฟรช</div>
+                  <div class="layer-analogy">💡 เปรียบเสมือน: สวิตช์ไฟ ประตูอัตโนมัติ ท่อประปา และระบบ Smart Home</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Triad Summary Table -->
+            <table class="comparison-table mt-md">
+              <thead>
+                <tr>
+                  <th>ภาษา / เทคโนโลยี</th>
+                  <th>หน้าที่หลัก (Core Responsibility)</th>
+                  <th>นามสกุลไฟล์</th>
+                  <th>ตัวอย่างโค้ดสั้น</th>
+                  <th>บทบาทใน .NET / Full-Stack</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong style="color: var(--html-color);">HTML5</strong></td>
+                  <td>โครงสร้าง &amp; ความหมายของข้อมูล</td>
+                  <td><code>.html</code> / <code>.cshtml</code> / <code>.razor</code></td>
+                  <td><code>&lt;button class="btn"&gt;สั่งซื้อ&lt;/button&gt;</code></td>
+                  <td>Razor Pages / Blazor Render Tree</td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #79c0ff;">CSS3</strong></td>
+                  <td>ความสวยงาม Layout &amp; Responsive</td>
+                  <td><code>.css</code> / <code>.scss</code></td>
+                  <td><code>.btn { background: #58a6ff; }</code></td>
+                  <td>CSS Isolation ใน Blazor / UI Libraries</td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #f7df1e;">JavaScript</strong></td>
+                  <td>Logic, DOM Manipulation &amp; API Calls</td>
+                  <td><code>.js</code> / <code>.ts</code></td>
+                  <td><code>btn.addEventListener('click', buy)</code></td>
+                  <td>Client-side SPA หรือ JS Interop ใน Blazor</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 2: HTML โครงสร้างและ Semantics ─── -->
+      <section class="lesson-section reveal" id="html-fundamentals">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(228, 77, 38, 0.2); color: var(--html-color); border: 1px solid var(--html-color);">02</div>
+          <div>
+            <h2>HTML โครงสร้างและ Semantics (HTML Structure &amp; Semantic Tags)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">สร้างโครงสร้างเว็บที่ถูกต้องตามหลักมาตรฐาน เข้าถึงง่าย (Accessibility) และเป็นมิตรกับ Search Engine (SEO)</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🧱</span>
+            <span class="concept-title">โครงกระดูกพื้นฐานของไฟล์ HTML (HTML Document Skeleton)</span>
+          </div>
+          <div class="concept-body">
+            <p>ทุกไฟล์ HTML จะต้องเริ่มต้นด้วย <code>&lt;!DOCTYPE html&gt;</code> เพื่อบอก Browser ว่านี่คือเอกสาร HTML5 และประกอบด้วย 2 ส่วนหลักคือ <code>&lt;head&gt;</code> (ข้อมูลการตั้งค่า Meta) และ <code>&lt;body&gt;</code> (ส่วนเนื้อหาที่แสดงผลบนหน้าจอ)</p>
+
+            <div class="code-block-wrapper">
+              <div class="code-block-header">
+                <div class="file-info">
+                  <span class="file-icon">📄</span>
+                  <span>index.html</span>
+                </div>
+                <button class="copy-btn">📋 Copy</button>
+              </div>
+              <div class="code-block-body">
+                <pre class="language-html"><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="th"&gt;
+&lt;head&gt;
+  &lt;!-- ข้อมูล Meta และการตั้งค่าหน้าเว็บ --&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;ร้านค้าออนไลน์ .NET Store&lt;/title&gt;
+  &lt;!-- เชื่อมโยงไฟล์ CSS ภายนอก --&gt;
+  &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;!-- ส่วนเนื้อหาทั้งหมดที่มองเห็นได้บนหน้าจอ --&gt;
+  &lt;h1&gt;ยินดีต้อนรับสู่ .NET Store&lt;/h1&gt;
+  &lt;p&gt;แหล่งรวมสินค้าไอทีและคอร์สเรียนการเขียนโปรแกรม&lt;/p&gt;
+
+  &lt;!-- เชื่อมโยงไฟล์ JavaScript --&gt;
+  &lt;script src="app.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+              </div>
+              <div class="color-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--syn-tag)"></span> HTML Tag (&lt;html&gt;, &lt;head&gt;, &lt;body&gt;)</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--syn-attribute)"></span> Attribute (lang, charset, name, content, href, src)</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--syn-string)"></span> Attribute Value ("th", "UTF-8", "styles.css")</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--syn-comment)"></span> Comment (&lt;!-- คำอธิบาย --&gt;)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Semantic HTML Diagram & Explanation -->
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🏷️</span>
+            <span class="concept-title">Semantic HTML5 Tags (แท็กที่บ่งบอกความหมายชัดเจน)</span>
+          </div>
+          <div class="concept-body">
+            <p>ในอดีต นักพัฒนามักใช้ <code>&lt;div&gt;</code> ครอบทุกอย่าง แต่ใน HTML5 ได้เพิ่ม <strong>Semantic Tags</strong> เพื่อให้เบราว์เซอร์, โปรแกรมอ่านหน้าจอสำหรับผู้พิการ (Screen Readers) และ Google Bot เข้าใจโครงสร้างของหน้าเว็บได้อย่างแม่นยำ</p>
+
+            <!-- Semantic Wireframe Mockup -->
+            <div class="semantic-wireframe">
+              <div class="semantic-box sem-header">
+                <span>🔝 &lt;header&gt; — ส่วนหัวของหน้าเว็บ / โลโก้ / แบนเนอร์หลัก</span>
+              </div>
+              <div class="semantic-box sem-nav">
+                <span>🧭 &lt;nav&gt; — แถบเมนูนำทาง (Navigation Bar / Links)</span>
+              </div>
+              <div class="sem-body-grid">
+                <div class="semantic-box sem-main">
+                  <div>🎯 &lt;main&gt; — เนื้อหาหลักของหน้านี้ (มีได้เพียง 1 อันต่อหน้า)</div>
+                  <div class="semantic-box sem-article">
+                    <span>📰 &lt;article&gt; — บทความ / โพสต์ / การ์ดสินค้า ที่แยกอ่านเดี่ยวๆ ได้</span>
+                  </div>
+                  <div class="semantic-box sem-section">
+                    <span>📑 &lt;section&gt; — ส่วนย่อยแบ่งตามหัวข้อเรื่อง</span>
+                  </div>
+                </div>
+                <div class="semantic-box sem-aside">
+                  <span>📌 &lt;aside&gt;<br>Sidebar / แถบข้าง / ลิงก์ที่เกี่ยวข้อง / โฆษณา</span>
+                </div>
+              </div>
+              <div class="semantic-box sem-footer">
+                <span>🔻 &lt;footer&gt; — ส่วนท้ายของหน้าเว็บ / ลิขสิทธิ์ / ข้อมูลติดต่อ / ลิงก์นโยบาย</span>
+              </div>
+            </div>
+
+            <!-- Common Tags Reference Grid -->
+            <div class="type-grid" style="margin-top: var(--space-lg);">
+              <div class="type-card">
+                <div class="type-card-top">
+                  <span class="tag-badge">&lt;h1&gt; ถึง &lt;h6&gt;</span>
+                  <span class="type-size-badge">Headings</span>
+                </div>
+                <div class="type-desc">หัวข้อระดับ 1 ถึง 6 โดย <code>&lt;h1&gt;</code> มีความสำคัญสูงสุด ควรมีเพียง 1 จุดต่อหน้าเพื่อผลดีต่อ SEO</div>
+                <div class="type-example">&lt;h1&gt;หัวข้อหลักของบทความ&lt;/h1&gt;</div>
+              </div>
+
+              <div class="type-card">
+                <div class="type-card-top">
+                  <span class="tag-badge">&lt;p&gt;, &lt;strong&gt;, &lt;em&gt;</span>
+                  <span class="type-size-badge">Text Formatting</span>
+                </div>
+                <div class="type-desc"><code>&lt;p&gt;</code> สำหรับย่อหน้าข้อความ, <code>&lt;strong&gt;</code> เน้นความสำคัญ (ตัวหนา), <code>&lt;em&gt;</code> เน้นเสียงคำ (ตัวเอียง)</div>
+                <div class="type-example">&lt;p&gt;เรียนรู้ &lt;strong&gt;.NET 8&lt;/strong&gt; ได้แล้ววันนี้&lt;/p&gt;</div>
+              </div>
+
+              <div class="type-card">
+                <div class="type-card-top">
+                  <span class="tag-badge">&lt;a&gt; &amp; &lt;img&gt;</span>
+                  <span class="type-size-badge">Links &amp; Media</span>
+                </div>
+                <div class="type-desc"><code>&lt;a href="..."&gt;</code> สร้างลิงก์ และ <code>&lt;img src="..." alt="..."&gt;</code> แสดงรูปภาพ (ต้องมี <code>alt</code> เสมอ)</div>
+                <div class="type-example">&lt;a href="/profile"&gt;ดูโปรไฟล์&lt;/a&gt;</div>
+              </div>
+
+              <div class="type-card">
+                <div class="type-card-top">
+                  <span class="tag-badge">&lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;</span>
+                  <span class="type-size-badge">Lists</span>
+                </div>
+                <div class="type-desc"><code>&lt;ul&gt;</code> รายการแบบไม่มีลำดับ (Bullet points), <code>&lt;ol&gt;</code> รายการแบบมีตัวเลขลำดับ, และ <code>&lt;li&gt;</code> คือสมาชิกแต่ละข้อ</div>
+                <div class="type-example">&lt;ul&gt;&lt;li&gt;HTML5&lt;/li&gt;&lt;li&gt;CSS3&lt;/li&gt;&lt;/ul&gt;</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HTML Forms & Inputs (Crucial for ASP.NET Core) -->
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">📋</span>
+            <span class="concept-title">Forms &amp; Input Controls (การรับส่งข้อมูลผ่านฟอร์ม)</span>
+          </div>
+          <div class="concept-body">
+            <p>ฟอร์มคือหัวใจหลักในการรับข้อมูลจากผู้ใช้เพื่อส่งไปยัง Backend API (เช่น ASP.NET Core Controller) การผูก <code>&lt;label for="id"&gt;</code> กับ <code>&lt;input id="id" name="key"&gt;</code> มีความสำคัญอย่างยิ่งในการจับคู่ข้อมูล</p>
+
+            <div class="code-block-wrapper">
+              <div class="code-block-header">
+                <div class="file-info">
+                  <span class="file-icon">📄</span>
+                  <span>register-form.html</span>
+                </div>
+                <button class="copy-btn">📋 Copy</button>
+              </div>
+              <div class="code-block-body">
+                <pre class="language-html"><code class="language-html">&lt;!-- ฟอร์มสำหรับส่งข้อมูลไปยัง ASP.NET Core API --&gt;
+&lt;form action="/api/users/register" method="POST" id="registerForm"&gt;
+  &lt;!-- ช่องกรอกข้อความทั่วไป --&gt;
+  &lt;div class="form-group"&gt;
+    &lt;label for="username"&gt;ชื่อผู้ใช้ (Username):&lt;/label&gt;
+    &lt;input type="text" id="username" name="username" placeholder="เช่น somchai_dev" required&gt;
+  &lt;/div&gt;
+
+  &lt;!-- ช่องกรอกอีเมล (ตรวจเช็ก format อัตโนมัติ) --&gt;
+  &lt;div class="form-group"&gt;
+    &lt;label for="email"&gt;อีเมล:&lt;/label&gt;
+    &lt;input type="email" id="email" name="email" placeholder="user@example.com" required&gt;
+  &lt;/div&gt;
+
+  &lt;!-- ช่องกรอกรหัสผ่าน (ซ่อนตัวอักษร) --&gt;
+  &lt;div class="form-group"&gt;
+    &lt;label for="password"&gt;รหัสผ่าน:&lt;/label&gt;
+    &lt;input type="password" id="password" name="password" minlength="8" required&gt;
+  &lt;/div&gt;
+
+  &lt;!-- เมนูดรอปดาวน์ (Select &amp; Option) --&gt;
+  &lt;div class="form-group"&gt;
+    &lt;label for="role"&gt;ตำแหน่งที่สนใจ:&lt;/label&gt;
+    &lt;select id="role" name="role"&gt;
+      &lt;option value="backend"&gt;C# / .NET Backend Developer&lt;/option&gt;
+      &lt;option value="fullstack"&gt;Full-Stack Blazor Developer&lt;/option&gt;
+      &lt;option value="frontend"&gt;Frontend Developer&lt;/option&gt;
+    &lt;/select&gt;
+  &lt;/div&gt;
+
+  &lt;!-- กล่องข้อความหลายบรรทัด --&gt;
+  &lt;div class="form-group"&gt;
+    &lt;label for="bio"&gt;แนะนำตัวสั้นๆ:&lt;/label&gt;
+    &lt;textarea id="bio" name="bio" rows="3"&gt;&lt;/textarea&gt;
+  &lt;/div&gt;
+
+  &lt;!-- ปุ่มกดยืนยัน --&gt;
+  &lt;button type="submit" class="btn btn-primary"&gt;🚀 สมัครสมาชิก&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+              </div>
+              <div class="code-block-output">
+                <span class="output-label">💡 คำแนะนำสำคัญ:</span>
+                <span class="output-text">Attribute <code>name="..."</code> คือ Key ที่จะถูกส่งไปยัง Server (Model Binding ใน ASP.NET Core จะจับคู่กับ Property ของ C# DTO Class อัตโนมัติ เช่น <code>public string Username { get; set; }</code>)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HTML Tables -->
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">📊</span>
+            <span class="concept-title">Tables (การแสดงข้อมูลตาราง)</span>
+          </div>
+          <div class="concept-body">
+            <p>ตารางควรใช้สำหรับการแสดงชุดข้อมูลที่เป็นแถวและคอลัมน์ (Tabular Data) เช่น รายชื่อสินค้า รายการคำสั่งซื้อ โดยประกอบด้วย <code>&lt;table&gt;</code>, <code>&lt;thead&gt;</code>, <code>&lt;tbody&gt;</code>, <code>&lt;tr&gt;</code> (Row), <code>&lt;th&gt;</code> (Header Cell), และ <code>&lt;td&gt;</code> (Data Cell)</p>
+
+            <div class="code-block-wrapper">
+              <div class="code-block-header">
+                <div class="file-info">
+                  <span class="file-icon">📄</span>
+                  <span>product-table.html</span>
+                </div>
+                <button class="copy-btn">📋 Copy</button>
+              </div>
+              <div class="code-block-body">
+                <pre class="language-html"><code class="language-html">&lt;table class="data-table"&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;รหัสสินค้า&lt;/th&gt;
+      &lt;th&gt;ชื่อคอร์สเรียน&lt;/th&gt;
+      &lt;th&gt;ราคา (บาท)&lt;/th&gt;
+      &lt;th&gt;สถานะ&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;#NET-01&lt;/td&gt;
+      &lt;td&gt;ASP.NET Core Web API Mastery&lt;/td&gt;
+      &lt;td&gt;2,500&lt;/td&gt;
+      &lt;td&gt;&lt;span class="badge badge-success"&gt;พร้อมเรียน&lt;/span&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;#BLZ-02&lt;/td&gt;
+      &lt;td&gt;Blazor Full-Stack Web Apps&lt;/td&gt;
+      &lt;td&gt;2,900&lt;/td&gt;
+      &lt;td&gt;&lt;span class="badge badge-primary"&gt;เปิดรับสมัคร&lt;/span&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 3: CSS พื้นฐานและการจัด Layout ─── -->
+      <section class="lesson-section reveal" id="css-fundamentals">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(38, 77, 228, 0.2); color: #58a6ff; border: 1px solid #58a6ff;">03</div>
+          <div>
+            <h2>CSS พื้นฐานและการจัด Layout (CSS Selectors, Box Model &amp; Flexbox)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ควบคุมหน้าตา สีสัน สัดส่วน การจัดวาง Flexbox และ Responsive Design ให้รองรับทุกหน้าจอ</p>
+          </div>
+        </div>
+
+        <!-- CSS Selectors -->
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🎯</span>
+            <span class="concept-title">ตัวเลือก CSS (CSS Selectors &amp; Specificity)</span>
+          </div>
+          <div class="concept-body">
+            <p>CSS Selector คือวิธีการระบุเป้าหมายว่าต้องการให้โค้ดสไตล์ไปปรับแต่ง Element ตัวใดในหน้า HTML</p>
+
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th>ประเภท Selector</th>
+                  <th>ไวยากรณ์ (Syntax)</th>
+                  <th>เป้าหมายที่เลือก</th>
+                  <th>ตัวอย่างการใช้งานจริง</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Element Selector</strong></td>
+                  <td><code>tag { ... }</code></td>
+                  <td>เลือกทุกแท็กของชื่อนั้น</td>
+                  <td><code>p { line-height: 1.6; }</code> (เปลี่ยนทุกย่อหน้า)</td>
+                </tr>
+                <tr>
+                  <td><strong>Class Selector</strong></td>
+                  <td><code>.className { ... }</code></td>
+                  <td>เลือกทุก Element ที่มี class ตรงกัน (ใช้ซ้ำได้หลายที่)</td>
+                  <td><code>.btn-primary { background: #58a6ff; }</code></td>
+                </tr>
+                <tr>
+                  <td><strong>ID Selector</strong></td>
+                  <td><code>#idName { ... }</code></td>
+                  <td>เลือก Element ที่มี ID เฉพาะเจาะจง (ควรมีเพียง 1 ตัวต่อหน้า)</td>
+                  <td><code>#navbar { position: fixed; }</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Pseudo-class</strong></td>
+                  <td><code>selector:hover</code></td>
+                  <td>เลือกตามสถานะของผู้ใช้ (เช่น นำเมาส์ไปชี้, โฟกัส)</td>
+                  <td><code>.card:hover { transform: translateY(-3px); }</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Descendant / Child</strong></td>
+                  <td><code>.parent .child</code> / <code>parent &gt; child</code></td>
+                  <td>เลือก Element ลูกหลานที่อยู่ภายในกล่องแม่</td>
+                  <td><code>.nav-list &gt; li { display: inline-block; }</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CSS Box Model -->
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">📦</span>
+            <span class="concept-title">โมเดลกล่องของ CSS (The CSS Box Model)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🖼️ เปรียบเสมือนรูปภาพที่ใส่กรอบแขวนบนฝาผนัง</div>
+              <p class="analogy-text">
+                ทุก Element บนหน้าเว็บ HTML คือกล่องสี่เหลี่ยมที่ประกอบด้วย 4 เลเยอร์จากนอกเข้าใน:
+                <br>• <strong>Margin (ระยะห่างภายนอก)</strong> — ระยะเว้นว่างระหว่างกล่องนี้กับกล่องเพื่อนบ้านรอบๆ (โปร่งใส)
+                <br>• <strong>Border (เส้นขอบ)</strong> — เส้นกรอบรูปที่มีความหนา สี และรูปแบบเส้น
+                <br>• <strong>Padding (ระยะเว้นว่างภายใน)</strong> — ระยะช่องไฟระหว่างเส้นขอบรูปกับตัวเนื้อหารูปภาพ
+                <br>• <strong>Content (เนื้อหา)</strong> — ตัวเนื้อหา ตัวอักษร หรือรูปภาพด้านในสุด
+              </p>
+            </div>
+
+            <!-- Visual Box Model Diagram -->
+            <div class="box-model-diagram">
+              <span class="box-label" style="color: #ffa657;">MARGIN (ระยะห่างภายนอกขอบ)</span>
+              <div class="box-model-border">
+                <span class="box-label" style="color: #f7df1e;">BORDER (เส้นขอบความหนา)</span>
+                <div class="box-model-padding">
+                  <span class="box-label" style="color: #7ee787;">PADDING (ระยะเว้นวรรคภายใน)</span>
+                  <div class="box-model-content">
+                    <span>CONTENT (ข้อความ / รูปภาพ / วิดีโอ กว้าง x สูง)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="callout callout-tip">
+              <div class="callout-title">💡 กฎทองของ Web Developer: `box-sizing: border-box`</div>
+              <p style="margin-bottom: 0;">โดยค่าเริ่มต้นของเบราว์เซอร์ เมื่อเราเพิ่ม <code>padding</code> หรือ <code>border</code> ขนาดความกว้างรวมของกล่องจะขยายใหญ่ขึ้น ทำให้ layout พังง่าย! ดังนั้นโปรเจกต์เว็บยุคใหม่จึงมักใส่โค้ด Reset เสมอ:<br>
+              <code>*, *::before, *::after { box-sizing: border-box; }</code> เพื่อให้ความกว้าง (Width) รวม Padding และ Border ให้อัตโนมัติ</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flexbox Layout -->
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">📐</span>
+            <span class="concept-title">การจัดเลย์เอาต์ด้วย CSS Flexbox (1-Dimensional Layout)</span>
+          </div>
+          <div class="concept-body">
+            <p><strong>Flexbox</strong> เป็นเครื่องมือมาตรฐานในการจัดเรียง Element ลูกให้อยู่ในแถวแนวนอนหรือแนวตั้ง จัดตำแหน่งกึ่งกลาง และกระจายระยะห่างอย่างยืดหยุ่น</p>
+
+            <div class="code-block-wrapper">
+              <div class="code-block-header">
+                <div class="file-info">
+                  <span class="file-icon">🎨</span>
+                  <span>layout.css</span>
+                </div>
+                <button class="copy-btn">📋 Copy</button>
+              </div>
+              <div class="code-block-body">
+                <pre class="language-css"><code class="language-css">/* กล่องแม่ (Flex Container) */
+.navbar-container {
+  display: flex;                /* เปิดใช้งาน Flexbox */
+  flex-direction: row;          /* จัดเรียงแนวนอน (ค่าเริ่มต้น) */
+  justify-content: space-between; /* กระจายเนื้อหาชิดซ้ายและขวาสุด */
+  align-items: center;          /* จัดกึ่งกลางในแนวตั้ง */
+  gap: 1.5rem;                  /* ระยะห่างระหว่างกล่องลูก */
+  padding: 1rem 2rem;
+  background-color: #161b22;
+}
+
+/* จัดกึ่งกลางแบบสมบูรณ์แบบ (Center Anything) */
+.hero-center-box {
+  display: flex;
+  justify-content: center; /* กึ่งกลางแนวนอน */
+  align-items: center;     /* กึ่งกลางแนวตั้ง */
+  min-height: 300px;
+}</code></pre>
+              </div>
+            </div>
+
+            <!-- Responsive & Media Queries -->
+            <div class="callout callout-info">
+              <div class="callout-title">📱 การทำเว็บรองรับทุกหน้าจอด้วย @media Queries (Responsive Design)</div>
+              <p style="margin-bottom: 0;">ใช้ <code>@media</code> เพื่อปรับสไตล์ตามขนาดความกว้างหน้าจอ เช่น บนมือถือเปลี่ยน Flex แถวแนวนอนเป็นแนวตั้ง:</p>
+            </div>
+
+            <div class="code-block-wrapper">
+              <div class="code-block-header">
+                <div class="file-info">
+                  <span class="file-icon">🎨</span>
+                  <span>responsive.css</span>
+                </div>
+                <button class="copy-btn">📋 Copy</button>
+              </div>
+              <div class="code-block-body">
+                <pre class="language-css"><code class="language-css">/* สไตล์สำหรับ Desktop (หน้าจอกว้าง) */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 คอลัมน์ */
+  gap: 20px;
+}
+
+/* เมื่อหน้าจอเล็กกว่าหรือเท่ากับ 768px (Tablet & Mobile) */
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: 1fr; /* ปรับเหลือ 1 คอลัมน์เต็มหน้าจอ */
+  }
+
+  .navbar-container {
+    flex-direction: column; /* เรียงเมนูจากบนลงล่าง */
+    align-items: flex-start;
+  }
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 4: JavaScript พื้นฐานและการจัดการ DOM ─── -->
+      <section class="lesson-section reveal" id="js-fundamentals">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(247, 223, 30, 0.2); color: #f7df1e; border: 1px solid #f7df1e;">04</div>
+          <div>
+            <h2>JavaScript พื้นฐานและการจัดการ DOM (JavaScript &amp; DOM Manipulation)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ตัวแปร ฟังก์ชัน การดักจับ Event การแก้ไข DOM แบบ Real-time และการเรียก Backend Web API ด้วย Fetch &amp; Async/Await</p>
+          </div>
+        </div>
+
+        <!-- JS Variables & Modern Syntax -->
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">⚡</span>
+            <span class="concept-title">ตัวแปรและฟังก์ชันใน Modern JavaScript (ES6+)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🔒 เลือกประเภทตัวแปรให้เหมาะสมกับงาน</div>
+              <p class="analogy-text">
+                • <code>const</code> — ตัวแปรค่าคงที่ (Constant) ไม่สามารถเปลี่ยนค่าใหม่ได้ ป้องกันบั๊กได้ดีที่สุด <strong>(แนะนำให้ใช้เป็นค่าเริ่มต้นเสมอ)</strong>
+                <br>• <code>let</code> — ตัวแปรที่เปลี่ยนค่าได้ มีขอบเขตทำงานเฉพาะใน Block <code>{ ... }</code> ที่ประกาศ
+                <br>• <code>var</code> — ตัวแปรแบบเก่า มีปัญหาเรื่อง Hoisting และ Scope รั่วไหล <strong>(ไม่แนะนำให้ใช้ในโค้ดยุคใหม่)</strong>
+              </p>
+            </div>
+
+            <div class="code-block-wrapper">
+              <div class="code-block-header">
+                <div class="file-info">
+                  <span class="file-icon">📜</span>
+                  <span>basics.js</span>
+                </div>
+                <button class="copy-btn">📋 Copy</button>
+              </div>
+              <div class="code-block-body">
+                <pre class="language-javascript"><code class="language-javascript">// 1. การประกาศตัวแปร
+const apiBaseUrl = "https://api.dotnetstore.com/v1"; // เปลี่ยนค่าไม่ได้
+let currentCartTotal = 0;                             // เปลี่ยนค่าได้
+
+// 2. ข้อมูลแบบ Object และ Array
+const course = {
+  id: 101,
+  title: "ASP.NET Core Web API",
+  price: 2500,
+  tags: ["C#", ".NET 8", "Backend"]
+};
+
+// 3. Arrow Function (ไวยากรณ์ฟังก์ชันลูกศรยุคใหม่)
+const calculateDiscount = (price, percent) => {
+  return price - (price * (percent / 100));
+};
+
+// 4. Template Literals (การต่อข้อความด้วย Backticks ` `)
+const finalPrice = calculateDiscount(course.price, 10);
+console.log(`คอร์ส ${course.title} ลดราคาเหลือเพียง: ${finalPrice} บาท ⚡`);</code></pre>
+              </div>
+              <div class="code-block-output">
+                <span class="output-label">▶ Console Output:</span>
+                <span class="output-text">คอร์ส ASP.NET Core Web API ลดราคาเหลือเพียง: 2250 บาท ⚡</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DOM Manipulation & Events -->
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🌲</span>
+            <span class="concept-title">การเข้าถึงและแก้ไขหน้าเว็บ (DOM Manipulation &amp; Events)</span>
+          </div>
+          <div class="concept-body">
+            <p><strong>DOM (Document Object Model)</strong> คือต้นไม้โครงสร้างของ HTML ที่ JavaScript สามารถเข้าถึง เปลี่ยนข้อความ ซ่อน/แสดง หรือดักฟังเหตุการณ์การคลิกของผู้ใช้ได้ทันที</p>
+
+            <div class="code-block-wrapper">
+              <div class="code-block-header">
+                <div class="file-info">
+                  <span class="file-icon">📜</span>
+                  <span>dom-events.js</span>
+                </div>
+                <button class="copy-btn">📋 Copy</button>
+              </div>
+              <div class="code-block-body">
+                <pre class="language-javascript"><code class="language-javascript">// 1. ค้นหา Element จาก DOM
+const buyBtn = document.getElementById('buyButton');
+const statusText = document.querySelector('.status-message');
+const counterLabel = document.querySelector('#cartCount');
+
+let cartCount = 0;
+
+// 2. ดักฟัง Event การคลิก (addEventListener)
+buyBtn.addEventListener('click', (event) => {
+  cartCount++;
+  
+  // แก้ไขข้อความในหน้าเว็บแบบ Real-time
+  counterLabel.textContent = cartCount;
+  statusText.innerHTML = `&lt;strong style="color: #3fb950;"&gt;✓ เพิ่มลงตะกร้าสำเร็จแล้ว!&lt;/strong&gt;`;
+  
+  // เพิ่ม/ลบ Class ของ CSS
+  buyBtn.classList.add('btn-success');
+  buyBtn.classList.remove('btn-primary');
+});</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fetch API & Async/Await -->
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🌐</span>
+            <span class="concept-title">การเชื่อมต่อ Backend API ด้วย Fetch &amp; Async/Await</span>
+          </div>
+          <div class="concept-body">
+            <p>ในสถาปัตยกรรม Web สมัยใหม่ JavaScript จะทำหน้าที่ยิง HTTP Request ไปยัง <strong>ASP.NET Core Web API</strong> เพื่อดึงข้อมูล JSON มาแสดงผลบนหน้าจอโดยไม่ต้องรีโหลดหน้าเว็บใหม่ (AJAX / Single Page Application)</p>
+
+            <div class="code-block-wrapper">
+              <div class="code-block-header">
+                <div class="file-info">
+                  <span class="file-icon">📜</span>
+                  <span>api-service.js</span>
+                </div>
+                <button class="copy-btn">📋 Copy</button>
+              </div>
+              <div class="code-block-body">
+                <pre class="language-javascript"><code class="language-javascript">// ฟังก์ชันแบบ Asynchronous ดึงข้อมูลสินค้าจาก .NET Web API
+async function fetchProductsFromDotNetApi() {
+  const listContainer = document.getElementById('productList');
+  
+  try {
+    listContainer.innerHTML = "&lt;p&gt;กำลังโหลดข้อมูลจาก Server...&lt;/p&gt;";
+    
+    // ยิง HTTP GET ไปยัง Backend Endpoint
+    const response = await fetch('/api/products');
+    
+    if (!response.ok) {
+      throw new Error(`HTTP Error! Status: ${response.status}`);
+    }
+    
+    // แปลง Response เป็น JSON Object
+    const products = await response.json();
+    
+    // นำข้อมูลมาสร้าง HTML แสดงผล
+    listContainer.innerHTML = products.map(item => `
+      &lt;div class="product-card"&gt;
+        &lt;h3&gt;${item.name}&lt;/h3&gt;
+        &lt;p class="price"&gt;฿${item.price.toLocaleString()}&lt;/p&gt;
+        &lt;button onclick="addToCart(${item.id})" class="btn btn-sm btn-primary"&gt;ซื้อสินค้า&lt;/button&gt;
+      &lt;/div&gt;
+    `).join('');
+    
+  } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
+    listContainer.innerHTML = `&lt;p class="text-danger"&gt;ไม่สามารถดึงข้อมูลได้: ${error.message}&lt;/p&gt;`;
+  }
+}</code></pre>
+              </div>
+              <div class="code-block-output">
+                <span class="output-label">🔄 Flow การทำงาน:</span>
+                <span class="output-text">Browser (Fetch) ─── HTTP GET /api/products ───▶ ASP.NET Core Controller (C#) ─── Return JSON ───▶ Browser JS Render HTML</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 5: ทั้ง 3 ทำงานร่วมกันยังไง & สัมพันธ์กับ ASP.NET Core ─── -->
+      <section class="lesson-section reveal" id="how-they-work-together">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(126, 231, 135, 0.2); color: var(--accent-success); border: 1px solid var(--accent-success);">05</div>
+          <div>
+            <h2>ทั้ง 3 ทำงานร่วมกันอย่างไร &amp; เชื่อมโยงสู่ ASP.NET Core และ Blazor</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ภาพรวมกระบวนการ Render ของ Web Browser และบทบาทในการพัฒนาซอฟต์แวร์สาย .NET</p>
+          </div>
+        </div>
+
+        <!-- Live Interactive Sandbox Component -->
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🧪</span>
+            <span class="concept-title">ทดลองเล่นจริง: การทำงานสอดประสานของ HTML + CSS + JS (Live Sandbox)</span>
+          </div>
+          <div class="concept-body">
+            <p>ลองกดปุ่มด้านขวาเพื่อดูว่า JavaScript ปรับเปลี่ยนสไตล์ CSS และข้อความในโครงสร้าง HTML แบบเรียลไทม์ได้อย่างไร:</p>
+
+            <div class="triad-sandbox">
+              <div class="sandbox-header">
+                <div style="font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                  <span>🖥️ Live Web Component Preview</span>
+                  <span class="badge badge-success">Interactive</span>
+                </div>
+                <span class="text-muted" style="font-size: 0.8rem; font-family: var(--font-code);">DOM State: Active</span>
+              </div>
+              <div class="sandbox-body">
+                <!-- Preview Canvas -->
+                <div class="sandbox-preview">
+                  <div class="demo-interactive-card" id="sandboxCard">
+                    <div class="demo-avatar" id="sandboxAvatar">👨‍💻</div>
+                    <div class="demo-title" id="sandboxTitle">.NET Developer</div>
+                    <div class="demo-role" id="sandboxRole">Level 1: Junior C# Coder</div>
+                    <div class="demo-counter-badge">
+                      ⭐ แต้มสะสม: <span id="sandboxScore">0</span> XP
+                    </div>
+                    <div>
+                      <button class="btn btn-sm btn-primary" id="sandboxActionBtn" style="width: 100%;">⚡ เก็บ XP</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Controls & Explanation -->
+                <div class="sandbox-controls">
+                  <div>
+                    <h4 style="font-size: 0.95rem; margin-bottom: 4px;">🎮 ปรับแต่งสถานะผ่าน JavaScript:</h4>
+                    <p class="text-muted" style="font-size: 0.82rem; margin-bottom: 12px;">คลิกปุ่มเพื่อทดสอบ DOM Manipulation และ Class Toggle</p>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <button class="btn btn-outline btn-sm" id="btnChangeRole">
+                      <span>🔄</span> เปลี่ยนสายอาชีพ (เปลี่ยน HTML Text)
+                    </button>
+                    <button class="btn btn-outline btn-sm" id="btnToggleTheme">
+                      <span>🎨</span> สลับธีมการ์ด (แก้ CSS Classes)
+                    </button>
+                    <button class="btn btn-outline btn-sm" id="btnResetSandbox">
+                      <span>↺</span> รีเซ็ตค่าเริ่มต้น (Reset State)
+                    </button>
+                  </div>
+                  <div class="callout callout-info" style="margin-top: 8px; padding: 8px 12px; font-size: 0.8rem;">
+                    <strong>สิ่งที่เกิดขึ้นเบื้องหลัง:</strong><br>
+                    1. <strong>HTML</strong> ให้แท็ก <code>&lt;div&gt;</code>, <code>&lt;span&gt;</code>, <code>&lt;button&gt;</code><br>
+                    2. <strong>CSS</strong> ให้สีกรอบ เงา Card, Animation และ Flexbox<br>
+                    3. <strong>JS</strong> จัดการ Event Listener และคำนวณแต้ม XP อัตโนมัติ
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connection to ASP.NET Core & Blazor -->
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🔗</span>
+            <span class="concept-title">ความสัมพันธ์กับสถาปัตยกรรม .NET (ASP.NET Core &amp; Blazor)</span>
+          </div>
+          <div class="concept-body">
+            <div class="type-grid">
+              <!-- Server-Side Rendering (Razor) -->
+              <div class="type-card">
+                <div class="type-card-top">
+                  <span class="type-icon">🖥️</span>
+                  <span class="type-size-badge">SSR</span>
+                </div>
+                <div class="type-name">1. Razor Pages &amp; MVC</div>
+                <div class="type-desc">Server ฝั่ง C# ประมวลผลและสร้างโค้ด <strong>HTML</strong> ส่งตรงกลับมาให้ Browser แสดงผล เหมาะกับเว็บที่เน้น SEO และทำงานรวดเร็ว</div>
+                <div class="type-example">@Model.ProductName (C# รวมร่างกับ HTML)</div>
+              </div>
+
+              <!-- Web API + Modern Frontend -->
+              <div class="type-card">
+                <div class="type-card-top">
+                  <span class="type-icon">🔌</span>
+                  <span class="type-size-badge">REST API</span>
+                </div>
+                <div class="type-name">2. ASP.NET Core Web API</div>
+                <div class="type-desc">Server ส่งเฉพาะข้อมูลดิบ <strong>JSON</strong> ผ่าน REST API แล้วให้ <strong>JavaScript</strong> (React, Vue หรือ Vanilla JS) นำไป Render หน้าเว็บ</div>
+                <div class="type-example">fetch('/api/products') ──▶ JSON</div>
+              </div>
+
+              <!-- Blazor Full-Stack -->
+              <div class="type-card">
+                <div class="type-card-top">
+                  <span class="type-icon">⚡</span>
+                  <span class="type-size-badge">WebAssembly</span>
+                </div>
+                <div class="type-name">3. Blazor Web Apps</div>
+                <div class="type-desc">เขียนภาษา <strong>C# แทน JavaScript</strong> รันบนเบราว์เซอร์ผ่าน WebAssembly (WASM) แต่ยังคงใช้ <strong>HTML &amp; CSS</strong> ในการจัดโครงสร้างและสไตล์!</div>
+                <div class="type-example">&lt;button @onclick="Increment"&gt; (C# ใน UI)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 6: แบบทดสอบวัดความรู้ (Inline Quiz) ─── -->
+      <section class="lesson-section reveal" id="quiz">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(210, 153, 34, 0.2); color: var(--accent-warning); border: 1px solid var(--accent-warning);">06</div>
+          <div>
+            <h2>แบบทดสอบความเข้าใจ: HTML, CSS &amp; JavaScript</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ทดสอบความรู้ 5 ข้อเพื่อประเมินความเข้าใจและรับคะแนน XP สะสม</p>
+          </div>
+        </div>
+
+        <!-- Quiz Container rendered by QuizEngine -->
+        <div id="web-basics-quiz"></div>
+      </section>
+
+      <!-- ─── Lesson Navigation Footer ─── -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-default); flex-wrap: wrap; gap: var(--space-md);">
+        <a href="csharp-basics.html" class="btn btn-outline">
+          <span>←</span>
+          <span>บทเรียนก่อนหน้า: C# Basics</span>
+        </a>
+        <a href="blazor-intro.html" class="btn btn-primary">
+          <span>บทเรียนถัดไป: Blazor Intro &amp; WASM</span>
+          <span>→</span>
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <!-- ─── Interactive Page Logic & Quiz Setup ─── -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Mark this lesson as completed in Progress tracker
+      if (typeof Progress !== 'undefined') {
+        Progress.completeLesson('html-css-js');
+        Progress.setModuleProgress('web', 100);
+      }
+
+      // 2. Interactive Sandbox Controls
+      let score = 0;
+      const roles = [
+        { title: ".NET Developer", role: "Level 1: Junior C# Coder", icon: "👨‍💻", bg: "var(--bg-secondary)" },
+        { title: "Full-Stack Architect", role: "Level 2: Blazor & ASP.NET Master", icon: "🚀", bg: "rgba(81, 43, 212, 0.15)" },
+        { title: "Cloud Specialist", role: "Level 3: Azure & Microservices Pro", icon: "☁️", bg: "rgba(0, 120, 212, 0.15)" }
+      ];
+      let currentRoleIndex = 0;
+
+      const card = document.getElementById('sandboxCard');
+      const avatar = document.getElementById('sandboxAvatar');
+      const title = document.getElementById('sandboxTitle');
+      const role = document.getElementById('sandboxRole');
+      const scoreLabel = document.getElementById('sandboxScore');
+      const actionBtn = document.getElementById('sandboxActionBtn');
+      const btnChangeRole = document.getElementById('btnChangeRole');
+      const btnToggleTheme = document.getElementById('btnToggleTheme');
+      const btnReset = document.getElementById('btnResetSandbox');
+
+      if (actionBtn && scoreLabel) {
+        actionBtn.addEventListener('click', () => {
+          score += 25;
+          scoreLabel.textContent = score;
+          avatar.style.transform = 'scale(1.2) rotate(10deg)';
+          setTimeout(() => {
+            avatar.style.transform = 'scale(1) rotate(0deg)';
+          }, 200);
+
+          if (typeof Progress !== 'undefined') {
+            Progress.addXP(5);
+          }
+        });
+      }
+
+      if (btnChangeRole && role && title && avatar) {
+        btnChangeRole.addEventListener('click', () => {
+          currentRoleIndex = (currentRoleIndex + 1) % roles.length;
+          const r = roles[currentRoleIndex];
+          title.textContent = r.title;
+          role.textContent = r.role;
+          avatar.textContent = r.icon;
+          card.style.background = r.bg;
+        });
+      }
+
+      if (btnToggleTheme && card) {
+        btnToggleTheme.addEventListener('click', () => {
+          if (card.style.borderColor === 'rgb(247, 223, 30)') {
+            card.style.borderColor = 'var(--border-default)';
+            card.style.boxShadow = 'var(--shadow-md)';
+          } else {
+            card.style.borderColor = '#f7df1e';
+            card.style.boxShadow = '0 0 20px rgba(247, 223, 30, 0.3)';
+          }
+        });
+      }
+
+      if (btnReset && card && scoreLabel && title && role && avatar) {
+        btnReset.addEventListener('click', () => {
+          score = 0;
+          currentRoleIndex = 0;
+          scoreLabel.textContent = "0";
+          title.textContent = roles[0].title;
+          role.textContent = roles[0].role;
+          avatar.textContent = roles[0].icon;
+          card.style.background = roles[0].bg;
+          card.style.borderColor = 'var(--border-default)';
+          card.style.boxShadow = 'var(--shadow-md)';
+        });
+      }
+
+      // 3. Quiz Questions Definition
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'หากเปรียบเทียบเว็บไซต์เหมือนกับการสร้างบ้าน "CSS" ทำหน้าที่ตรงกับส่วนใดมากที่สุด?',
+          options: [
+            'เสาเข็ม อิฐ และโครงสร้างปูนของตัวบ้าน (Structure)',
+            'สีทาบ้าน วอลเปเปอร์ เฟอร์นิเจอร์ และการตกแต่งภายใน (Presentation & Style)',
+            'ระบบสายไฟ สวิตช์อัตโนมัติ และปั๊มน้ำ (Behavior & Interactivity)',
+            'เอกสารโฉนดที่ดินและพิมพ์เขียวการสร้างบ้าน (Server Configuration)'
+          ],
+          answer: 1,
+          explanation: 'CSS ทำหน้าที่กำหนด Presentation หรือรูปลักษณ์ความสวยงาม สีสัน ฟอนต์ และการจัดวาง Layout เปรียบเสมือนการทาสีและตกแต่งภายในบ้าน'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ข้อใดคือเหตุผลสำคัญที่สุดที่ควรใช้แท็ก Semantic HTML5 (เช่น <header>, <main>, <nav>, <article>) แทนการใช้ <div> ครอบทั้งหมด?',
+          options: [
+            'ทำให้หน้าเว็บโหลดไฟล์เร็วขึ้น 10 เท่าเสมอ',
+            'ช่วยให้เบราว์เซอร์, Screen Readers สำหรับผู้พิการ และ Search Engine (SEO) เข้าใจโครงสร้างความหมายของเนื้อหาได้อย่างถูกต้อง',
+            'ทำให้ไม่ต้องเขียนโค้ด CSS อีกต่อไป',
+            'เป็นข้อบังคับที่ไม่เช่นนั้นจะไม่สามารถเปิดดูบนสมาร์ตโฟนได้'
+          ],
+          answer: 1,
+          explanation: 'Semantic Tags ช่วยบอกความหมายและโครงสร้างของเนื้อหา ทำให้ระบบค้นหา (SEO) และเครื่องมือช่วยการเข้าถึง (Accessibility) เข้าใจหน้าเว็บได้ดีกว่าการใช้ generic <div>'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ในโมเดลกล่องของ CSS (Box Model) ลำดับจาก "ชั้นนอกสุด" เข้าสู่ "ชั้นในสุด" ข้อใดเรียงลำดับได้ถูกต้องสมบูรณ์?',
+          options: [
+            'Content ➔ Padding ➔ Border ➔ Margin',
+            'Margin ➔ Border ➔ Padding ➔ Content',
+            'Border ➔ Margin ➔ Padding ➔ Content',
+            'Padding ➔ Margin ➔ Border ➔ Content'
+          ],
+          answer: 1,
+          explanation: 'Box Model เรียงจากชั้นนอกสุดเข้ามาคือ Margin (ระยะห่างภายนอก) ➔ Border (เส้นขอบ) ➔ Padding (ระยะเว้นว่างภายใน) ➔ Content (เนื้อหาภายในสุด)'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ในการเขียน JavaScript ยุคใหม่ (ES6+) หากต้องการประกาศตัวแปรที่ไม่ต้องการให้ถูกเขียนค่าทับใหม่ (Reassigned) เพื่อความปลอดภัย ควรเลือกใช้คีย์เวิร์ดใด?',
+          options: [
+            'var',
+            'let',
+            'const',
+            'static'
+          ],
+          answer: 2,
+          explanation: 'const ใช้ประกาศตัวแปรค่าคงที่ที่มี Block Scope และไม่อนุญาตให้ Reassign ค่าใหม่ ช่วยป้องกันข้อผิดพลาดและบั๊กในโปรแกรม'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ในการพัฒนาเว็บด้วย .NET ความสัมพันธ์ระหว่าง Frontend (HTML/CSS/JS) กับ ASP.NET Core Web API มักทำงานร่วมกันในลักษณะใดมากที่สุด?',
+          options: [
+            'ASP.NET Core จะแปลงไฟล์ C# เป็น CSS ทั้งหมดบนฝั่ง Client',
+            'Frontend ฝั่ง Browser ใช้ JavaScript (Fetch API) ยิงขอข้อมูล JSON จาก ASP.NET Core Web API แล้วนำมาร้อยเรียงลงใน HTML DOM',
+            'JavaScript เป็นผู้ประมวลผลคำสั่ง SQL โดยไม่ต้องพึ่งพา Backend Server',
+            'เบราว์เซอร์ไม่สามารถรัน JavaScript ได้หากไม่ได้ติดตั้ง .NET SDK'
+          ],
+          answer: 1,
+          explanation: 'ในสถาปัตยกรรม Client-Server สมัยใหม่ Frontend (HTML/CSS/JS หรือ Blazor WASM) จะสื่อสารกับ ASP.NET Core Web API ผ่าน HTTP Request เพื่อรับส่งข้อมูลแบบ JSON'
+        }
+      ];
+
+      // 4. Initialize Quiz
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('web-basics-quiz', quizQuestions, {
+          quizId: 'html-css-js-basics',
+          showTimer: false,
+          showExplanation: true
+        });
+      }
+    });
+  </script>
+</body>
+</html>

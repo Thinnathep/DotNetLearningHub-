@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dependency Injection (DI) ใน .NET — DotNet Learning Hub</title>
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <style>
+    /* ─── Custom Styles for DI Page ─── */
+    .di-banner {
+      background: linear-gradient(135deg, rgba(81, 43, 212, 0.2) 0%, rgba(88, 166, 255, 0.1) 100%);
+      border: 1px solid rgba(88, 166, 255, 0.3);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .di-banner::after {
+      content: '💉';
+      position: absolute;
+      right: 20px;
+      bottom: -15px;
+      font-size: 7rem;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    /* Hospital Analogy Grid */
+    .hospital-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+
+    .hospital-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      transition: all var(--transition-normal);
+      position: relative;
+    }
+
+    .hospital-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .hospital-card .card-icon-lg {
+      font-size: 2.2rem;
+      margin-bottom: var(--space-sm);
+    }
+
+    .hospital-card .card-role {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--syn-type);
+      margin-bottom: 2px;
+    }
+
+    .hospital-card .card-tech {
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: var(--accent-warning);
+      margin-bottom: var(--space-sm);
+      display: inline-block;
+      background: rgba(210, 153, 34, 0.1);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .hospital-card .card-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Lifetime Cards */
+    .lifetime-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+
+    .lifetime-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      transition: all var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lifetime-card.transient {
+      border-top: 4px solid #ffa657;
+    }
+    .lifetime-card.transient:hover {
+      border-color: #ffa657;
+      box-shadow: 0 0 20px rgba(255, 166, 87, 0.2);
+    }
+
+    .lifetime-card.scoped {
+      border-top: 4px solid #58a6ff;
+    }
+    .lifetime-card.scoped:hover {
+      border-color: #58a6ff;
+      box-shadow: 0 0 20px rgba(88, 166, 255, 0.2);
+    }
+
+    .lifetime-card.singleton {
+      border-top: 4px solid #d2a8ff;
+    }
+    .lifetime-card.singleton:hover {
+      border-color: #d2a8ff;
+      box-shadow: 0 0 20px rgba(210, 168, 255, 0.2);
+    }
+
+    .lifetime-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+
+    .lifetime-emoji {
+      font-size: 2.2rem;
+    }
+
+    .lifetime-title {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .lifetime-method {
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: var(--syn-method);
+      background: var(--bg-tertiary);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      margin-top: 2px;
+    }
+
+    .lifetime-analogy {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid var(--border-default);
+      padding: var(--space-sm) var(--space-md);
+      margin: var(--space-md) 0;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 0.88rem;
+    }
+
+    .lifetime-details {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      flex-grow: 1;
+    }
+
+    .lifetime-tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: var(--space-md);
+    }
+
+    /* Danger Captive Box */
+    .danger-card {
+      background: rgba(248, 81, 73, 0.06);
+      border: 1px solid rgba(248, 81, 73, 0.3);
+      border-left: 6px solid var(--accent-danger);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+    }
+
+    .danger-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent-danger);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Comparison Table Styling */
+    .table-responsive {
+      overflow-x: auto;
+      margin: var(--space-lg) 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div style="display: flex; align-items: center; gap: var(--space-md);">
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+      <a href="../index.html" class="site-logo">
+        <div class="logo-icon">💉</div>
+        <span>DotNet Learning Hub</span>
+      </a>
+    </div>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <a href="quiz-arena.html" class="btn btn-outline btn-sm" style="border-radius: var(--radius-full);">
+        🎮 Quiz Arena
+      </a>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation (All Tracks)
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าแรก (Dashboard)</span>
+      </a>
+    </div>
+
+    <!-- 🟣 Track C# Language -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="csharp-basics.html" class="sidebar-link">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="csharp-oop.html" class="sidebar-link">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="csharp-collections.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Collections &amp; Generics</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>LINQ &amp; Async/Await</span>
+        <span class="sidebar-badge badge-mid">Lv 4</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track .NET & Web API (Active Track) -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track .NET &amp; Web API</div>
+      <a href="dotnet-structure.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 Project Structure</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="dotnet-di.html" class="sidebar-link active">
+        <span class="link-icon">💉</span>
+        <span>Dependency Injection</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="dotnet-middleware.html" class="sidebar-link">
+        <span class="link-icon">🛡️</span>
+        <span>Middleware Pipeline</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="rest-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>RESTful API Design</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="system-integration.html" class="sidebar-link">
+        <span class="link-icon">🔄</span>
+        <span>System Integration</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🔴 Track Database & ORM -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔴 Track Database &amp; ORM</div>
+      <a href="sql-basics.html" class="sidebar-link">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; CRUD</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="sql-advanced.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>SQL Advanced &amp; Index</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="sql-playground.html" class="sidebar-link">
+        <span class="link-icon">💻</span>
+        <span>SQL Playground Live</span>
+        <span class="sidebar-badge badge-new">Live</span>
+      </a>
+      <a href="ef-core.html" class="sidebar-link">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🟢 Track Blazor & Markup -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟢 Track Blazor &amp; Markup</div>
+      <a href="blazor-intro.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Blazor Intro &amp; WASM</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="blazor-components.html" class="sidebar-link">
+        <span class="link-icon">🧩</span>
+        <span>Blazor Components</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="xaml-basics.html" class="sidebar-link">
+        <span class="link-icon">📐</span>
+        <span>XAML Basics (.NET MAUI)</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="xml-json.html" class="sidebar-link">
+        <span class="link-icon">📄</span>
+        <span>XML &amp; JSON Data Formats</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🟡 Track Web Basics -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟡 Track Web Basics</div>
+      <a href="html-css-js.html" class="sidebar-link">
+        <span class="link-icon">🌐</span>
+        <span>HTML, CSS &amp; JavaScript</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track DevOps & Security -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track DevOps &amp; Security</div>
+      <a href="git-cicd.html" class="sidebar-link">
+        <span class="link-icon">🐙</span>
+        <span>Git &amp; CI/CD Pipelines</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="secure-coding.html" class="sidebar-link">
+        <span class="link-icon">🔒</span>
+        <span>Secure Coding &amp; OWASP</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🟢 Track Quality & Testing -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟢 Track Quality &amp; Process</div>
+      <a href="unit-testing.html" class="sidebar-link">
+        <span class="link-icon">🧪</span>
+        <span>Unit Testing &amp; xUnit</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="code-review.html" class="sidebar-link">
+        <span class="link-icon">👀</span>
+        <span>Code Review Best Practices</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="sdlc-agile.html" class="sidebar-link">
+        <span class="link-icon">🔄</span>
+        <span>SDLC &amp; Agile / Scrum</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="tech-docs.html" class="sidebar-link">
+        <span class="link-icon">📝</span>
+        <span>Technical Documentation</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🔴 Track Architecture -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔴 Track Architecture</div>
+      <a href="architecture.html" class="sidebar-link">
+        <span class="link-icon">🏛️</span>
+        <span>Clean Architecture &amp; CQRS</span>
+        <span class="sidebar-badge badge-new">Adv</span>
+      </a>
+    </div>
+
+    <!-- 🎮 Games & Arena -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🎮 Games &amp; Arena</div>
+      <a href="quiz-arena.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Quiz Arena</span>
+        <span class="sidebar-badge badge-new">Arena</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header animate-fade-in">
+        <div class="breadcrumb">
+          <a href="../index.html">หน้าหลัก</a>
+          <span>/</span>
+          <span>.NET &amp; Web API Track</span>
+          <span>/</span>
+          <span class="text-primary">Dependency Injection</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(81, 43, 212, 0.25); color: #79c0ff; border: 1px solid rgba(88, 166, 255, 0.4);">💉</div>
+          <div>
+            <h1>Dependency Injection (DI) ใน .NET</h1>
+            <div class="page-description">เจาะลึกระบบ Inversion of Control (IoC), เทคนิค Constructor Injection, 3 Service Lifetimes และการป้องกันปัญหา Captive Dependency</div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="level-tag level-mid">⭐⭐ กลาง (Intermediate)</span></span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>เวลาเรียน: <strong>~45 นาที</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>รางวัล: <strong>+100 XP</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>💻</span>
+            <span>รองรับ .NET 8 / .NET 9 (C# 12)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Overview Hero Banner ─── -->
+      <div class="di-banner reveal">
+        <h3 style="margin-top: 0; color: #58a6ff; font-size: 1.3rem;">🚀 หัวใจสำคัญของการสร้าง Enterprise Application</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 0; max-width: 800px; font-size: 0.95rem; line-height: 1.6;">
+          ใน <strong>ASP.NET Core</strong> ระบบ <strong>Dependency Injection (DI)</strong> ไม่ใช่ฟีเจอร์เสริม แต่เป็นโครงสร้างพื้นฐานระดับ First-Class Citizen ที่ถูกฝังมาตั้งแต่เกิด ช่วยปลดล็อกโค้ดจากการผูกมัดแน่น (Tight Coupling) สู่ความยืดหยุ่นสูง (Loose Coupling) และทำให้การทดสอบด้วย Unit Test กลายเป็นเรื่องง่าย
+        </p>
+      </div>
+
+      <!-- ─── Analogy: โรงพยาบาลและการจ่ายยา ─── -->
+      <section class="lesson-section reveal" id="analogy">
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">💡</span>
+            <div>
+              <span class="concept-title">เปรียบเทียบให้เห็นภาพ (Analogy): ระบบโรงพยาบาลและห้องยา</span>
+              <div class="text-sm text-muted">เข้าใจ Inversion of Control และ DI ผ่านชีวิตประจำวัน</div>
+            </div>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🏥 ชีวิตจริง vs Dependency Injection</div>
+              <p class="analogy-text">
+                ลองจินตนาการว่า หากคนไข้ป่วยแล้วต้อง <strong>"ออกไปหาพืชสมุนไพร บดสารเคมี และต้มยาเอง"</strong> นั่นคือการเขียนโค้ดแบบเดิมที่คลาสต้อง <code>new</code> ทุกอย่างเอง (Tight Coupling) ซึ่งอันตรายและพังง่ายมาก! แต่ในโรงพยาบาลยุคใหม่:
+              </p>
+            </div>
+
+            <div class="hospital-grid">
+              <div class="hospital-card">
+                <div class="card-icon-lg">🤒</div>
+                <div class="card-role">1. คนไข้ (Client / Controller)</div>
+                <div class="card-tech">Controller / Minimal API</div>
+                <div class="card-desc">
+                  ต้องการยาเพื่อรักษาอาการ ไม่จำเป็นต้องรู้วิธีผลิตยา แค่ระบุความต้องการผ่าน <strong>Constructor</strong> แล้วรอรับยาที่พร้อมใช้ไปทำงานต่อได้เลย
+                </div>
+              </div>
+
+              <div class="hospital-card">
+                <div class="card-icon-lg">📋</div>
+                <div class="card-role">2. ใบสั่งแพทย์ (Interface)</div>
+                <div class="card-tech">Interface เช่น IOrderService</div>
+                <div class="card-desc">
+                  สัญญามาตรฐาน (Contract) ระบุชื่อตัวยาและขนาดยา โดยไม่ผูกมัดกับยี่ห้อโรงงานผลิต เพื่อให้สามารถสลับเปลี่ยนยาเทียบเท่าได้ทันที
+                </div>
+              </div>
+
+              <div class="hospital-card">
+                <div class="card-icon-lg">👨‍⚕️</div>
+                <div class="card-role">3. เภสัชกร (DI Container)</div>
+                <div class="card-tech">IServiceProvider / IServiceCollection</div>
+                <div class="card-desc">
+                  ผู้ดูแลคลังยาและจัดยาตามใบสั่ง คอยควบคุมว่ายานี้ต้องจ่ายใหม่ทุกครั้ง (Transient), จ่ายเป็นชุดประจำเตียง (Scoped) หรือใช้ตู้ยาร่วมกันทั้งตึก (Singleton)
+                </div>
+              </div>
+
+              <div class="hospital-card">
+                <div class="card-icon-lg">💊</div>
+                <div class="card-role">4. ตัวยาจริง (Implementation)</div>
+                <div class="card-tech">Class เช่น OrderService</div>
+                <div class="card-desc">
+                  คลาสที่ลงมือประมวลผลการทำงานจริง (Concrete Class) ที่ถูกสร้างขึ้นและส่งมอบ (Inject) ให้แก่ผู้เรียกใช้งานอย่างปลอดภัย
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 1: ทำไมต้องใช้ DI? ─── -->
+      <section class="lesson-section reveal" id="why-di">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(81, 43, 212, 0.2); color: var(--accent-primary); border: 1px solid var(--accent-primary);">01</div>
+          <div>
+            <h2>ทำไมต้องใช้ DI? — จาก Tight Coupling สู่ Loose Coupling</h2>
+            <p class="text-muted" style="margin-bottom: 0;">แก้ปัญหาคำสั่ง <code>new</code> ที่ผูกมัดโค้ดจนยากแก่การบำรุงรักษาและทดสอบ</p>
+          </div>
+        </div>
+
+        <p>
+          ในยุคก่อน เมื่อคลาส <code>OrderService</code> ต้องการบันทึกข้อมูลลงฐานข้อมูลและส่งอีเมลแจ้งเตือน เรามักเห็นโค้ดที่สร้าง Object ด้วยคำสั่ง <code>new</code> ภายในคลาสโดยตรง:
+        </p>
+
+        <!-- Code Block: Tight Coupling Problem -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">❌</span>
+              <span style="color: var(--accent-danger); font-weight: 600;">ปัญหา: การผูกมัดแน่น (Tight Coupling — Bad Practice)</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">public class OrderService
+{
+    private readonly SqlServerRepository _repository;
+    private readonly SmtpEmailService _emailService;
+
+    public OrderService()
+    {
+        // ❌ สร้าง Dependency เองโดยตรง (Tight Coupling)
+        // ข้อเสีย 1: OrderService ถูกผูกติดกับ SQL Server และ SMTP Server ถาวร
+        // ข้อเสีย 2: ไม่สามารถเขียน Unit Test ได้เลย เพราะจะไปต่อ Database จริงและส่ง Email จริง!
+        // ข้อเสีย 3: ฝ่าฝืนหลัก Dependency Inversion Principle (DIP) ใน SOLID
+        _repository = new SqlServerRepository("Server=prod-db;...");
+        _emailService = new SmtpEmailService("smtp.office365.com", 587);
+    }
+
+    public async Task PlaceOrderAsync(Order order)
+    {
+        await _repository.SaveAsync(order);
+        await _emailService.SendConfirmationAsync(order.CustomerEmail);
+    }
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">⚠️ ทำไมคำสั่ง new ถึงสร้างหนี้ทางเทคนิค (Technical Debt)?</div>
+          <div>
+            1. <strong>ยากต่อการเปลี่ยน Infrastructure:</strong> หากวันหนึ่งต้องการเปลี่ยนฐานข้อมูลจาก SQL Server เป็น PostgreSQL หรือ MongoDB คุณต้องแก้โค้ดทุกไฟล์ที่ <code>new SqlServerRepository()</code><br>
+            2. <strong>เขียน Automated Test ไม่ได้:</strong> เมื่อรัน Unit Test ระบบจะพยายามยิงเครือข่ายไปยัง SMTP และ DB จริง ทำให้ Test ช้า ไม่เสถียร และอาจทำลายข้อมูลจริงบน Production<br>
+            3. <strong>จัดการ Lifecycle ของ Resource ไม่ได้:</strong> ไม่สามารถควบคุมได้ว่า Connection หรือ Instance ควรถูกแชร์หรือปิดทำลายเมื่อใด
+          </div>
+        </div>
+
+        <p style="margin-top: var(--space-lg);">
+          <strong>ทางออกที่ถูกต้อง:</strong> ใช้หลักการ <strong>Inversion of Control (IoC)</strong> โดยย้ายความรับผิดชอบในการสร้าง Object ออกไปให้ DI Container และรับ Service เข้ามาผ่าน <strong>Constructor Injection</strong>:
+        </p>
+
+        <!-- Code Block: Loose Coupling with DI -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">✅</span>
+              <span style="color: var(--accent-success); font-weight: 600;">ทางออก: Loose Coupling ด้วย Dependency Injection (Good Practice)</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">// 1. สร้าง Interface เพื่อเป็นตัวกลาง (Abstraction)
+public interface IOrderRepository
+{
+    Task SaveAsync(Order order);
+}
+
+public interface IEmailService
+{
+    Task SendConfirmationAsync(string email);
+}
+
+// 2. ฉีด Interface เข้ามาทาง Constructor (Constructor Injection)
+public class OrderService
+{
+    private readonly IOrderRepository _repository;
+    private readonly IEmailService _emailService;
+
+    // ✅ OrderService ไม่สนใจว่าใครเป็นผู้สร้าง หรือต่อกับ Database ตัวไหน
+    // ขอเพียงส่ง Object ที่ปฏิบัติตาม Interface เข้ามาก็พร้อมทำงานทันที!
+    public OrderService(IOrderRepository repository, IEmailService emailService)
+    {
+        _repository = repository;
+        _emailService = emailService;
+    }
+
+    public async Task PlaceOrderAsync(Order order)
+    {
+        await _repository.SaveAsync(order);
+        await _emailService.SendConfirmationAsync(order.CustomerEmail);
+    }
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">💡 ประโยชน์เมื่อเขียน Unit Test ด้วย Mock</div>
+          <div>
+            ในชุดทดสอบ Unit Test เราสามารถส่ง <code>Mock&lt;IOrderRepository&gt;</code> และ <code>Mock&lt;IEmailService&gt;</code> ปลอมๆ เข้าไปใน <code>OrderService</code> ได้ทันที ทำให้ทดสอบ Business Logic ได้ 100% ภายในเสี้ยววินาทีโดยไม่ต้องต่อ Database หรือ Network ใดๆ
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 2: 3 Lifetimes ของ Service ใน ASP.NET Core ─── -->
+      <section class="lesson-section reveal" id="lifetimes">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(81, 43, 212, 0.2); color: var(--syn-method); border: 1px solid var(--syn-method);">02</div>
+          <div>
+            <h2>3 Lifetimes ของ Service ใน ASP.NET Core</h2>
+            <p class="text-muted" style="margin-bottom: 0;">เข้าใจวงจรชีวิตของ Object เพื่อเลือกใช้อย่างถูกต้อง ไม่เปลือง Memory และไม่เกิด Concurrency Bug</p>
+          </div>
+        </div>
+
+        <p>
+          เมื่อเราลงทะเบียน Service เข้าสู่ระบบของ ASP.NET Core ในไฟล์ <code>Program.cs</code> เราต้องระบุ <strong>Service Lifetime</strong> ซึ่งบอกให้ DI Container ทราบว่า <em>"ควรสร้าง Instance บ่อยแค่ไหน และเมื่อใดควรทำลายทิ้ง"</em> แบ่งออกเป็น 3 ระดับ ดังนี้:
+        </p>
+
+        <div class="lifetime-grid">
+          <!-- 1. Transient Card -->
+          <div class="lifetime-card transient">
+            <div class="lifetime-header">
+              <span class="lifetime-emoji">⚡</span>
+              <div>
+                <div class="lifetime-title" style="color: #ffa657;">Transient</div>
+                <span class="lifetime-method">AddTransient&lt;T, U&gt;()</span>
+              </div>
+            </div>
+            <div class="lifetime-analogy">
+              🧻 <strong>เปรียบเหมือน: กระดาษทิชชู่</strong><br>
+              ดึงแผ่นใหม่ใช้ทุกครั้ง ใช้เสร็จทิ้งทันที ไม่แชร์ร่วมกับใคร
+            </div>
+            <div class="lifetime-details">
+              • <strong>การทำงาน:</strong> สร้าง Instance ใหม่ขึ้นมา <strong>ทุกครั้งที่มีการร้องขอ (Every Request for Injection)</strong> แม้จะอยู่ใน HTTP Request เดียวกันก็ตาม<br>
+              • <strong>State:</strong> ไร้สถานะ (Stateless) ไม่เก็บข้อมูลค้างไว้<br>
+              • <strong>เหมาะสำหรับ:</strong> บริการขนาดเล็กและทำงานรวดเร็ว (Lightweight) เช่น เครื่องคำนวณภาษี, แปลงสกุลเงิน, Token Generator
+            </div>
+            <div class="lifetime-tag-list">
+              <span class="badge badge-warning">Stateless</span>
+              <span class="badge badge-warning">New Every Call</span>
+              <span class="badge badge-warning">Lightweight</span>
+            </div>
+          </div>
+
+          <!-- 2. Scoped Card -->
+          <div class="lifetime-card scoped">
+            <div class="lifetime-header">
+              <span class="lifetime-emoji">🔄</span>
+              <div>
+                <div class="lifetime-title" style="color: #58a6ff;">Scoped</div>
+                <span class="lifetime-method">AddScoped&lt;T, U&gt;()</span>
+              </div>
+            </div>
+            <div class="lifetime-analogy">
+              🍱 <strong>เปรียบเหมือน: ถาดอาหารประจำบุคคล</strong><br>
+              แต่ละคน (Request) ได้ถาดของตัวเอง วนใช้ตลอดมื้ออาหาร พออิ่มก็เก็บทิ้ง
+            </div>
+            <div class="lifetime-details">
+              • <strong>การทำงาน:</strong> สร้าง <strong>1 Instance ต่อ 1 HTTP Request</strong> ทุก Class ที่ถูกเรียกใน Request เดียวกันจะได้ใช้ Instance ตัวเดียวกัน เมื่อจบ Request จะถูก Dispose ทันที<br>
+              • <strong>State:</strong> เก็บสถานะเฉพาะภายใน 1 Request เท่านั้น<br>
+              • <strong>เหมาะสำหรับ:</strong> <code>DbContext</code> (EF Core), Repository, Business Services, Unit of Work
+            </div>
+            <div class="lifetime-tag-list">
+              <span class="badge badge-primary">1 Per HTTP Request</span>
+              <span class="badge badge-primary">DbContext Standard</span>
+              <span class="badge badge-primary">Auto Dispose</span>
+            </div>
+          </div>
+
+          <!-- 3. Singleton Card -->
+          <div class="lifetime-card singleton">
+            <div class="lifetime-header">
+              <span class="lifetime-emoji">👑</span>
+              <div>
+                <div class="lifetime-title" style="color: #d2a8ff;">Singleton</div>
+                <span class="lifetime-method">AddSingleton&lt;T, U&gt;()</span>
+              </div>
+            </div>
+            <div class="lifetime-analogy">
+              🚰 <strong>เปรียบเหมือน: ตู้กดน้ำของสำนักงาน</strong><br>
+              ติดตั้งเครื่องเดียว ทุกคนในบริษัทและทุกคำขอเดินมากดใช้ตู้เดียวกันเสมอ
+            </div>
+            <div class="lifetime-details">
+              • <strong>การทำงาน:</strong> สร้าง <strong>เพียง 1 Instance ตลอดอายุของ Application</strong> ตั้งแต่เริ่มรันเซิร์ฟเวอร์จนกระทั่งปิดโปรแกรม ทุก HTTP Request และทุก Thread ใช้ร่วมกัน<br>
+              • <strong>State:</strong> แชร์ข้อมูลร่วมกันทั้งระบบ (Global State)<br>
+              • <strong>เหมาะสำหรับ:</strong> In-Memory Cache, Global Configuration, Logger, Background Task Worker
+            </div>
+            <div class="lifetime-tag-list">
+              <span class="badge badge-info">1 Per Application</span>
+              <span class="badge badge-info">Memory Cache</span>
+              <span class="badge badge-info">Must be Thread-Safe</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Callout on DbContext Lifetime -->
+        <div class="callout callout-info" style="border-left-color: #58a6ff;">
+          <div class="callout-title" style="color: #58a6ff;">🔍 ทำไม DbContext ใน Entity Framework Core จึงต้องเป็น Scoped เสมอ?</div>
+          <div>
+            1. <strong>DbContext ไม่ใช่ Thread-Safe:</strong> หากใช้ Singleton และมี Request เข้ามาพร้อมกัน 10 คน จะเกิดการแย่งใช้งาน Connection เดียวกันจนแอป Crash ทันที<br>
+            2. <strong>การทำงานแบบ Unit of Work:</strong> ใน 1 HTTP Request อาจมีการเรียกหลาย Service ทุก Service ควรเห็น Change Tracker ชุดเดียวกันเพื่อให้ <code>SaveChangesAsync()</code> บันทึกเป็น Transaction เดียวกันได้อย่างถูกต้อง<br>
+            3. <strong>คืน Connection เข้า Pool ทันที:</strong> เมื่อ HTTP Request จบลง DI Container จะเรียก <code>Dispose()</code> ปิด Database Connection คืนสู่ Pool ป้องกัน Connection รั่วไหล (Leak)
+          </div>
+        </div>
+
+        <!-- Detailed Comparison Table -->
+        <h3 class="mt-xl" style="color: var(--text-primary);">📊 ตารางเปรียบเทียบ 3 Lifetimes อย่างละเอียด</h3>
+        <div class="table-responsive">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th style="width: 20%;">เกณฑ์เปรียบเทียบ</th>
+                <th style="width: 26%; color: #ffa657;">⚡ Transient</th>
+                <th style="width: 27%; color: #58a6ff;">🔄 Scoped (หัวใจหลักของ Web)</th>
+                <th style="width: 27%; color: #d2a8ff;">👑 Singleton</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>ความถี่การสร้าง Instance</strong></td>
+                <td>สร้างใหม่ทุกครั้งที่มีการ Inject หรือ <code>GetService()</code></td>
+                <td>สร้าง 1 ครั้งต่อ 1 HTTP Request (หรือ 1 Custom Scope)</td>
+                <td>สร้างเพียงครั้งเดียวในครั้งแรกที่ถูกเรียก (หรือตอน App Start)</td>
+              </tr>
+              <tr>
+                <td><strong>อายุการใช้งาน (Lifetime)</strong></td>
+                <td>สั้นมาก อยู่เท่ากับ Method หรือ Object ที่รับมันไป</td>
+                <td>เท่ากับระยะเวลาประมวลผลของ HTTP Request นั้น</td>
+                <td>ยาวนานเท่ากับ Application Lifecycle (จนสั่ง Stop Service)</td>
+              </tr>
+              <tr>
+                <td><strong>การแชร์ข้อมูล (State Sharing)</strong></td>
+                <td>ไม่แชร์ข้อมูลใดๆ เลย (Isolated 100%)</td>
+                <td>แชร์ข้อมูลข้าม Service ต่างๆ ภายใน Request เดียวกันได้</td>
+                <td>แชร์ข้อมูลให้กับทุก Request และทุกผู้ใช้งานในระบบ</td>
+              </tr>
+              <tr>
+                <td><strong>ความปลอดภัยทาง Thread (Thread-Safety)</strong></td>
+                <td>ปลอดภัยสูง เพราะใช้งานแยก Instance กันโดยสิ้นเชิง</td>
+                <td>ปลอดภัยตราบใดที่ 1 Request ถูกประมวลผลแบบ Single-thread</td>
+                <td><strong>ต้องระวังสูงมาก!</strong> โค้ดต้องเป็น Thread-safe เพราะถูกเรียกพร้อมกันได้</td>
+              </tr>
+              <tr>
+                <td><strong>การใช้หน่วยความจำ (Memory)</strong></td>
+                <td>สร้างและทำลายบ่อย อาศัย Garbage Collector (GC)</td>
+                <td>คืนหน่วยความจำทันทีเมื่อ Request สิ้นสุด</td>
+                <td>กินหน่วยความจำค้างไว้ใน Heap ตลอดเวลาจนกว่าแอปจะปิด</td>
+              </tr>
+              <tr>
+                <td><strong>ตัวอย่างคลาสที่เหมาะสม</strong></td>
+                <td><code>IEmailValidator</code>, <code>ITokenGenerator</code>, <code>IDateTimeProvider</code></td>
+                <td><code>AppDbContext</code>, <code>IOrderRepository</code>, <code>IUserService</code></td>
+                <td><code>IMemoryCache</code>, <code>IConfiguration</code>, <code>ILogger&lt;T&gt;</code></td>
+              </tr>
+              <tr>
+                <td><strong>คำสั่งลงทะเบียนใน Program.cs</strong></td>
+                <td><code>builder.Services.AddTransient&lt;...&gt;();</code></td>
+                <td><code>builder.Services.AddScoped&lt;...&gt;();</code></td>
+                <td><code>builder.Services.AddSingleton&lt;...&gt;();</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ─── Section 3: กับดักอันตราย — Captive Dependency ─── -->
+      <section class="lesson-section reveal" id="captive-dependency">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(248, 81, 73, 0.2); color: var(--accent-danger); border: 1px solid var(--accent-danger);">03</div>
+          <div>
+            <h2>กับดักอันตราย — Captive Dependency</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ข้อผิดพลาดร้ายแรงที่สุดในระบบ DI: การฉีด Scoped Service เข้าไปใน Singleton Service</p>
+          </div>
+        </div>
+
+        <div class="danger-card">
+          <div class="danger-title">
+            <span>🚨</span>
+            <span>Captive Dependency คืออะไร และทำไมจึงอันตรายถึงชีวิตของ Application?</span>
+          </div>
+          <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 0;">
+            <strong>Captive Dependency</strong> เกิดขึ้นเมื่อ Service ที่มีอายุขัยยาวนานกว่า (เช่น <strong>Singleton</strong>) รับ Service ที่มีอายุขัยสั้นกว่า (เช่น <strong>Scoped</strong>) เข้ามาทาง Constructor<br>
+            เนื่องจาก Singleton จะถูกสร้างเพียงครั้งเดียวและคงอยู่ตลอดกาล ส่งผลให้ Scoped Service ตัวนั้น <strong>"ถูกกักขัง (Captured)"</strong> และมีอายุยืนยาวค้างฟ้าตาม Singleton ไปด้วยโดยที่ DI Container ไม่สามารถทำลายทิ้งได้เมื่อจบ HTTP Request!
+          </p>
+        </div>
+
+        <!-- Code Block: Captive Dependency Mistake -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">💣</span>
+              <span style="color: var(--accent-danger); font-weight: 600;">ตัวอย่างโค้ดที่เกิดปัญหา Captive Dependency (ห้ามทำเด็ดขาด!)</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">// 1. AppDbContext ถูกลงทะเบียนเป็น Scoped ตามมาตรฐาน
+builder.Services.AddDbContext&lt;AppDbContext&gt;();
+
+// 2. แต่ NotificationQueue ถูกลงทะเบียนเป็น Singleton!
+builder.Services.AddSingleton&lt;INotificationQueue, NotificationQueue&gt;();
+
+// ❌ คลาสนี้เป็น Singleton แต่ฉีด AppDbContext (Scoped) เข้ามาใน Constructor!
+public class NotificationQueue : INotificationQueue
+{
+    private readonly AppDbContext _db; // 💣 ถูกกักขังให้อยู่ตลอดไป (Captive)
+
+    public NotificationQueue(AppDbContext db)
+    {
+        _db = db; // DbContext ตัวนี้จะไม่เคยถูก Dispose เลยตลอดอายุโปรแกรม!
+    }
+
+    public async Task ProcessQueueAsync()
+    {
+        // 💥 เมื่อมีหลาย Thread เรียกฟังก์ชันนี้พร้อมกัน
+        // จะเกิด: InvalidOperationException: A second operation was started on this context instance before a previous operation completed.
+        var users = await _db.Users.ToListAsync();
+    }
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="callout callout-danger">
+          <div class="callout-title">💥 3 หายนะที่เกิดขึ้นเมื่อติดกับดัก Captive Dependency:</div>
+          <div>
+            1. <strong>InvalidOperationException (Concurrency Crash):</strong> DbContext ตัวเดิมถูกหลาย Thread ใช้งานพร้อมกัน ทำให้แอปพังและส่ง HTTP 500 ให้ผู้ใช้งานทันที<br>
+            2. <strong>Stale Data (ได้ข้อมูลเก่าที่ไม่อัปเดต):</strong> Change Tracker ของ DbContext ไม่เคยถูกล้าง ทำให้เมื่อมีข้อมูลอัปเดตใหม่ในฐานข้อมูล แอปยังคงอ่านได้ข้อมูลเดิมที่ค้างอยู่ใน Memory<br>
+            3. <strong>Memory Leak มหาศาล:</strong> DbContext จะเก็บ Object ที่เคย Query ไว้ในหน่วยความจำตลอดไปจนกว่า Server จะเกิด Out Of Memory (OOM) และดับไป
+          </div>
+        </div>
+
+        <!-- How to fix Captive Dependency -->
+        <h3 class="mt-xl" style="color: var(--accent-success);">🛠️ วิธีแก้ไขที่ถูกต้อง: การใช้ IServiceScopeFactory</h3>
+        <p>
+          หากเรามี <code>Singleton</code> Service (เช่น <code>IHostedService</code>, <code>BackgroundService</code> หรือ Worker) และจำเป็นต้องใช้งาน <code>DbContext</code> (Scoped) วิธีการที่ถูกต้องคือการฉีด <strong><code>IServiceScopeFactory</code></strong> แล้วสั่งสร้าง Scope ชั่วคราวเฉพาะตอนทำงาน:
+        </p>
+
+        <!-- Code Block: Correct Solution with IServiceScopeFactory -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">✨</span>
+              <span style="color: var(--accent-success); font-weight: 600;">วิธีแก้: ใช้ IServiceScopeFactory เพื่อสร้าง Scope เฉพาะกิจ (Best Practice)</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">public class QueueProcessorWorker : BackgroundService
+{
+    // ✅ 1. ฉีด IServiceScopeFactory (Singleton) เข้ามาอย่างปลอดภัย
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ILogger&lt;QueueProcessorWorker&gt; _logger;
+
+    public QueueProcessorWorker(IServiceScopeFactory scopeFactory, ILogger&lt;QueueProcessorWorker&gt; logger)
+    {
+        _scopeFactory = scopeFactory;
+        _logger = logger;
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            // ✅ 2. สร้าง Scope จำลองขึ้นมาใหม่สำหรับการประมวลผลรอบนี้
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                // ✅ 3. ดึง Scoped Service (AppDbContext) ออกมาจาก Scope เฉพาะกิจ
+                var db = scope.ServiceProvider.GetRequiredService&lt;AppDbContext&gt;();
+
+                var pendingTasks = await db.Queues.Where(q => !q.IsProcessed).ToListAsync(stoppingToken);
+                
+                foreach (var item in pendingTasks)
+                {
+                    item.IsProcessed = true;
+                }
+
+                await db.SaveChangesAsync(stoppingToken);
+            } // ✅ 4. เมื่อหลุดบล็อก using: Scope และ AppDbContext จะถูก Dispose ทำลายทิ้งทันทีอย่างปลอดภัย!
+
+            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+        }
+    }
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">🛡️ ระบบตรวจจับอัตโนมัติของ .NET (ValidateScopes)</div>
+          <div>
+            ในสภาพแวดล้อม <strong>Development</strong> (<code>app.Environment.IsDevelopment()</code>) ASP.NET Core จะเปิดการตรวจสอบ <code>ValidateScopes = true</code> และ <code>ValidateOnBuild = true</code> เป็นค่าเริ่มต้น โดยจะโยน Exception ทันทีที่สตาร์ทโปรแกรมหากตรวจพบว่ามีการฉีด Scoped Service เข้าไปใน Singleton Service เพื่อป้องกันไม่ให้บั๊กนี้หลุดไปถึง Production!
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 4: การลงทะเบียนและการฉีด Service ใน Controller & Minimal API ─── -->
+      <section class="lesson-section reveal" id="implementation">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(81, 43, 212, 0.2); color: var(--accent-info); border: 1px solid var(--accent-info);">04</div>
+          <div>
+            <h2>การลงทะเบียนและการฉีด Service ใน Controller &amp; Minimal API</h2>
+            <p class="text-muted" style="margin-bottom: 0;">เรียนรู้วิธีตั้งค่า Program.cs และการเรียกใช้ Service ทั้งแบบ Controller แบบเดิมและ Minimal APIs ยุคใหม่</p>
+          </div>
+        </div>
+
+        <h3>1. การลงทะเบียน Service ในไฟล์ Program.cs (.NET 8/9)</h3>
+        <p>
+          ในไฟล์ <code>Program.cs</code> เราจะใช้ <code>builder.Services</code> ในการกำหนดคู่ Interface และ Concrete Implementation ก่อนที่จะเรียกคำสั่ง <code>builder.Build()</code>:
+        </p>
+
+        <!-- Code Block: Program.cs Registration -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>Program.cs (Registration Examples)</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">var builder = WebApplication.CreateBuilder(args);
+
+// 1. ลงทะเบียนแบบ Transient
+builder.Services.AddTransient&lt;ITokenGenerator, JwtTokenGenerator&gt;();
+
+// 2. ลงทะเบียนแบบ Scoped (ใช้กับ Database &amp; Business Logic)
+builder.Services.AddScoped&lt;IOrderRepository, SqlOrderRepository&gt;();
+builder.Services.AddScoped&lt;IOrderService, OrderService&gt;();
+
+// 3. ลงทะเบียนแบบ Singleton (ใช้กับ Cache หรือ Config)
+builder.Services.AddSingleton&lt;ICacheService, RedisCacheService&gt;();
+
+// 4. Keyed Services ใน .NET 8 (ระบุ Key ให้บริการที่มีหลาย Implementation)
+builder.Services.AddKeyedScoped&lt;INotificationService, EmailNotificationService&gt;("email");
+builder.Services.AddKeyedScoped&lt;INotificationService, SmsNotificationService&gt;("sms");
+
+var app = builder.Build();</code></pre>
+          </div>
+        </div>
+
+        <h3 class="mt-xl">2. Constructor Injection ใน Controller (Classic Approach)</h3>
+        <p>
+          เมื่อต้องการใช้งาน Service ใน Controller ให้ประกาศตัวแปร <code>private readonly</code> และรับผ่านพารามิเตอร์ของ Constructor:
+        </p>
+
+        <!-- Code Block: Controller Injection -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">🎮</span>
+              <span>Controllers/OrdersController.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">[ApiController]
+[Route("api/[controller]")]
+public class OrdersController : ControllerBase
+{
+    private readonly IOrderService _orderService;
+    private readonly ILogger&lt;OrdersController&gt; _logger;
+
+    // ✅ DI Container จะส่ง OrderService และ Logger ตัวจริงเข้ามาให้อัตโนมัติ
+    public OrdersController(IOrderService orderService, ILogger&lt;OrdersController&gt; logger)
+    {
+        _orderService = orderService;
+        _logger = logger;
+    }
+
+    [HttpPost]
+    public async Task&lt;IActionResult&gt; CreateOrder([FromBody] CreateOrderDto dto)
+    {
+        _logger.LogInformation("Creating order for customer {Email}", dto.CustomerEmail);
+        var result = await _orderService.PlaceOrderAsync(dto);
+        return CreatedAtAction(nameof(GetOrderById), new { id = result.Id }, result);
+    }
+
+    [HttpGet("{id}")]
+    public async Task&lt;IActionResult&gt; GetOrderById(int id)
+    {
+        var order = await _orderService.GetByIdAsync(id);
+        return order is not null ? Ok(order) : NotFound();
+    }
+}</code></pre>
+          </div>
+        </div>
+
+        <h3 class="mt-xl">3. Method Injection ใน Minimal APIs (.NET 8/9 Modern Approach)</h3>
+        <p>
+          ใน Minimal API ไม่จำเป็นต้องสร้าง Controller หรือเขียน Constructor! เราสามารถใส่ Service ที่ต้องการลงในพารามิเตอร์ของ Lambda Function ได้โดยตรง:
+        </p>
+
+        <!-- Code Block: Minimal API Injection -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚡</span>
+              <span>Program.cs (Minimal API Injection)</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">// ✅ Direct Parameter Injection — ไม่ต้องเขียน [FromServices] ใน .NET 7/8/9
+app.MapGet("/api/orders", async (IOrderService orderService) =>
+{
+    var orders = await orderService.GetAllOrdersAsync();
+    return Results.Ok(orders);
+});
+
+// ✅ ใช้งานร่วมกับ DTO และ Service หลายตัวพร้อมกัน
+app.MapPost("/api/orders", async (CreateOrderDto dto, IOrderService orderService, ILogger&lt;Program&gt; logger) =>
+{
+    logger.LogInformation("New Order Received from {Email}", dto.CustomerEmail);
+    var newOrder = await orderService.PlaceOrderAsync(dto);
+    return Results.Created($"/api/orders/{newOrder.Id}", newOrder);
+});
+
+// ✅ การใช้ [FromKeyedServices] ใน .NET 8 เพื่อเลือกตัวส่ง Notification
+app.MapPost("/api/notify", async (string message, [FromKeyedServices("sms")] INotificationService notifier) =>
+{
+    await notifier.SendAsync("081-234-5678", message);
+    return Results.Ok(new { status = "SMS Sent!" });
+});</code></pre>
+          </div>
+        </div>
+
+        <!-- Best Practices Checklist -->
+        <div class="card mt-xl" style="border-color: var(--border-active); background: var(--bg-card);">
+          <h4 style="margin-top: 0; color: var(--accent-primary);">📋 กฎเหล็ก Best Practices สำหรับ Dependency Injection</h4>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; color: var(--text-secondary);">
+            <div>✅ <strong>1. พึ่งพา Abstraction เสมอ:</strong> ประกาศและ Inject ผ่าน Interface (เช่น <code>IUserService</code>) แทนที่จะเป็นคลาสจริงตรงๆ</div>
+            <div>✅ <strong>2. หลีกเลี่ยง Service Locator Anti-pattern:</strong> ห้ามเรียกใช้ <code>serviceProvider.GetService&lt;T&gt;()</code> กระจายอยู่ในโค้ด เพราะทำให้ไม่รู้ว่าคลาสนั้นพึ่งพาอะไรบ้าง</div>
+            <div>✅ <strong>3. Constructor ต้องกระชับ (Lean Constructor):</strong> Constructor มีหน้าที่รับและบันทึก Dependency ลงใน Field เท่านั้น ไม่ควรมีการต่อฐานข้อมูลหรือทำงานหนักๆ ใน Constructor</div>
+            <div>✅ <strong>4. ตรวจสอบ Lifetimes ให้สอดคล้อง:</strong> ท่องจำเสมอ: <em>Transient เรียกใครก็ได้, Scoped เรียก Scoped หรือ Singleton ได้, แต่ Singleton ห้ามฉีด Scoped Service เข้า Constructor ตรงๆ!</em></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 5: Inline Quiz ─── -->
+      <section class="lesson-section reveal" id="quiz-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(63, 185, 80, 0.2); color: var(--accent-success); border: 1px solid var(--accent-success);">05</div>
+          <div>
+            <h2>แบบทดสอบความเข้าใจ: Dependency Injection (DI)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ทดสอบความรู้เกี่ยวกับ Lifetimes, การออกแบบ Loose Coupling และการแก้ปัญหา Captive Dependency (5 ข้อ)</p>
+          </div>
+        </div>
+
+        <!-- Quiz Container rendered by QuizEngine -->
+        <div id="dotnet-di-quiz"></div>
+      </section>
+
+      <!-- ─── Next Lesson Navigation ─── -->
+      <div class="card mt-2xl reveal" style="border-color: var(--border-active); background: linear-gradient(135deg, rgba(81, 43, 212, 0.15) 0%, rgba(22, 27, 34, 0.8) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge badge-success mb-xs">🎉 ยอดเยี่ยม! ผ่านบทเรียน Dependency Injection</span>
+            <h3 style="margin-top: 4px; margin-bottom: 4px;">พร้อมไปต่อกับบทเรียนถัดไป: Middleware Request Pipeline หรือยัง?</h3>
+            <p class="text-muted" style="margin-bottom: 0;">เรียนรู้การทำงานของสายพาน Middleware ลำดับการคัดกรอง Request และการสร้าง Custom Middleware ใน .NET 8</p>
+          </div>
+          <div>
+            <a href="dotnet-middleware.html" class="btn btn-primary btn-lg">
+              <span>ไปบทเรียนถัดไป: Middleware Pipeline →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Mark this lesson as completed in Progress tracker
+      if (typeof Progress !== 'undefined') {
+        Progress.completeLesson('dotnet-di');
+        Progress.setModuleProgress('dotnet', 40);
+      }
+
+      // Quiz Questions Definition
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'medium',
+          question: 'ในการพัฒนา ASP.NET Core Web API เหตุใดคลาส DbContext ของ Entity Framework Core จึงควรถูกลงทะเบียนด้วย Lifetime แบบ "Scoped" (AddScoped) เป็นค่ามาตรฐาน?',
+          options: [
+            'เพื่อให้สร้าง Instance ใหม่ทุกครั้งที่มีการเรียกใช้ฟังก์ชัน เพื่อความเร็วสูงสุด',
+            'เพื่อให้แชร์ DbContext ตัวเดียวร่วมกันตลอดทั้ง Application เพื่อประหยัด Memory',
+            'เพื่อให้ 1 HTTP Request ได้รับ 1 DbContext Instance ที่ทำงานร่วมกันใน Transaction เดียว และถูก Dispose คืน Connection เมื่อจบคำขอ ป้องกันปัญหา Concurrency',
+            'เพราะ .NET ไม่อนุญาตให้ใช้ DbContext กับ Lifetime อื่นนอกจาก Scoped'
+          ],
+          answer: 2,
+          explanation: 'DbContext ไม่ใช่ Thread-safe การใช้ Scoped จะทำให้ 1 HTTP Request ได้ 1 DbContext ประจำตัว ซึ่งทำงานเป็น Unit of Work เดียวกัน และถูก Dispose ปิด Database Connection ทันทีที่ Request จบการทำงาน'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'Service ที่ถูกลงทะเบียนด้วยคำสั่ง `builder.Services.AddTransient<ITokenService, TokenService>()` จะมีพฤติกรรมการสร้าง Instance อย่างไร?',
+          options: [
+            'สร้าง Instance เพียงครั้งเดียวตอนแอปสตาร์ท และคงอยู่ตลอดไป',
+            'สร้าง Instance ใหม่ทุกๆ ครั้งที่มีการขอ Injection เข้าไป แม้ว่าจะอยู่ใน Request เดียวกันก็ตาม',
+            'สร้าง 1 Instance ต่อ 1 HTTP Request',
+            'สร้าง Instance ใหม่ทุกๆ 1 ชั่วโมง'
+          ],
+          answer: 1,
+          explanation: 'Transient จะสร้าง Object Instance ใหม่เอี่ยมทุกครั้งที่มีการร้องขอ (Every injection request) เหมาะสำหรับ Service ขนาดเล็กที่ไร้สถานะ (Stateless)'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'medium',
+          question: 'ปรากฏการณ์ "Captive Dependency" ในระบบ Dependency Injection เกิดจากสาเหตุใด?',
+          options: [
+            'การลืมลงทะเบียน Interface ใน Program.cs',
+            'การฉีด Service ที่มี Lifetime อายุสั้นกว่า (เช่น Scoped) เข้าไปใน Constructor ของ Service ที่มี Lifetime ยาวนานกว่า (เช่น Singleton)',
+            'การสร้าง Service มากกว่า 100 ตัวในแอปพลิเคชันเดียวกัน',
+            'การใช้คำสั่ง new แทนการใช้ Dependency Injection'
+          ],
+          answer: 1,
+          explanation: 'Captive Dependency เกิดขึ้นเมื่อ Singleton รับ Scoped Service เข้าไปใน Constructor ทำให้ Scoped Service นั้นถูกกักขังและกลายเป็น Singleton ไปด้วย ส่งผลให้ไม่ถูก Dispose, เกิดปัญหา Data ค้าง และแอป Crash เมื่อมี Multi-threading'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'advanced',
+          question: 'หากคุณสร้าง BackgroundService (ซึ่งมีสถานะเป็น Singleton) และต้องการเรียกใช้งาน DbContext (ซึ่งเป็น Scoped) เพื่อบันทึกข้อมูลทุก 1 นาที ข้อใดคือวิธีแก้ปัญหาที่ถูกต้องและปลอดภัยที่สุด?',
+          options: [
+            'เปลี่ยน DbContext ให้เป็น Singleton ตาม BackgroundService',
+            'ใช้คำสั่ง new DbContext() ภายในฟังก์ชัน ExecuteAsync โดยตรง',
+            'ฉีด IServiceScopeFactory เข้าไปใน BackgroundService แล้วสั่ง CreateScope() ภายในรอบการทำงานเพื่อสร้าง Scope จำลองเฉพาะกิจ',
+            'ห้ามใช้ DbContext ใน BackgroundService เด็ดขาด'
+          ],
+          answer: 2,
+          explanation: 'การฉีด IServiceScopeFactory เข้าไป แล้วสั่ง using (var scope = _scopeFactory.CreateScope()) เพื่อดึง DbContext ออกมาใช้งานในแต่ละรอบ จะทำให้ DbContext ถูกสร้างและ Dispose ทำลายทิ้งอย่างถูกต้องทุกรอบการทำงาน'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ใน ASP.NET Core Minimal API (.NET 8/9) หากต้องการดึง Service จาก DI Container มาใช้งานใน Endpoint มีวิธีการเขียนอย่างไร?',
+          options: [
+            'ต้องสร้าง Controller Class ครอบเสมอ',
+            'ระบุ Type ของ Interface เป็น Parameter ของ Lambda function ใน MapGet/MapPost ได้โดยตรง',
+            'ต้องเรียกผ่าน Global Variable เท่านั้น',
+            'ต้องใช้คำสั่ง App.GetService() เสมอ'
+          ],
+          answer: 1,
+          explanation: 'ใน Minimal API ของ .NET ยุคใหม่ DI Container รองรับ Direct Method Injection โดยสามารถระบุ Interface เป็น Parameter ของ Lambda expression ได้ทันทีโดยไม่ต้องใส่ Attribute เพิ่มเติม'
+        }
+      ];
+
+      // Initialize Quiz
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('dotnet-di-quiz', quizQuestions, {
+          quizId: 'dotnet-di',
+          showTimer: false,
+          showExplanation: true
+        });
+      }
+    });
+  </script>
+</body>
+</html>

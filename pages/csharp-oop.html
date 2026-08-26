@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C# OOP &amp; คลาส (Level 2) — DotNet Learning Hub</title>
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <style>
+    /* Custom styling for OOP Pillars & Cards */
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    .pillar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+    .pillar-card:hover {
+      border-color: var(--accent-info);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-glow);
+    }
+    .pillar-card-icon {
+      font-size: 2rem;
+      margin-bottom: var(--space-sm);
+    }
+    .pillar-card-title {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--syn-type);
+      margin-bottom: 4px;
+    }
+    .pillar-card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: var(--space-sm);
+      font-weight: 500;
+    }
+    .pillar-card-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Access Modifier Cards */
+    .modifier-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    .modifier-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      transition: all var(--transition-normal);
+    }
+    .modifier-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+    .modifier-tag {
+      font-family: var(--font-code);
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-xs);
+    }
+    .tag-public { background: rgba(63, 185, 80, 0.15); color: var(--accent-success); border: 1px solid rgba(63, 185, 80, 0.3); }
+    .tag-private { background: rgba(248, 81, 73, 0.15); color: var(--accent-danger); border: 1px solid rgba(248, 81, 73, 0.3); }
+    .tag-protected { background: rgba(210, 153, 34, 0.15); color: var(--accent-warning); border: 1px solid rgba(210, 153, 34, 0.3); }
+    .tag-internal { background: rgba(163, 113, 247, 0.15); color: var(--accent-info); border: 1px solid rgba(163, 113, 247, 0.3); }
+
+    /* Visual Blueprint vs Object Box */
+    .blueprint-container {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr;
+      align-items: center;
+      gap: var(--space-md);
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+    }
+    @media (max-width: 768px) {
+      .blueprint-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+    }
+    .blueprint-box {
+      border: 2px dashed var(--accent-primary);
+      background: rgba(88, 166, 255, 0.04);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+    }
+    .instance-box {
+      border: 2px solid var(--accent-success);
+      background: rgba(63, 185, 80, 0.04);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+    }
+    .blueprint-arrow {
+      text-align: center;
+      font-size: 1.8rem;
+      color: var(--text-muted);
+      font-family: var(--font-heading);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <a href="../index.html" class="site-logo">
+      <div class="logo-icon">🟣</div>
+      <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าหลัก (Dashboard)</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="./csharp-basics.html" class="sidebar-link">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="./csharp-oop.html" class="sidebar-link active">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="./csharp-collections.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>LINQ &amp; Collections (Level 3)</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="./csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>Async/Await &amp; Advanced (Lv 4)</span>
+        <span class="sidebar-badge badge-new">Lv 4</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🌐 Track .NET &amp; Web API</div>
+      <a href="./dotnet-overview.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 &amp; CLI Overview</span>
+      </a>
+      <a href="./aspnet-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>ASP.NET Core Web API</span>
+      </a>
+      <a href="./ef-core.html" class="sidebar-link">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+      </a>
+      <a href="./blazor.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Blazor Web Apps</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🛠️ Track Database &amp; Quality</div>
+      <a href="./sql-basics.html" class="sidebar-link">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; T-SQL</span>
+      </a>
+      <a href="./architecture.html" class="sidebar-link">
+        <span class="link-icon">🏛️</span>
+        <span>Clean Architecture &amp; Patterns</span>
+      </a>
+      <a href="./testing.html" class="sidebar-link">
+        <span class="link-icon">🧪</span>
+        <span>Unit Testing &amp; xUnit</span>
+      </a>
+      <a href="./devops.html" class="sidebar-link">
+        <span class="link-icon">🐳</span>
+        <span>Docker &amp; CI/CD</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header animate-fade-in">
+        <div class="breadcrumb">
+          <a href="../index.html">หน้าหลัก</a>
+          <span>/</span>
+          <span>C# Track</span>
+          <span>/</span>
+          <span class="text-primary">C# OOP &amp; คลาส</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(104, 33, 122, 0.25); color: #d2a8ff; border: 1px solid rgba(163, 113, 247, 0.4);">🟣</div>
+          <div>
+            <h1>C# OOP — Level 2</h1>
+            <div class="page-description">เจาะลึกการเขียนโปรแกรมเชิงวัตถุ (Object-Oriented Programming) หัวใจสำคัญของการพัฒนาแอปพลิเคชันและ Web API ระดับมืออาชีพ</div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="level-tag level-basic">⭐ พื้นฐาน</span></span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>เวลาเรียน: <strong>~60 นาที</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>รางวัล: <strong>+120 XP</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>💻</span>
+            <span>รองรับ .NET 8 / C# 12</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 4 Pillars Overview ─── -->
+      <div class="pillar-grid reveal">
+        <div class="pillar-card">
+          <div class="pillar-card-icon">🔒</div>
+          <div class="pillar-card-title">Encapsulation</div>
+          <div class="pillar-card-subtitle">การห่อหุ้มและซ่อนข้อมูล</div>
+          <div class="pillar-card-desc">ปกป้องข้อมูลภายในออบเจกต์ไม่ให้ภายนอกแก้ไขโดยตรง ควบคุมผ่าน Property และ Method</div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-card-icon">🧬</div>
+          <div class="pillar-card-title">Inheritance</div>
+          <div class="pillar-card-subtitle">การสืบทอดคุณสมบัติ</div>
+          <div class="pillar-card-desc">นำโครงสร้างและความสามารถจากคลาสแม่ (Base Class) มาต่อยอดในคลาสลูก (Derived Class)</div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-card-icon">🎭</div>
+          <div class="pillar-card-title">Polymorphism</div>
+          <div class="pillar-card-subtitle">การมีได้หลายรูปแบบ</div>
+          <div class="pillar-card-desc">หน้าตาเมธอดเดียวกัน แต่พฤติกรรมการทำงานต่างกันตามประเภทของออบเจกต์จริง ณ รันไทม์</div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-card-icon">🔌</div>
+          <div class="pillar-card-title">Abstraction</div>
+          <div class="pillar-card-subtitle">การซ่อนความซับซ้อน</div>
+          <div class="pillar-card-desc">กำหนดสัญญาการทำงาน (Interface / Abstract Class) ให้ผู้ใช้รู้ว่า "ทำอะไรได้" โดยไม่ต้องรู้รายละเอียดภายใน</div>
+        </div>
+      </div>
+
+      <!-- ─── Section 1: Class & Object ─── -->
+      <section class="lesson-section reveal" id="class-object">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(104, 33, 122, 0.2); color: var(--syn-method); border: 1px solid var(--syn-method);">01</div>
+          <div>
+            <h2>คลาสและออบเจกต์ (Class &amp; Object)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">รากฐานที่สำคัญที่สุดของภาษา C# — เปลี่ยนแบบแปลนความคิดให้กลายเป็นวัตถุจริงในหน่วยความจำ</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">💡</span>
+            <span class="concept-title">เปรียบเทียบให้เห็นภาพ (Analogy)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">📐 แบบพิมพ์เขียว (Class) vs บ้านที่สร้างเสร็จแล้ว (Object)</div>
+              <p class="analogy-text">
+                • <strong>Class (คลาส)</strong> คือ <em>"แบบพิมพ์เขียวของบ้าน" (Blueprint)</em> — บอกว่าบ้านนี้ต้องมีกี่ห้องนอน มีประตู มีหน้าต่าง มีฟังก์ชันเปิดไฟ แต่ตัวพิมพ์เขียวเองไม่ใช่บ้านจริง ไม่เปลืองที่ดิน (ยังไม่จองหน่วยความจำ RAM จริง)
+                <br>• <strong>Object (ออบเจกต์)</strong> คือ <em>"บ้านจริงที่สร้างขึ้นมา" (Instance)</em> — สร้างจากแบบพิมพ์เขียวโดยใช้คำสั่ง <code>new</code> มีเลขที่บ้านเป็นของตัวเอง (Memory Address) และคุณสามารถสร้างบ้านได้กี่หลังก็ได้จากแบบพิมพ์เขียวใบเดียว!
+              </p>
+            </div>
+
+            <!-- Visual Blueprint vs Object -->
+            <div class="blueprint-container">
+              <div class="blueprint-box">
+                <div style="font-weight: 700; color: var(--accent-primary); margin-bottom: 8px;">📐 Class: Product</div>
+                <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                  • <code>string Name</code><br>
+                  • <code>decimal Price</code><br>
+                  • <code>void DisplayDetails()</code>
+                </div>
+                <div style="margin-top: 8px; font-size: 0.75rem; color: var(--text-muted);">* นิยามโครงสร้างและพฤติกรรม</div>
+              </div>
+
+              <div class="blueprint-arrow">
+                <span>new ➔</span>
+              </div>
+
+              <div class="instance-box">
+                <div style="font-weight: 700; color: var(--accent-success); margin-bottom: 8px;">📦 Objects จริงใน Heap RAM</div>
+                <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                  1. <code>laptop</code> (Name="MacBook", Price=45,000)<br>
+                  2. <code>mouse</code> (Name="Logitech", Price=1,290)
+                </div>
+                <div style="margin-top: 8px; font-size: 0.75rem; color: var(--text-muted);">* แต่ละตัวมีข้อมูลแยกกันอิสระ</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>Product.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System;
+
+namespace DotNetLearningHub.OOP
+{
+    // 1. ประกาศ Class (แบบพิมพ์เขียวสินค้า)
+    public class Product
+    {
+        // Properties: คุณลักษณะของสินค้า
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+        public int Stock { get; set; }
+
+        // Constructor: เมธอดพิเศษที่ทำงานอัตโนมัติเมื่อสร้าง Object ด้วย new
+        public Product(string name, decimal price, int stock)
+        {
+            Name = name;
+            Price = price;
+            Stock = stock;
+        }
+
+        // Method: พฤติกรรมหรือความสามารถของสินค้า
+        public void DisplayDetails()
+        {
+            Console.WriteLine($"📦 สินค้า: {Name,-15} | ราคา: {Price,8:N2} บาท | คงเหลือ: {Stock,3} ชิ้น");
+        }
+
+        public void ApplyDiscount(decimal percentage)
+        {
+            decimal discountAmount = Price * (percentage / 100);
+            Price -= discountAmount;
+            Console.WriteLine($"🏷️ ลดราคา {percentage}% ให้สินค้า {Name}! ราคาใหม่คือ: {Price:N2} บาท");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("=== การสร้างและใช้งาน Object ใน C# ===\n");
+
+            // 2. สร้าง Object ตัวแรกผ่าน Constructor
+            Product laptop = new Product("Gaming Laptop", 35900.00m, 5);
+
+            // 3. สร้าง Object ตัวที่สอง
+            Product mouse = new Product("Wireless Mouse", 1290.00m, 20);
+
+            // 4. เรียกใช้ Method ของแต่ละ Object
+            laptop.DisplayDetails();
+            mouse.DisplayDetails();
+
+            Console.WriteLine();
+            // จัดโปรโมชันลดราคา 10% ให้เฉพาะ Laptop
+            laptop.ApplyDiscount(10);
+
+            Console.WriteLine("\n--- ข้อมูลหลังจัดโปรโมชัน ---");
+            laptop.DisplayDetails();
+            mouse.DisplayDetails();
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">=== การสร้างและใช้งาน Object ใน C# ===
+
+📦 สินค้า: Gaming Laptop  | ราคา: 35,900.00 บาท | คงเหลือ:   5 ชิ้น
+📦 สินค้า: Wireless Mouse  | ราคา:  1,290.00 บาท | คงเหลือ:  20 ชิ้น
+
+🏷️ ลดราคา 10% ให้สินค้า Gaming Laptop! ราคาใหม่คือ: 32,310.00 บาท
+
+--- ข้อมูลหลังจัดโปรโมชัน ---
+📦 สินค้า: Gaming Laptop  | ราคา: 32,310.00 บาท | คงเหลือ:   5 ชิ้น
+📦 สินค้า: Wireless Mouse  | ราคา:  1,290.00 บาท | คงเหลือ:  20 ชิ้น</span>
+          </div>
+          <div class="color-legend">
+            <div class="legend-item"><span class="legend-dot" style="background:var(--syn-keyword)"></span> Keyword (public, class, new, void)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--syn-type)"></span> Type/Class (Product, string, decimal, int)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--syn-method)"></span> Method/Constructor (DisplayDetails, ApplyDiscount)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--syn-variable)"></span> Instance/Variable (laptop, mouse, Name, Price)</div>
+          </div>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">💡 Pro Tip: Object Initializer Syntax ใน C# ยุคใหม่</div>
+          <p style="margin-bottom: 0;">นอกจากเรียก Constructor แล้ว C# ยังรองรับการกำหนดค่าเริ่มต้นผ่าน Object Initializer ได้ทันที เช่น <code>var book = new Product { Name = "C# 12 Guide", Price = 450m, Stock = 10 };</code> ช่วยให้โค้ดอ่านง่ายและยืดหยุ่นยิ่งขึ้น</p>
+        </div>
+      </section>
+
+      <!-- ─── Section 2: Encapsulation ─── -->
+      <section class="lesson-section reveal" id="encapsulation">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(88, 166, 255, 0.2); color: var(--accent-primary); border: 1px solid var(--accent-primary);">02</div>
+          <div>
+            <h2>การห่อหุ้มข้อมูลและระดับการเข้าถึง (Encapsulation)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ปกป้องข้อมูลสำคัญไม่ให้ถูกแก้ไขโดยพลการ พร้อมตรวจสอบความถูกต้อง (Validation) ก่อนบันทึก</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🔒</span>
+            <span class="concept-title">ห้องส่วนตัว vs ห้องรับแขก (Encapsulation Analogy)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🏠 เปรียบเทียบพื้นที่ในบ้านกับการเข้าถึงข้อมูล</div>
+              <p class="analogy-text">
+                • <strong><code>public</code> (ห้องรับแขก)</strong> — แขกทุกคนที่มาเยือนสามารถเข้ามานั่งพักผ่อนได้อิสระ โค้ดจากภายนอกคลาสเรียกใช้งานได้โดยตรง
+                <br>• <strong><code>private</code> (ห้องนอนส่วนตัว / ตู้เซฟ)</strong> — มีเฉพาะเจ้าของห้องเท่านั้นที่มีกุญแจไขเข้าไปได้ โค้ดภายนอกมองไม่เห็นและแตะต้องไม่ได้
+                <br>• <strong><code>protected</code> (สมบัติที่ส่งต่อให้ลูกหลาน)</strong> — คนในครอบครัวและลูกหลานที่สืบทอดสายเลือดเท่านั้นที่เข้าถึงได้ (คลาสแม่และคลาสลูก)
+                <br>• <strong><code>internal</code> (ประตูรั้วหมู่บ้าน)</strong> — ใครก็ตามที่อยู่ในหมู่บ้านเดียวกัน (Assembly / Project เดียวกัน) สามารถเข้าถึงได้
+              </p>
+            </div>
+
+            <!-- Access Modifiers Grid -->
+            <div class="modifier-grid">
+              <div class="modifier-card">
+                <span class="modifier-tag tag-public">public</span>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 6px 0 0;">เข้าถึงได้จากทุกที่ ทั้งภายในและภายนอกโปรเจกต์</p>
+              </div>
+              <div class="modifier-card">
+                <span class="modifier-tag tag-private">private</span>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 6px 0 0;">เข้าถึงได้เฉพาะ <em>ภายในคลาสเดียวกัน</em> เท่านั้น (ค่าเริ่มต้นของ Field)</p>
+              </div>
+              <div class="modifier-card">
+                <span class="modifier-tag tag-protected">protected</span>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 6px 0 0;">เข้าถึงได้ภายในคลาสตัวเอง และ <em>คลาสลูกที่สืบทอดไป</em></p>
+              </div>
+              <div class="modifier-card">
+                <span class="modifier-tag tag-internal">internal</span>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 6px 0 0;">เข้าถึงได้เฉพาะโค้ดที่อยู่ใน <em>Assembly/Project เดียวกัน</em></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>BankAccount.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System;
+
+namespace DotNetLearningHub.OOP
+{
+    public class BankAccount
+    {
+        // 1. Backing Field เก็บเป็น private เพื่อป้องกันไม่ให้ภายนอกแก้ตัวเลขโดยตรง
+        private decimal _balance;
+        private string _accountNumber;
+
+        // 2. Public Property ควบคุมการอ่าน (get) และเขียน (set) พร้อม Validation
+        public string AccountNumber 
+        { 
+            get => _accountNumber;
+            // init-only: กำหนดได้เฉพาะตอนเปิดบัญชีเท่านั้น หลังจากนั้นห้ามแก้ไข!
+            init => _accountNumber = value; 
+        }
+
+        public string AccountHolder { get; set; }
+
+        // Property ยอดเงินคงเหลือ: ให้อ่านได้อย่างเดียว (Read-Only จากภายนอก)
+        public decimal Balance 
+        { 
+            get { return _balance; } 
+            private set 
+            { 
+                if (value < 0)
+                {
+                    throw new ArgumentException("ยอดเงินคงเหลือในบัญชีต้องไม่ติดลบ!");
+                }
+                _balance = value; 
+            }
+        }
+
+        // Constructor
+        public BankAccount(string accNo, string holder, decimal initialDeposit)
+        {
+            if (initialDeposit < 500)
+            {
+                throw new ArgumentException("เปิดบัญชีขั้นต่ำต้องฝาก 500 บาทขึ้นไป");
+            }
+
+            AccountNumber = accNo;
+            AccountHolder = holder;
+            _balance = initialDeposit;
+        }
+
+        // Method ฝากเงิน: มีการตรวจสอบค่าก่อนทำรายการ
+        public void Deposit(decimal amount)
+        {
+            if (amount <= 0)
+            {
+                Console.WriteLine("⚠️ ยอดเงินฝากต้องมากกว่า 0 บาท!");
+                return;
+            }
+
+            _balance += amount;
+            Console.WriteLine($"✅ ฝากเงินสำเร็จ: +{amount:N2} บาท | ยอดคงเหลือปัจจุบัน: {_balance:N2} บาท");
+        }
+
+        // Method ถอนเงิน: ตรวจสอบว่ายอดเงินในบัญชีมีเพียงพอหรือไม่
+        public bool Withdraw(decimal amount)
+        {
+            if (amount <= 0)
+            {
+                Console.WriteLine("⚠️ ยอดเงินถอนต้องมากกว่า 0 บาท!");
+                return false;
+            }
+
+            if (amount > _balance)
+            {
+                Console.WriteLine($"❌ ถอนเงินไม่สำเร็จ: ยอดเงินไม่พอ (ต้องการถอน {amount:N2} แต่มี {_balance:N2})");
+                return false;
+            }
+
+            _balance -= amount;
+            Console.WriteLine($"💸 ถอนเงินสำเร็จ: -{amount:N2} บาท | ยอดคงเหลือปัจจุบัน: {_balance:N2} บาท");
+            return true;
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Console.WriteLine("=== ระบบบัญชีธนาคาร (Encapsulation Demo) ===\n");
+
+            var account = new BankAccount("ACC-90210", "สมชาย สายโค้ด", 1000m);
+            Console.WriteLine($"เจ้าของบัญชี: {account.AccountHolder} | เลขที่: {account.AccountNumber}");
+            Console.WriteLine($"ยอดเงินเริ่มต้น: {account.Balance:N2} บาท\n");
+
+            // ทดลองทำรายการฝาก-ถอนที่ถูกต้อง
+            account.Deposit(2500m);
+            account.Withdraw(1200m);
+
+            // ทดลองถอนเงินเกินบัญชี (ระบบจะดักจับไว้ได้ ป้องกันเงินติดลบ)
+            account.Withdraw(50000m);
+
+            // account._balance = 999999; // ❌ คอมไพล์ไม่ผ่านทันที! เพราะ _balance เป็น private
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">=== ระบบบัญชีธนาคาร (Encapsulation Demo) ===
+
+เจ้าของบัญชี: สมชาย สายโค้ด | เลขที่: ACC-90210
+ยอดเงินเริ่มต้น: 1,000.00 บาท
+
+✅ ฝากเงินสำเร็จ: +2,500.00 บาท | ยอดคงเหลือปัจจุบัน: 3,500.00 บาท
+💸 ถอนเงินสำเร็จ: -1,200.00 บาท | ยอดคงเหลือปัจจุบัน: 2,300.00 บาท
+❌ ถอนเงินไม่สำเร็จ: ยอดเงินไม่พอ (ต้องการถอน 50,000.00 แต่มี 2,300.00)</span>
+          </div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">⚠️ กฎเหล็ก: ทำไมไม่ควรตั้ง Field เป็น Public โดยตรง?</div>
+          <p style="margin-bottom: 0;">หากเราเปิด <code>public decimal Balance;</code> โค้ดภายนอกจะสามารถแอบเขียน <code>acc.Balance = -999999;</code> ได้ทันทีโดยไม่มีการตรวจเช็ก ส่งผลให้เกิด Bug ร้ายแรงในระบบบัญชี! การใช้ Encapsulation จึงเป็นการสร้างด่านตรวจความปลอดภัยให้กับข้อมูลเสมอ</p>
+        </div>
+      </section>
+
+      <!-- ─── Section 3: Inheritance ─── -->
+      <section class="lesson-section reveal" id="inheritance">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(63, 185, 80, 0.2); color: var(--accent-success); border: 1px solid var(--accent-success);">03</div>
+          <div>
+            <h2>การสืบทอดคุณสมบัติ (Inheritance)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ลดความซ้ำซ้อนของโค้ด (DRY) โดยให้คลาสลูกสืบทอดและต่อยอดจากคลาสแม่</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🧬</span>
+            <span class="concept-title">พ่อแม่ถ่ายทอดยีนให้ลูก (Inheritance Analogy)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">👨‍👩‍👧 การส่งต่อพันธุกรรมและความสามารถ</div>
+              <p class="analogy-text">
+                • <strong>Base Class (คลาสแม่ / คลาสหลัก)</strong> เช่น <code>Animal</code> — มีคุณสมบัติพื้นฐานที่สัตว์ทุกตัวต้องมีร่วมกัน เช่น มีชื่อ (<code>Name</code>), มีอายุ (<code>Age</code>), หายใจได้, กินอาหารได้ (<code>Eat()</code>)
+                <br>• <strong>Derived Class (คลาสลูก)</strong> เช่น <code>Dog</code> และ <code>Cat</code> — ได้รับคุณสมบัติทั้งหมดจากแม่โดยไม่ต้องเขียนซ้ำ และสามารถเพิ่มความสามารถเฉพาะตัว เช่น สุนัขมีเมธอด <code>FetchBall()</code> คาบลูกบอลได้ ส่วนแมวมี <code>ClimbTree()</code> ปีนต้นไม้ได้
+                <br>• คีย์เวิร์ด <code>: base(...)</code> คือการส่งค่าขึ้นไปให้ Constructor ของคลาสแม่ทำงานก่อน
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>Animals.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System;
+
+namespace DotNetLearningHub.OOP
+{
+    // 1. Base Class (คลาสแม่)
+    public class Animal
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+
+        public Animal(string name, int age)
+        {
+            Name = name;
+            Age = age;
+        }
+
+        public void Eat()
+        {
+            Console.WriteLine($"🍽️ {Name} กำลังกินอาหารอย่างเอร็ดอร่อย");
+        }
+
+        // คีย์เวิร์ด virtual อนุญาตให้คลาสลูกเขียนทับ (override) พฤติกรรมได้
+        public virtual void MakeSound()
+        {
+            Console.WriteLine($"🔊 {Name} กำลังส่งเสียงทั่วไป");
+        }
+    }
+
+    // 2. Derived Class 1 (คลาสลูก Dog สืบทอดจาก Animal ด้วยเครื่องหมาย :)
+    public class Dog : Animal
+    {
+        public string Breed { get; set; }
+
+        // : base(name, age) ส่งพารามิเตอร์ขึ้นไปให้ Animal Constructor จัดการ
+        public Dog(string name, int age, string breed) : base(name, age)
+        {
+            Breed = breed;
+        }
+
+        // คีย์เวิร์ด override เขียนทับการส่งเสียงให้เป็นเสียงเห่า
+        public override void MakeSound()
+        {
+            Console.WriteLine($"🐕 {Name} (พันธุ์ {Breed}) เห่า: โฮ่งๆ! บ๊อกๆ!");
+        }
+
+        // เมธอดเฉพาะตัวของสุนัข
+        public void FetchStick()
+        {
+            Console.WriteLine($"🎾 {Name} วิ่งไปคาบกิ่งไม้กลับมาอย่างรวดเร็ว!");
+        }
+    }
+
+    // 3. Derived Class 2 (คลาสลูก Cat สืบทอดจาก Animal)
+    public class Cat : Animal
+    {
+        public bool IsLazy { get; set; }
+
+        public Cat(string name, int age, bool isLazy) : base(name, age)
+        {
+            IsLazy = isLazy;
+        }
+
+        public override void MakeSound()
+        {
+            Console.WriteLine($"🐈 {Name} ร้อง: เหมียว~ เหมียว~ ฟี้...");
+        }
+
+        public void ScratchSofa()
+        {
+            Console.WriteLine($"🛋️ {Name} กำลังลับเล็บกับโซฟาจนเป็นรอย!");
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Console.WriteLine("=== การสืบทอดคุณสมบัติ (Inheritance Demo) ===\n");
+
+            Dog lucky = new Dog("ลัคกี้", 3, "โกลเด้น รีทรีฟเวอร์");
+            lucky.Eat();         // เมธอดที่สืบทอดมาจาก Animal
+            lucky.MakeSound();   // เมธอดที่ override ใหม่
+            lucky.FetchStick();  // เมธอดเฉพาะของ Dog
+
+            Console.WriteLine();
+
+            Cat mimi = new Cat("มี่มี่", 2, true);
+            mimi.Eat();          // เมธอดที่สืบทอดมาจาก Animal
+            mimi.MakeSound();    // เมธอดที่ override ใหม่
+            mimi.ScratchSofa();  // เมธอดเฉพาะของ Cat
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">=== การสืบทอดคุณสมบัติ (Inheritance Demo) ===
+
+🍽️ ลัคกี้ กำลังกินอาหารอย่างเอร็ดอร่อย
+🐕 ลัคกี้ (พันธุ์ โกลเด้น รีทรีฟเวอร์) เห่า: โฮ่งๆ! บ๊อกๆ!
+🎾 ลัคกี้ วิ่งไปคาบกิ่งไม้กลับมาอย่างรวดเร็ว!
+
+🍽️ มี่มี่ กำลังกินอาหารอย่างเอร็ดอร่อย
+🐈 มี่มี่ ร้อง: เหมียว~ เหมียว~ ฟี้...
+🛋️ มี่มี่ กำลังลับเล็บกับโซฟาจนเป็นรอย!</span>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">💡 รู้หรือไม่: Single Inheritance ใน C#</div>
+          <p style="margin-bottom: 0;">ภาษา C# ยอมให้คลาสหนึ่งสืบทอดจาก <strong>คลาสแม่ได้เพียงคลาสเดียวเท่านั้น (Single Class Inheritance)</strong> เพื่อป้องกันความสับสนเรื่อง Diamond Problem แต่สามารถ <strong>Implement หลาย Interface พร้อมกันได้ไม่จำกัด!</strong></p>
+        </div>
+      </section>
+
+      <!-- ─── Section 4: Polymorphism ─── -->
+      <section class="lesson-section reveal" id="polymorphism">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(210, 168, 255, 0.2); color: var(--syn-method); border: 1px solid var(--syn-method);">04</div>
+          <div>
+            <h2>การมีได้หลายรูปแบบ (Polymorphism)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">เรียกใช้คำสั่งเดียวกันผ่านตัวแปรประเภทแม่ แต่ผลลัพธ์ปรับเปลี่ยนตามประเภทของออบเจกต์ลูกจริง</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🎭</span>
+            <span class="concept-title">หน้ากากเดียวกัน แต่พฤติกรรมต่างกัน (Polymorphism Analogy)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🎮 ปุ่มกด Action เดียวกันบนจอยเกม</div>
+              <p class="analogy-text">
+                ลองนึกถึงปุ่ม <strong>[X - Attack]</strong> บนจอยเกมคอนโซล:
+                <br>• ถ้าตัวละครปัจจุบันเป็น <em>อัศวิน (Knight)</em> ➔ ตัวละครจะ <strong>กวัดแกว่งดาบ</strong>
+                <br>• ถ้าตัวละครเป็น <em>นักธนู (Archer)</em> ➔ ตัวละครจะ <strong>ยิงลูกธนู</strong>
+                <br>• ถ้าตัวละครเป็น <em>จอมเวท (Mage)</em> ➔ ตัวละครจะ <strong>ร่ายคาถาลูกไฟ</strong>
+                <br>ระบบเกมไม่ต้องเขียน if-else แยก 100 ชนิดตัวละคร แค่สั่ง <code>hero.Attack()</code> ตัวละครจะตอบสนองด้วยท่าทางเฉพาะตัวของมันเอง นี่คือหัวใจของ <strong>Dynamic Polymorphism</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>PolymorphismDemo.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+namespace DotNetLearningHub.OOP
+{
+    // คลาสลูกตัวที่ 3
+    public class Bird : Animal
+    {
+        public Bird(string name, int age) : base(name, age) { }
+
+        public override void MakeSound()
+        {
+            Console.WriteLine($"🐦 {Name} ส่งเสียงร้อง: จิ๊บๆ! จิ๊บๆ! 🎶");
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Console.WriteLine("=== การทำงานของ Runtime Polymorphism ===\n");
+
+            // เก็บออบเจกต์ต่างชนิดกัน (Dog, Cat, Bird) ไว้ใน List<Animal> เดียวกัน
+            List<Animal> farmZoo = new List<Animal>()
+            {
+                new Dog("เจ้าตูบ", 4, "ไซบีเรียน"),
+                new Cat("เจ้าส้ม", 2, false),
+                new Bird("นกแก้วโนริ", 1),
+                new Dog("โกโก้", 5, "พุดเดิ้ล")
+            };
+
+            Console.WriteLine("📢 เรียกคำสั่ง animal.MakeSound() วนลูปทุกตัว:");
+            Console.WriteLine("---------------------------------------------");
+
+            // วนลูปสั่งงานด้วยคำสั่งเดียวกันทั้งหมด!
+            foreach (Animal animal in farmZoo)
+            {
+                // .NET Runtime จะตัดสินใจเรียก MakeSound() ของตัวจริง (Dog/Cat/Bird) ณ ตอนรัน
+                animal.MakeSound();
+            }
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">=== การทำงานของ Runtime Polymorphism ===
+
+📢 เรียกคำสั่ง animal.MakeSound() วนลูปทุกตัว:
+---------------------------------------------
+🐕 เจ้าตูบ (พันธุ์ ไซบีเรียน) เห่า: โฮ่งๆ! บ๊อกๆ!
+🐈 เจ้าส้ม ร้อง: เหมียว~ เหมียว~ ฟี้...
+🐦 นกแก้วโนริ ส่งเสียงร้อง: จิ๊บๆ! จิ๊บๆ! 🎶
+🐕 โกโก้ (พันธุ์ พุดเดิ้ล) เห่า: โฮ่งๆ! บ๊อกๆ!</span>
+          </div>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">💡 ความแตกต่าง: Overriding vs Overloading</div>
+          <p style="margin-bottom: 0;">
+            • <strong>Method Overriding (Dynamic Polymorphism):</strong> คลาสลูกเขียนทับเมธอดของคลาสแม่ (ชื่อเหมือน, พารามิเตอร์เหมือนกันทุกอย่าง) ทำงานตอน Run-time
+            <br>• <strong>Method Overloading (Static Polymorphism):</strong> เขียนเมธอดชื่อเดียวกันภายในคลาสเดียวกัน แต่เปลี่ยนจำนวนหรือชนิดข้อมูลของ Parameter เช่น <code>Add(int a, int b)</code> กับ <code>Add(double a, double b)</code> ตัดสินใจตอน Compile-time
+          </p>
+        </div>
+      </section>
+
+      <!-- ─── Section 5: Interface ─── -->
+      <section class="lesson-section reveal" id="interface">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(163, 113, 247, 0.2); color: var(--accent-info); border: 1px solid var(--accent-info);">05</div>
+          <div>
+            <h2>อินเทอร์เฟซและสัญญาการทำงาน (Interface)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">กำหนดสัญญา (Contract) บังคับว่าคลาสที่นำไปใช้ต้องมีเมธอดอะไรบ้าง รองรับการต่อแบบแยกชิ้นส่วน (Loose Coupling)</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🔌</span>
+            <span class="concept-title">ปลั๊กไฟและเต้ารับสากล (Interface Analogy)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">⚡ สัญญารูปทรงของเต้ารับไฟฟ้า</div>
+              <p class="analogy-text">
+                • <strong>Interface</strong> เหมือน <em>"มาตรฐานเต้าเสียบปลั๊กไฟ 3 ขา"</em> — ระบุแค่ว่าใครจะเสียบต้องมี 3 ขาและรับไฟ 220V แต่ไม่สนใจว่าอุปกรณ์ที่นำมาเสียบจะเป็น พัดลม, ตู้เย็น, ไมโครเวฟ หรือคอมพิวเตอร์
+                <br>• <strong>Convention ใน C#:</strong> ชื่อ Interface จะขึ้นต้นด้วยตัวอักษร <strong><code>I</code></strong> เสมอ เช่น <code>IPayable</code>, <code>ILogger</code>, <code>IDisposable</code>, <code>IRepository</code>
+                <br>• Interface มีแต่หัวเมธอด (Method Signature) ไม่มีการเขียนโค้ดการทำงาน (Implementation) จนกระทั่งคลาสที่เอาไปใช้นำไปเติมเนื้อหาจริง
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>PaymentService.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System;
+
+namespace DotNetLearningHub.OOP
+{
+    // 1. ประกาศ Interface สัญญาสำหรับการชำระเงิน
+    public interface IPayable
+    {
+        string PaymentProvider { get; }
+        bool ProcessPayment(decimal amount);
+    }
+
+    // 2. ประกาศ Interface เพิ่มเติมสำหรับการออกใบเสร็จ
+    public interface IReceiptGenerator
+    {
+        void PrintReceipt(string transactionId, decimal amount);
+    }
+
+    // 3. คลาสชำระผ่านบัตรเครดิต (Implement ทั้ง 2 Interface)
+    public class CreditCardPayment : IPayable, IReceiptGenerator
+    {
+        public string PaymentProvider => "VISA / Mastercard Gateway";
+        public string CardNumber { get; set; }
+
+        public CreditCardPayment(string cardNumber)
+        {
+            CardNumber = cardNumber;
+        }
+
+        public bool ProcessPayment(decimal amount)
+        {
+            string maskedCard = CardNumber.Substring(CardNumber.Length - 4);
+            Console.WriteLine($"💳 กำลังตัดบัตรเครดิตหมายเลข ****-****-****-{maskedCard} ยอด: {amount:N2} บาท");
+            Console.WriteLine($"   ➔ ผ่านระบบ {PaymentProvider} สำเร็จ!");
+            return true;
+        }
+
+        public void PrintReceipt(string transactionId, decimal amount)
+        {
+            Console.WriteLine($"   🧾 [E-Receipt #{transactionId}]: ยอดชำระ {amount:N2} บาท (สถานะ: ชำระแล้ว)\n");
+        }
+    }
+
+    // 4. คลาสชำระผ่านพร้อมเพย์ QR Code
+    public class PromptPayPayment : IPayable, IReceiptGenerator
+    {
+        public string PaymentProvider => "Thai QR Payment (PromptPay)";
+        public string PhoneNumber { get; set; }
+
+        public PromptPayPayment(string phoneNumber)
+        {
+            PhoneNumber = phoneNumber;
+        }
+
+        public bool ProcessPayment(decimal amount)
+        {
+            Console.WriteLine($"📱 สร้าง QR Code พร้อมเพย์เบอร์ {PhoneNumber} ยอด: {amount:N2} บาท");
+            Console.WriteLine($"   ➔ ลูกค้าสแกนและโอนเงินเรียบร้อยผ่าน {PaymentProvider}");
+            return true;
+        }
+
+        public void PrintReceipt(string transactionId, decimal amount)
+        {
+            Console.WriteLine($"   🧾 [PromptPay Slip #{transactionId}]: ยอดเงินเข้าบัญชี {amount:N2} บาท เรียบร้อย\n");
+        }
+    }
+
+    // 5. คลาส Checkout ในระบบ E-Commerce ที่เรียกใช้งานผ่าน Interface (Loose Coupling)
+    public class CheckoutService
+    {
+        public void CompleteOrder(IPayable paymentMethod, decimal totalAmount)
+        {
+            Console.WriteLine($"🛒 เริ่มกระบวนการชำระเงินยอดรวม: {totalAmount:N2} บาท");
+            bool isSuccess = paymentMethod.ProcessPayment(totalAmount);
+
+            if (isSuccess && paymentMethod is IReceiptGenerator receiptService)
+            {
+                string txId = "TXN-" + Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+                receiptService.PrintReceipt(txId, totalAmount);
+            }
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Console.WriteLine("=== ระบบชำระเงินด้วย Interface (Polymorphic Payments) ===\n");
+
+            var checkout = new CheckoutService();
+
+            // ชำระด้วยบัตรเครดิต
+            IPayable card = new CreditCardPayment("4532112233448899");
+            checkout.CompleteOrder(card, 3500m);
+
+            // ชำระด้วย PromptPay
+            IPayable qr = new PromptPayPayment("081-234-5678");
+            checkout.CompleteOrder(qr, 790m);
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">=== ระบบชำระเงินด้วย Interface (Polymorphic Payments) ===
+
+🛒 เริ่มกระบวนการชำระเงินยอดรวม: 3,500.00 บาท
+💳 กำลังตัดบัตรเครดิตหมายเลข ****-****-****-8899 ยอด: 3,500.00 บาท
+   ➔ ผ่านระบบ VISA / Mastercard Gateway สำเร็จ!
+   🧾 [E-Receipt #TXN-7A8B9C0D]: ยอดชำระ 3,500.00 บาท (สถานะ: ชำระแล้ว)
+
+🛒 เริ่มกระบวนการชำระเงินยอดรวม: 790.00 บาท
+📱 สร้าง QR Code พร้อมเพย์เบอร์ 081-234-5678 ยอด: 790.00 บาท
+   ➔ ลูกค้าสแกนและโอนเงินเรียบร้อยผ่าน Thai QR Payment (PromptPay)
+   🧾 [PromptPay Slip #TXN-1F2E3D4C]: ยอดเงินเข้าบัญชี 790.00 บาท เรียบร้อย</span>
+          </div>
+        </div>
+
+        <!-- Interface vs Abstract Class Comparison Table -->
+        <div style="margin-top: var(--space-xl);">
+          <h3 style="margin-bottom: var(--space-md); font-size: 1.15rem;">📊 ตารางเปรียบเทียบ: Interface vs Abstract Class</h3>
+          <div style="overflow-x: auto;">
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th style="width: 25%;">คุณสมบัติ</th>
+                  <th style="width: 37.5%; color: var(--accent-info);">🔌 Interface</th>
+                  <th style="width: 37.5%; color: var(--syn-method);">🏛️ Abstract Class</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>เป้าหมายหลัก</strong></td>
+                  <td>กำหนด <em>"สัญญา (Can-Do)"</em> ว่าทำอะไรได้บ้าง</td>
+                  <td>สร้าง <em>"โครงสร้างแกนกลาง (Is-A)"</em> ของตระกูลคลาส</td>
+                </tr>
+                <tr>
+                  <td><strong>การสืบทอด (Inheritance)</strong></td>
+                  <td><span class="badge badge-success">หลายตัวได้ (Multiple)</span> คลาสหนึ่ง implement ได้หลาย interface</td>
+                  <td><span class="badge badge-warning">ได้เพียงคลาสเดียว (Single)</span> ต่อหนึ่งคลาสลูก</td>
+                </tr>
+                <tr>
+                  <td><strong>มี Constructor หรือไม่?</strong></td>
+                  <td>❌ ไม่มี Constructor</td>
+                  <td>✅ มี Constructor เพื่อเซ็ตค่าเริ่มต้นให้คลาสแม่ได้</td>
+                </tr>
+                <tr>
+                  <td><strong>State &amp; Fields</strong></td>
+                  <td>❌ ไม่มี Field เก็บสถานะตัวแปรทั่วไป (มีได้เฉพาะ Property/Method Signature)</td>
+                  <td>✅ สามารถมี Field, Protected Variable และ State ภายในได้</td>
+                </tr>
+                <tr>
+                  <td><strong>โค้ดการทำงานจริง</strong></td>
+                  <td>เดิมไม่มี (ใน C# 8+ มี Default Interface Method ได้)</td>
+                  <td>✅ ผสมผสานได้ทั้ง <code>abstract method</code> และ <code>concrete method</code> ทั่วไป</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 6: Abstract Class ─── -->
+      <section class="lesson-section reveal" id="abstract-class">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(255, 123, 114, 0.2); color: var(--syn-keyword); border: 1px solid var(--syn-keyword);">06</div>
+          <div>
+            <h2>คลาสนามธรรม (Abstract Class)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">คลาสแม่แบบที่ไม่สามารถสร้างออบเจกต์ตรงๆ ได้ ออกแบบมาเพื่อเป็นฐานให้คลาสอื่นนำไปสืบทอดและเติมเต็ม</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">📐</span>
+            <span class="concept-title">รูปทรงเรขาคณิตทั่วไป (Shape Analogy)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🔺 แนวคิดรูปทรงกับความเป็นจริง</div>
+              <p class="analogy-text">
+                หากมีคนสั่งคุณว่า <em>"ช่วยวาดรูปทรงเรขาคณิต (Shape) ให้ดูหน่อยสิ"</em> คุณจะถามกลับทันทีว่า <em>"จะให้วาดวงกลม สามเหลี่ยม หรือสี่เหลี่ยม?"</em>
+                <br>เพราะคำว่า "รูปทรง" เป็นเพียงนามธรรม (Abstract) ไม่มีสูตรคำนวณพื้นที่ตายตัวจนกว่าจะระบุว่าเป็นรูปทรงอะไรกันแน่
+                <br>ดังนั้นเราจึงสร้าง <code>abstract class Shape</code> ไว้เป็นแม่แบบ และให้ <code>Circle</code> และ <code>Rectangle</code> นำไป Implement สูตรคำนวณ <code>CalculateArea()</code> ของตนเอง
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>Shapes.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System;
+
+namespace DotNetLearningHub.OOP
+{
+    // 1. ประกาศ Abstract Class (ห้ามใช้ new Shape() ตรงๆ)
+    public abstract class Shape
+    {
+        public string Color { get; set; }
+
+        protected Shape(string color)
+        {
+            Color = color;
+        }
+
+        // Abstract Method: ไม่มีเนื้อโค้ด บังคับให้คลาสลูกต้อง override เสมอ!
+        public abstract double CalculateArea();
+        public abstract double CalculatePerimeter();
+
+        // Concrete Method: มีโค้ดพร้อมใช้งาน คลาสลูกเรียกใช้ได้ทันที
+        public void DisplayInfo()
+        {
+            Console.WriteLine($"🎨 รูปทรงสี: {Color}");
+            Console.WriteLine($"   📐 พื้นที่: {CalculateArea():N2} ตร.หน่วย");
+            Console.WriteLine($"   📏 ความยาวรอบรูป: {CalculatePerimeter():N2} หน่วย\n");
+        }
+    }
+
+    // 2. Concrete Class 1: วงกลม
+    public class Circle : Shape
+    {
+        public double Radius { get; set; }
+
+        public Circle(string color, double radius) : base(color)
+        {
+            Radius = radius;
+        }
+
+        public override double CalculateArea()
+        {
+            return Math.PI * Radius * Radius;
+        }
+
+        public override double CalculatePerimeter()
+        {
+            return 2 * Math.PI * Radius;
+        }
+    }
+
+    // 3. Concrete Class 2: สี่เหลี่ยมผืนผ้า
+    public class Rectangle : Shape
+    {
+        public double Width { get; set; }
+        public double Height { get; set; }
+
+        public Rectangle(string color, double width, double height) : base(color)
+        {
+            Width = width;
+            Height = height;
+        }
+
+        public override double CalculateArea()
+        {
+            return Width * Height;
+        }
+
+        public override double CalculatePerimeter()
+        {
+            return 2 * (Width + Height);
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Console.WriteLine("=== การทำงานของ Abstract Class (Shapes) ===\n");
+
+            // Shape s = new Shape("แดง"); // ❌ Compile Error: สร้าง instance จาก abstract class ไม่ได้!
+
+            Shape circle = new Circle("แดงสด", 5.0);
+            Shape rect = new Rectangle("น้ำเงิน", 4.0, 6.0);
+
+            Console.WriteLine("⭕ ข้อมูลวงกลม:");
+            circle.DisplayInfo();
+
+            Console.WriteLine("🟦 ข้อมูลสี่เหลี่ยมผืนผ้า:");
+            rect.DisplayInfo();
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">=== การทำงานของ Abstract Class (Shapes) ===
+
+⭕ ข้อมูลวงกลม:
+🎨 รูปทรงสี: แดงสด
+   📐 พื้นที่: 78.54 ตร.หน่วย
+   📏 ความยาวรอบรูป: 31.42 หน่วย
+
+🟦 ข้อมูลสี่เหลี่ยมผืนผ้า:
+🎨 รูปทรงสี: น้ำเงิน
+   📐 พื้นที่: 24.00 ตร.หน่วย
+   📏 ความยาวรอบรูป: 20.00 หน่วย</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 7: Enum & Static ─── -->
+      <section class="lesson-section reveal" id="enum-static">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(210, 153, 34, 0.2); color: var(--accent-warning); border: 1px solid var(--accent-warning);">07</div>
+          <div>
+            <h2>อีนัมและสมาชิกสแตติก (Enum &amp; Static Members)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">กำหนดชุดค่าคงที่ที่มีความหมายชัดเจน และสร้างคลาสเครื่องมือส่วนกลางโดยไม่ต้องสร้างออบเจกต์</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">⚙️</span>
+            <span class="concept-title">เครื่องมือส่วนกลางและชุดตัวเลือก (Enum &amp; Static)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">📋 ตัวเลือกเมนู และ ตู้เครื่องมือส่วนกลาง</div>
+              <p class="analogy-text">
+                • <strong><code>enum</code> (Enumeration)</strong> เหมือน <em>"ตัวเลือกในแบบฟอร์ม"</em> — แทนที่จะเก็บสถานะออเดอร์เป็นข้อความ string "paid", "shipped" ที่อาจพิมพ์ผิดง่าย เรากำหนดเป็น enum <code>OrderStatus.Paid</code> ที่มี Type-Safety และ IntelliSense แนะนำอัตโนมัติ
+                <br>• <strong><code>static</code> (สมาชิกส่วนกลาง)</strong> เหมือน <em>"เครื่องชงกาแฟส่วนกลางของออฟฟิศ"</em> — เป็นของที่แชร์ร่วมกันทั้งบริษัท ทุกคนเรียกใช้ได้ทันทีโดยไม่ต้องซื้อเครื่องชงกาแฟส่วนตัวเข้ามาใหม่ (ไม่ต้องใช้คำสั่ง <code>new</code>)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>OrderSystem.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System;
+
+namespace DotNetLearningHub.OOP
+{
+    // 1. ประกาศ Enum สถานะของคำสั่งซื้อ
+    public enum OrderStatus
+    {
+        Pending = 1,    // รอดำเนินการ
+        Paid = 2,       // ชำระเงินแล้ว
+        Shipped = 3,    // จัดส่งแล้ว
+        Delivered = 4,  // ส่งถึงผู้รับเรียบร้อย
+        Cancelled = 5   // ยกเลิกคำสั่งซื้อ
+    }
+
+    // 2. Static Helper Class: คลาสยูทิลิตี้ส่วนกลาง ไม่ต้อง new
+    public static class OrderHelper
+    {
+        public static decimal VatRate = 0.07m; // ภาษีมูลค่าเพิ่ม 7%
+
+        // Static Method คำนวณราคาสุทธิรวม VAT
+        public static decimal CalculateGrossTotal(decimal netAmount)
+        {
+            return netAmount + (netAmount * VatRate);
+        }
+
+        // Static Method แปลงสถานะเป็นข้อความภาษาไทยด้วย C# Pattern Matching
+        public static string GetStatusBadge(OrderStatus status) => status switch
+        {
+            OrderStatus.Pending   => "⏳ รอดำเนินการชำระเงิน",
+            OrderStatus.Paid      => "💳 ชำระเงินสำเร็จ เตรียมแพ็กของ",
+            OrderStatus.Shipped   => "🚚 อยู่ระหว่างจัดส่งสินค้า",
+            OrderStatus.Delivered => "✅ สินค้าส่งถึงมือผู้รับแล้ว",
+            OrderStatus.Cancelled => "❌ รายการนี้ถูกยกเลิก",
+            _                     => "❓ ไม่ทราบสถานะ"
+        };
+    }
+
+    // 3. คลาสคำสั่งซื้อ
+    public class Order
+    {
+        public string OrderId { get; init; }
+        public decimal NetAmount { get; set; }
+        public OrderStatus Status { get; set; }
+
+        public Order(string orderId, decimal netAmount)
+        {
+            OrderId = orderId;
+            NetAmount = netAmount;
+            Status = OrderStatus.Pending; // เริ่มต้นเป็น Pending เสมอ
+        }
+
+        public void PrintInvoice()
+        {
+            decimal totalWithVat = OrderHelper.CalculateGrossTotal(NetAmount);
+            string statusText = OrderHelper.GetStatusBadge(Status);
+
+            Console.WriteLine($"📄 คำสั่งซื้อ: {OrderId}");
+            Console.WriteLine($"   💵 ยอดสุทธิ: {NetAmount:N2} บาท | รวม VAT 7%: {totalWithVat:N2} บาท");
+            Console.WriteLine($"   📌 สถานะปัจจุบัน: {statusText}\n");
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Console.WriteLine("=== ระบบจัดการคำสั่งซื้อ (Enum & Static Demo) ===\n");
+
+            var order1 = new Order("ORD-2026-001", 2000m);
+            order1.PrintInvoice();
+
+            // อัปเดตสถานะคำสั่งซื้อ
+            Console.WriteLine("🔄 ลูกค้าโอนเงินเข้ามาแล้ว...");
+            order1.Status = OrderStatus.Paid;
+            order1.PrintInvoice();
+
+            Console.WriteLine("🔄 ไรเดอร์นำสินค้าไปส่ง...");
+            order1.Status = OrderStatus.Shipped;
+            order1.PrintInvoice();
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">=== ระบบจัดการคำสั่งซื้อ (Enum & Static Demo) ===
+
+📄 คำสั่งซื้อ: ORD-2026-001
+   💵 ยอดสุทธิ: 2,000.00 บาท | รวม VAT 7%: 2,140.00 บาท
+   📌 สถานะปัจจุบัน: ⏳ รอดำเนินการชำระเงิน
+
+🔄 ลูกค้าโอนเงินเข้ามาแล้ว...
+📄 คำสั่งซื้อ: ORD-2026-001
+   💵 ยอดสุทธิ: 2,000.00 บาท | รวม VAT 7%: 2,140.00 บาท
+   📌 สถานะปัจจุบัน: 💳 ชำระเงินสำเร็จ เตรียมแพ็กของ
+
+🔄 ไรเดอร์นำสินค้าไปส่ง...
+📄 คำสั่งซื้อ: ORD-2026-001
+   💵 ยอดสุทธิ: 2,000.00 บาท | รวม VAT 7%: 2,140.00 บาท
+   📌 สถานะปัจจุบัน: 🚚 อยู่ระหว่างจัดส่งสินค้า</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 8: Inline Quiz ─── -->
+      <section class="lesson-section reveal" id="quiz-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(210, 168, 255, 0.2); color: var(--syn-method); border: 1px solid var(--syn-method);">08</div>
+          <div>
+            <h2>แบบทดสอบวัดความเข้าใจ (Level 2 Quiz)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ทดสอบความรู้ความเข้าใจเรื่อง OOP และการออกแบบคลาสในภาษา C# จำนวน 5 ข้อ</p>
+          </div>
+        </div>
+
+        <!-- Quiz Container rendered by QuizEngine -->
+        <div id="csharp-oop-quiz"></div>
+      </section>
+
+      <!-- ─── Next Lesson Navigation ─── -->
+      <div class="card mt-2xl reveal" style="border-color: var(--border-active); background: linear-gradient(135deg, rgba(104, 33, 122, 0.15) 0%, rgba(22, 27, 34, 0.8) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge badge-success mb-xs">🎉 ยอดเยี่ยม! ผ่านบทเรียน C# OOP</span>
+            <h3 style="margin-top: 4px; margin-bottom: 4px;">พร้อมไปต่อกับ Level 3: LINQ &amp; Collections แล้วหรือยัง?</h3>
+            <p class="text-muted" style="margin-bottom: 0;">เรียนรู้การจัดการ List, Dictionary, HashSet และการ Query ข้อมูลความเร็วสูงด้วย LINQ</p>
+          </div>
+          <div>
+            <a href="./csharp-collections.html" class="btn btn-primary btn-lg">
+              <span>ไปบทเรียนถัดไป Level 3 →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Mark this lesson as completed in Progress tracker
+      if (typeof Progress !== 'undefined') {
+        Progress.completeLesson('csharp-oop');
+        Progress.setModuleProgress('csharp', 50);
+      }
+
+      // Quiz Questions Definition (5 Comprehensive OOP Questions)
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ข้อใดเปรียบเทียบความสัมพันธ์ระหว่าง "Class" และ "Object" ได้ถูกต้องและชัดเจนที่สุด?',
+          options: [
+            'Class คือบ้านที่สร้างเสร็จแล้ว ส่วน Object คือแบบพิมพ์เขียวบนกระดาษ',
+            'Class คือแบบพิมพ์เขียว (Blueprint) ที่กำหนดโครงสร้าง ส่วน Object คือสิ่งของจริง (Instance) ที่สร้างขึ้นในหน่วยความจำ RAM',
+            'Class และ Object คือสิ่งเดียวกันทุกประการ สามารถใช้คำแทนกันได้เสมอ',
+            'Object สามารถมีได้เพียงตัวเดียวต่อหนึ่ง Class'
+          ],
+          answer: 1,
+          explanation: 'Class คือแบบพิมพ์เขียวหรือโครงสร้างต้นแบบ ส่วน Object (Instance) คือวัตถุจริงที่ถูกจองพื้นที่ใน Heap Memory ผ่านคำสั่ง new โดยเราสามารถสร้าง Object กี่ตัวก็ได้จาก Class ใบเดียวกัน'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'หลักการ Encapsulation (การห่อหุ้มข้อมูล) มีจุดประสงค์หลักเพื่ออะไรในทางปฏิบัติ?',
+          options: [
+            'เพื่อให้คลาสสามารถสืบทอดฟังก์ชันการทำงานจากหลายคลาสแม่ได้พร้อมกัน',
+            'เพื่อปกป้องข้อมูลภายใน (Information Hiding) ป้องกันการแก้ไขค่าที่ไม่ถูกต้องโดยตรง และควบคุมการเข้าถึงผ่าน Property (get/set) หรือ Method',
+            'เพื่อบีบอัดขนาดไฟล์ของโค้ดให้เล็กลง',
+            'เพื่อให้เมธอดทำงานแบบ Asynchronous ได้เร็วขึ้น'
+          ],
+          answer: 1,
+          explanation: 'Encapsulation คือการซ่อนฟิลด์ภายในเป็น private แล้วเปิดให้ภายนอกเข้าถึงผ่าน Property หรือ Method ที่มี Logic ตรวจสอบความถูกต้อง (Validation) ช่วยรักษาความสมบูรณ์ของข้อมูลใน Object'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ในภาษา C# หากต้องการให้เมธอดในคลาสแม่ (Base Class) สามารถถูกเขียนทับ (Override) พฤติกรรมในคลาสลูกได้ จะต้องประกาศคีย์เวิร์ดใดที่คลาสแม่ และคลาสลูกตามลำดับ?',
+          options: [
+            'คลาสแม่ใช้ static, คลาสลูกใช้ void',
+            'คลาสแม่ใช้ virtual (หรือ abstract), คลาสลูกใช้ override',
+            'คลาสแม่ใช้ private, คลาสลูกใช้ public',
+            'คลาสแม่ใช้ new, คลาสลูกใช้ base'
+          ],
+          answer: 1,
+          explanation: 'สำหรับการทำ Method Overriding ใน C# เมธอดที่คลาสแม่ต้องเปิดทางด้วยคีย์เวิร์ด virtual (หรือ abstract) และที่คลาสลูกต้องใช้คีย์เวิร์ด override เพื่อระบุว่าเป็นการเขียนทับการทำงานเดิม'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'ข้อใดคือความแตกต่างสำคัญที่สุดระหว่าง Interface และ Abstract Class ในภาษา C#?',
+          options: [
+            'Interface สามารถมี Constructor ได้ แต่ Abstract Class ไม่มี Constructor',
+            'หนึ่งคลาสสามารถ Implement ได้หลาย Interface (Multiple) แต่สามารถสืบทอด (Inherit) ได้เพียง 1 คลาสแม่เท่านั้น (Single Class Inheritance)',
+            'Abstract Class ไม่สามารถมีโค้ดการทำงานจริง (Concrete Method) ได้เลย',
+            'Interface ไม่สามารถกำหนด Method Signature ได้'
+          ],
+          answer: 1,
+          explanation: 'C# ยึดหลัก Single Class Inheritance (สืบทอดคลาสแม่ได้คลาสเดียว ไม่ว่าจะเป็น abstract หรือธรรมดา) แต่เปิดให้หนึ่งคลาสสามารถ Implement หลาย Interface ได้พร้อมกัน เพื่อความยืดหยุ่นในการเขียนโปรแกรมแบบ Loose Coupling'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'หากคลาสลูกต้องการส่งค่าพารามิเตอร์ขึ้นไปเรียกใช้งาน Constructor ของคลาสแม่ จะต้องใช้คีย์เวิร์ดใดต่อไปนี้?',
+          options: [
+            ': this(...)',
+            ': base(...)',
+            ': parent(...)',
+            ': super(...)'
+          ],
+          answer: 1,
+          explanation: 'ใน C# เราใช้คีย์เวิร์ด : base(...) ต่อท้ายชื่อ Constructor ของคลาสลูก เพื่อส่งต่อ Arguments ขึ้นไปให้ Constructor ของคลาสแม่ทำงาน (ส่วนใน Java จะใช้ super())'
+        }
+      ];
+
+      // Initialize Quiz
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('csharp-oop-quiz', quizQuestions, {
+          quizId: 'csharp-oop',
+          showTimer: false,
+          showExplanation: true
+        });
+      }
+    });
+  </script>
+</body>
+</html>

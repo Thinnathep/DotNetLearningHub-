@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blazor พื้นฐาน &amp; Razor Syntax — DotNet Learning Hub</title>
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <style>
+    /* Custom Styling for Blazor Intro Page */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(81, 43, 212, 0.25) 0%, rgba(104, 33, 122, 0.15) 50%, rgba(13, 17, 23, 0.9) 100%);
+      border: 1px solid rgba(138, 92, 246, 0.3);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-xl);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-banner::after {
+      content: '⚡';
+      position: absolute;
+      right: 20px;
+      bottom: -15px;
+      font-size: 8rem;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+
+    /* River Bridge Analogy Visual */
+    .bridge-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+    }
+    .bridge-visual {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: var(--space-md);
+      align-items: center;
+      margin: var(--space-lg) 0;
+    }
+    @media (max-width: 768px) {
+      .bridge-visual {
+        grid-template-columns: 1fr;
+      }
+    }
+    .bank-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      text-align: center;
+      transition: all var(--transition-normal);
+    }
+    .bank-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+    .bank-client { border-top: 3px solid #f7df1e; }
+    .bank-server { border-top: 3px solid #79c0ff; }
+    .bridge-span {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-md);
+      background: linear-gradient(90deg, rgba(81, 43, 212, 0.2), rgba(138, 92, 246, 0.4), rgba(81, 43, 212, 0.2));
+      border: 2px dashed #8a5cf6;
+      border-radius: var(--radius-md);
+      min-width: 140px;
+      text-align: center;
+    }
+    .bridge-badge {
+      background: #8a5cf6;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      margin-bottom: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Hosting Model Visual Cards */
+    .model-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+    .model-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      display: flex;
+      flex-direction: column;
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+    .model-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-glow);
+    }
+    .model-card.wasm { border-top: 4px solid #8a5cf6; }
+    .model-card.server { border-top: 4px solid #58a6ff; }
+    .model-card.auto { border-top: 4px solid #3fb950; }
+
+    .model-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+    .model-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+    .wasm .model-icon-box { background: rgba(138, 92, 246, 0.15); color: #8a5cf6; }
+    .server .model-icon-box { background: rgba(88, 166, 255, 0.15); color: #58a6ff; }
+    .auto .model-icon-box { background: rgba(63, 185, 80, 0.15); color: #3fb950; }
+
+    .model-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    .model-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: var(--font-code);
+    }
+    .model-list {
+      list-style: none;
+      padding: 0;
+      margin: var(--space-md) 0;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      flex-grow: 1;
+    }
+    .model-list li {
+      padding-left: 20px;
+      position: relative;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+    }
+    .model-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--accent-success);
+      font-weight: bold;
+    }
+    .model-list li.con::before {
+      content: '⚠️';
+      font-size: 0.75rem;
+    }
+
+    /* Razor Syntax Interactive Pill Table */
+    .syntax-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    .syntax-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      transition: all var(--transition-fast);
+    }
+    .syntax-card:hover {
+      border-color: var(--accent-primary);
+      background: var(--bg-hover);
+    }
+    .syntax-badge {
+      font-family: var(--font-code);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #ff7b72;
+      background: rgba(255, 123, 114, 0.12);
+      border: 1px solid rgba(255, 123, 114, 0.25);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      margin-bottom: var(--space-xs);
+    }
+    .syntax-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Interactive Live Blazor Sandbox Simulator */
+    .live-blazor-sim {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin: var(--space-xl) 0;
+      box-shadow: var(--shadow-md);
+    }
+    .sim-header {
+      background: var(--bg-tertiary);
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+    .sim-header .sim-tabs {
+      display: flex;
+      gap: 6px;
+    }
+    .sim-tab-btn {
+      background: transparent;
+      border: 1px solid var(--border-muted);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-family: var(--font-code);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .sim-tab-btn.active {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: #fff;
+      font-weight: 600;
+    }
+    .sim-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 380px;
+    }
+    @media (max-width: 860px) {
+      .sim-body {
+        grid-template-columns: 1fr;
+      }
+    }
+    .sim-code-pane {
+      background: #0d1117;
+      border-right: 1px solid var(--border-default);
+      overflow: auto;
+      font-size: 0.85rem;
+    }
+    .sim-code-pane pre {
+      margin: 0;
+      padding: var(--space-lg);
+      background: transparent !important;
+    }
+    .sim-render-pane {
+      background: var(--bg-primary);
+      padding: var(--space-xl);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .render-label {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 0.72rem;
+      font-family: var(--font-code);
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--accent-success);
+      border: 1px solid rgba(63, 185, 80, 0.3);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+    }
+
+    /* Visual Counter Widget */
+    .counter-widget {
+      text-align: center;
+      width: 100%;
+      max-width: 320px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      box-shadow: var(--shadow-sm);
+    }
+    .counter-display {
+      font-size: 3.5rem;
+      font-weight: 800;
+      font-family: var(--font-heading);
+      color: var(--accent-primary);
+      margin: var(--space-md) 0;
+      line-height: 1;
+      transition: transform 0.15s ease;
+    }
+    .counter-display.bump {
+      transform: scale(1.2);
+      color: #d2a8ff;
+    }
+    .counter-actions {
+      display: flex;
+      gap: var(--space-sm);
+      justify-content: center;
+    }
+
+    /* Visual Todo Widget */
+    .todo-widget {
+      width: 100%;
+      max-width: 380px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+    }
+    .todo-input-group {
+      display: flex;
+      gap: 6px;
+      margin-bottom: var(--space-md);
+    }
+    .todo-input {
+      flex: 1;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .todo-input:focus {
+      border-color: var(--accent-primary);
+    }
+    .todo-list-ui {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 180px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .todo-item-ui {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      font-size: 0.88rem;
+    }
+    .todo-item-ui.done span {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+    .todo-del-btn {
+      margin-left: auto;
+      background: transparent;
+      border: none;
+      color: var(--accent-danger);
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+    }
+    .todo-del-btn:hover {
+      background: rgba(248, 81, 73, 0.15);
+    }
+
+    /* Live Binding Visual Box */
+    .binding-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    @media (max-width: 768px) {
+      .binding-comparison {
+        grid-template-columns: 1fr;
+      }
+    }
+    .binding-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+    }
+    .binding-card.one-way { border-left: 4px solid var(--accent-warning); }
+    .binding-card.two-way { border-left: 4px solid var(--accent-success); }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div style="display: flex; align-items: center; gap: var(--space-md);">
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+      <a href="../index.html" class="site-logo">
+        <div class="logo-icon">⚡</div>
+        <span>DotNet Learning Hub</span>
+      </a>
+    </div>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <a href="quiz-arena.html" class="btn btn-outline btn-sm" style="border-radius: var(--radius-full);">
+        🎮 Quiz Arena
+      </a>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าหลัก (Dashboard)</span>
+      </a>
+    </div>
+
+    <!-- 🟣 Track C# Language -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="csharp-basics.html" class="sidebar-link">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="csharp-oop.html" class="sidebar-link">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="csharp-collections.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Collections &amp; Generics</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>LINQ &amp; Async/Await</span>
+        <span class="sidebar-badge badge-mid">Lv 4</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track ASP.NET Core & Web API -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track ASP.NET Core &amp; Web API</div>
+      <a href="dotnet-structure.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 Project Structure</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="dotnet-di.html" class="sidebar-link">
+        <span class="link-icon">💉</span>
+        <span>Dependency Injection</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="dotnet-middleware.html" class="sidebar-link">
+        <span class="link-icon">🛡️</span>
+        <span>Middleware Pipeline</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="rest-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>RESTful API Design</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="system-integration.html" class="sidebar-link">
+        <span class="link-icon">🔄</span>
+        <span>System Integration</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🔴 Track Database & ORM -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔴 Track Database &amp; ORM</div>
+      <a href="sql-basics.html" class="sidebar-link">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; CRUD</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="sql-advanced.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>SQL Advanced &amp; Index</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="sql-playground.html" class="sidebar-link">
+        <span class="link-icon">💻</span>
+        <span>SQL Playground Live</span>
+        <span class="sidebar-badge badge-new">Live</span>
+      </a>
+      <a href="ef-core.html" class="sidebar-link">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🟢 Track Blazor & Frontend (Active Track) -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟢 Track Blazor &amp; Markup</div>
+      <a href="blazor-intro.html" class="sidebar-link active">
+        <span class="link-icon">⚡</span>
+        <span>Blazor พื้นฐาน &amp; WASM</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="blazor-components.html" class="sidebar-link">
+        <span class="link-icon">🧩</span>
+        <span>Blazor Components</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="xaml-basics.html" class="sidebar-link">
+        <span class="link-icon">📐</span>
+        <span>XAML Basics (.NET MAUI)</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="xml-json.html" class="sidebar-link">
+        <span class="link-icon">📄</span>
+        <span>XML &amp; JSON Data Formats</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🟡 Track Web Basics -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟡 Track Web Basics</div>
+      <a href="html-css-js.html" class="sidebar-link">
+        <span class="link-icon">🌐</span>
+        <span>HTML, CSS &amp; JavaScript</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track DevOps & Security -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track DevOps &amp; Security</div>
+      <a href="git-cicd.html" class="sidebar-link">
+        <span class="link-icon">🐙</span>
+        <span>Git &amp; CI/CD Pipelines</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="secure-coding.html" class="sidebar-link">
+        <span class="link-icon">🔒</span>
+        <span>Secure Coding &amp; OWASP</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🟢 Track Quality & Architecture -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟢 Track Quality &amp; Process</div>
+      <a href="unit-testing.html" class="sidebar-link">
+        <span class="link-icon">🧪</span>
+        <span>Unit Testing &amp; xUnit</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="code-review.html" class="sidebar-link">
+        <span class="link-icon">👀</span>
+        <span>Code Review Best Practices</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="sdlc-agile.html" class="sidebar-link">
+        <span class="link-icon">🔄</span>
+        <span>SDLC &amp; Agile / Scrum</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="tech-docs.html" class="sidebar-link">
+        <span class="link-icon">📝</span>
+        <span>Technical Documentation</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="architecture.html" class="sidebar-link">
+        <span class="link-icon">🏛️</span>
+        <span>Clean Architecture &amp; CQRS</span>
+        <span class="sidebar-badge badge-new">Adv</span>
+      </a>
+    </div>
+
+    <!-- 🎮 Games & Arena -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🎮 Games &amp; Arena</div>
+      <a href="quiz-arena.html" class="sidebar-link">
+        <span class="link-icon">🎯</span>
+        <span>Quiz Arena</span>
+        <span class="sidebar-badge badge-new">Arena</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header reveal">
+        <div class="breadcrumb">
+          <a href="../index.html">🏠 หน้าหลัก</a>
+          <span>/</span>
+          <span>🟢 Blazor &amp; Frontend Track</span>
+          <span>/</span>
+          <span>Blazor พื้นฐาน &amp; Razor Syntax</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: linear-gradient(135deg, #512bd4, #8a5cf6); color: #fff;">⚡</div>
+          <h1>Blazor พื้นฐาน &amp; Razor Syntax</h1>
+        </div>
+        <p class="page-description">
+          สร้าง Rich Interactive Web Applications ด้วยภาษา <strong>C#</strong> และ <strong>.NET</strong> แทนการเขียน JavaScript! เรียนรู้เบื้องลึกของ 3 Hosting Models, ไวยากรณ์ Razor Syntax, Two-way Data Binding และการจัดการ State
+        </p>
+        <div class="page-meta">
+          <span class="meta-item">⭐ ระดับ: พื้นฐาน &gt; กลาง</span>
+          <span class="meta-item">⏱️ เวลา: ~45 นาที</span>
+          <span class="meta-item">⚡ รางวัล: +100 XP</span>
+          <span class="meta-item">🏷️ WebAssembly / Blazor Server / Razor / .NET 8</span>
+        </div>
+      </div>
+
+      <!-- ─── Analogy Section ─── -->
+      <div class="concept-card reveal">
+        <div class="concept-header">
+          <span class="concept-emoji">🌉</span>
+          <span class="concept-title">เปรียบเทียบให้เห็นภาพ: สะพานเชื่อมสองฝั่งแม่น้ำแห่งโลกเว็บ</span>
+        </div>
+        <div class="concept-body">
+          <div class="analogy-box">
+            <div class="analogy-label">💡 Deep Concept Analogy</div>
+            <p class="analogy-text">
+              ในโลกการพัฒนาเว็บแบบดั้งเดิม Frontend (หน้าบ้าน) และ Backend (หลังบ้าน) เปรียบเหมือน <strong>สองเมืองที่อยู่คนละฝั่งแม่น้ำ และพูดคนละภาษา</strong> — ฝั่งหน้าบ้านพูดภาษา <em>JavaScript/TypeScript</em> ส่วนฝั่งหลังบ้านพูดภาษา <em>C#</em> คุณต้องสร้างสะพานและคอยเขียนตัวแปลภาษา (DTOs/Interfaces) ซ้ำซ้อนสองรอบ!<br><br>
+              <strong>⚡ Blazor คือสะพานเชื่อมสองฝั่งแม่น้ำ</strong> ที่ทำให้ทั้งหน้าบ้านและหลังบ้าน <strong>พูดภาษา C# เดียวกัน 100%</strong> คุณสามารถแชร์ Data Models, Validation Logic และคลาสต่างๆ ข้ามฝั่งได้ทันทีโดยไม่ต้อง Context Switch หรือเรียนรู้ Framework ฝั่ง JS อีกต่อไป!
+            </p>
+          </div>
+
+          <!-- Visual Bridge Diagram -->
+          <div class="bridge-visual">
+            <div class="bank-card bank-client">
+              <div style="font-size: 2rem; margin-bottom: 6px;">💻</div>
+              <h4 style="color: #f7df1e; margin-bottom: 4px;">Frontend (Client Browser)</h4>
+              <p class="text-sm text-secondary" style="margin: 0;">UI Components, Razor DOM, State Events</p>
+              <div style="margin-top: 8px;">
+                <span class="badge badge-primary" style="font-size: 0.72rem; font-family: var(--font-code);">C# / .razor</span>
+              </div>
+            </div>
+
+            <div class="bridge-span">
+              <div class="bridge-badge">🌉 Blazor Engine</div>
+              <span style="font-size: 0.75rem; color: #d2a8ff; font-weight: 600;">แชร์ Model &amp; Logic ร่วมกัน</span>
+              <span style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-code);">Single Language Stack</span>
+            </div>
+
+            <div class="bank-card bank-server">
+              <div style="font-size: 2rem; margin-bottom: 6px;">🖥️</div>
+              <h4 style="color: #79c0ff; margin-bottom: 4px;">Backend (.NET Server)</h4>
+              <p class="text-sm text-secondary" style="margin: 0;">Business Logic, Database, Auth, EF Core</p>
+              <div style="margin-top: 8px;">
+                <span class="badge badge-primary" style="font-size: 0.72rem; font-family: var(--font-code);">C# / ASP.NET</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           Section 1: Blazor คืออะไร? & Hosting Models
+           ══════════════════════════════════════════════════════════ -->
+      <section class="lesson-section reveal">
+        <div class="section-header">
+          <div class="section-number" style="background: linear-gradient(135deg, #512bd4, #8a5cf6); color: #fff;">01</div>
+          <h2>Blazor คืออะไร? และ 3 Hosting Models ในโลกจริง</h2>
+        </div>
+
+        <p>
+          <strong>Blazor (Browser + Razor)</strong> เป็น Web Framework โอเพนซอร์สจาก Microsoft ที่ช่วยให้นักพัฒนาสามารถสร้าง <strong>Single Page Applications (SPA)</strong> และเว็บแอปพลิเคชันที่มีการโต้ตอบสูง (Interactive Web UI) โดยใช้ <strong>C# และ HTML/CSS</strong> โดยตรง ไม่ต้องพึ่งพา React, Angular หรือ Vue.js
+        </p>
+
+        <!-- 3 Hosting Models Cards -->
+        <div class="model-grid">
+          <!-- Model 1: WebAssembly -->
+          <div class="model-card wasm">
+            <div class="model-header">
+              <div class="model-icon-box">⚡</div>
+              <div>
+                <h3 class="model-title">Blazor WebAssembly</h3>
+                <span class="model-sub">Client-Side (WASM)</span>
+              </div>
+            </div>
+            <p class="text-sm text-secondary">
+              ดาวน์โหลด .NET WebAssembly Runtime และไฟล์ .dll ของโค้ด C# มารันใน Browser ของผู้ใช้โดยตรงแบบ 100% Client-side execution
+            </p>
+            <ul class="model-list">
+              <li><strong>Offline Support:</strong> ทำงานแบบ PWA หรือ Offline ได้เต็มรูปแบบ</li>
+              <li><strong>Zero Server Load:</strong> งานประมวลผล UI เกิดที่ CPU ผู้ใช้ เซิร์ฟเวอร์ทำหน้าที่แค่ Static File Host</li>
+              <li><strong>Static Hosting:</strong> สามารถโฮสต์บน GitHub Pages, AWS S3, Azure Blob ได้ทันที</li>
+              <li class="con"><strong>Initial Load Time:</strong> หน้าแรกใช้เวลาดาวน์โหลด WASM runtime นานกว่าปกติ (~2-5 MB)</li>
+              <li class="con"><strong>Code Visibility:</strong> โค้ด .dll ถูกโหลดไปที่เครื่อง Client (ไม่ควรใส่ความลับ/Connection String)</li>
+            </ul>
+          </div>
+
+          <!-- Model 2: Server -->
+          <div class="model-card server">
+            <div class="model-header">
+              <div class="model-icon-box">🖥️</div>
+              <div>
+                <h3 class="model-title">Blazor Server</h3>
+                <span class="model-sub">Real-Time SignalR</span>
+              </div>
+            </div>
+            <p class="text-sm text-secondary">
+              โค้ด C# ทั้งหมดรันบน Server ฝั่ง Browser มีเพียง HTML เบาๆ ที่สื่อสารผ่าน Real-time WebSocket (SignalR) เพื่ออัปเดตเฉพาะ DOM Diff
+            </p>
+            <ul class="model-list">
+              <li><strong>Fast Initial Load:</strong> โหลดหน้าแรกไวมาก ไม่ต้องดาวน์โหลด .NET runtime ขนาดใหญ่</li>
+              <li><strong>High Security:</strong> โค้ดและ Business Logic ไม่เคยหลุดออกจาก Server</li>
+              <li><strong>Full .NET API:</strong> เรียกใช้ Database, Services ภายในเครื่อง Server ได้โดยตรง</li>
+              <li class="con"><strong>Network Latency:</strong> ทุกการคลิกต้องส่งผ่าน SignalR จึงรู้สึกดีเลย์ถ้าเน็ตช้า</li>
+              <li class="con"><strong>Server Resource:</strong> ต้องเปิด WebSocket ค้างไว้ กิน RAM ตามจำนวน Active User</li>
+            </ul>
+          </div>
+
+          <!-- Model 3: Auto / Web App (.NET 8/9) -->
+          <div class="model-card auto">
+            <div class="model-header">
+              <div class="model-icon-box">🚀</div>
+              <div>
+                <h3 class="model-title">Blazor Web App (.NET 8/9)</h3>
+                <span class="model-sub">Full-Stack SSR + Auto Mode</span>
+              </div>
+            </div>
+            <p class="text-sm text-secondary">
+              มาตรฐานใหม่รวมทุกจุดเด่นเข้าด้วยกัน! โหลดหน้าแรกด้วย Static Server-Side Rendering (SSR) แล้วสลับเป็น WebAssembly ทันทีในพื้นหลัง
+            </p>
+            <ul class="model-list">
+              <li><strong>Best of Both Worlds:</strong> หน้าแรกโหลดเร็วระดับมิลลิวินาที (SSR) + การโต้ตอบลื่นไหล (WASM)</li>
+              <li><strong>Interactive Auto Mode:</strong> รันบน Server ชั่วคราวระหว่างรอ WASM ดาวน์โหลดเสร็จ</li>
+              <li><strong>SEO Friendly:</strong> Search Engine Bot อ่านเนื้อหา HTML ได้ครบถ้วนสมบูรณ์</li>
+              <li><strong>Per-Component Render Mode:</strong> เลือก Render Mode แยกเฉพาะ Component แต่ละตัวได้อิสระ</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <h3 class="mt-xl mb-md">📊 ตารางเปรียบเทียบข้อดี-ข้อเสียของแต่ละ Hosting Model</h3>
+        <div style="overflow-x: auto;">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>คุณสมบัติ (Feature)</th>
+                <th>⚡ Blazor WebAssembly</th>
+                <th>🖥️ Blazor Server</th>
+                <th>🚀 Blazor Web App (Auto / .NET 8)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>ตำแหน่งที่โค้ดรัน (Code Execution)</strong></td>
+                <td>ใน Web Browser ผ่าน WebAssembly</td>
+                <td>บน ASP.NET Core Server</td>
+                <td>Server SSR ก่อน แล้วสลับเป็น Client WASM</td>
+              </tr>
+              <tr>
+                <td><strong>ความเร็วในการโหลดครั้งแรก</strong></td>
+                <td>ช้ากว่า (ต้องดาวน์โหลด WASM runtime)</td>
+                <td>เร็วมาก (ส่ง Pure HTML/JS เล็กๆ)</td>
+                <td>เร็วที่สุด (Static SSR ทันที)</td>
+              </tr>
+              <tr>
+                <td><strong>การใช้งานเมื่อไม่มีอินเทอร์เน็ต (Offline)</strong></td>
+                <td><span class="badge badge-success">รองรับสมบูรณ์ (PWA)</span></td>
+                <td><span class="badge badge-danger">ไม่รองรับ (ต้องต่อเน็ต)</span></td>
+                <td><span class="badge badge-success">รองรับเมื่อ WASM โหลดเสร็จ</span></td>
+              </tr>
+              <tr>
+                <td><strong>ภาระทรัพยากรบน Server (Server Load)</strong></td>
+                <td>แทบเป็น 0 (Server แค่เสิร์ฟ Static Files)</td>
+                <td>สูง (ต้องจำ State และเปิด WebSocket)</td>
+                <td>ยืดหยุ่น ปรับแต่งตามโหมดที่เลือก</td>
+              </tr>
+              <tr>
+                <td><strong>ความปลอดภัยของโค้ด (IP Protection)</strong></td>
+                <td>ปานกลาง (ไฟล์ .dll อยู่ฝั่ง Client)</td>
+                <td>สูงสุด (โค้ดอยู่บน Server ทั้งหมด)</td>
+                <td>สูงสุดในส่วน Server Components</td>
+              </tr>
+              <tr>
+                <td><strong>กรณีการใช้งานที่เหมาะสมที่สุด</strong></td>
+                <td>แอปพลิเคชัน Offline, Dashboard, Internal Tools</td>
+                <td>Enterprise Web Apps, Intranet องค์กร</td>
+                <td>Public Website, E-Commerce, SaaS ยุคใหม่</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+           Section 2: ไวยากรณ์ Razor Syntax
+           ══════════════════════════════════════════════════════════ -->
+      <section class="lesson-section reveal">
+        <div class="section-header">
+          <div class="section-number" style="background: linear-gradient(135deg, #512bd4, #8a5cf6); color: #fff;">02</div>
+          <h2>ไวยากรณ์ Razor Syntax: การผสมผสาน HTML + C#</h2>
+        </div>
+
+        <p>
+          ไฟล์คอมโพเนนต์ของ Blazor จะมีนามสกุลเป็น <code>.razor</code> ซึ่งใช้ไวยากรณ์ <strong>Razor Syntax</strong> โดยมีหัวใจสำคัญคือเครื่องหมาย <strong><code>@</code> (At Sign)</strong> ที่ใช้เป็นตัวสลับโหมดจากการเขียน HTML เข้าสู่โลกของภาษา C# อย่างราบรื่น
+        </p>
+
+        <!-- Syntax Cards Grid -->
+        <div class="syntax-grid">
+          <div class="syntax-card">
+            <span class="syntax-badge">@ Direct Expression</span>
+            <p class="syntax-desc">
+              แทรกค่าจากตัวแปร C# หรือ Expression ลงใน HTML เช่น <code>&lt;h1&gt;@userName&lt;/h1&gt;</code> หรือ <code>&lt;p&gt;@DateTime.Now.Year&lt;/p&gt;</code>
+            </p>
+          </div>
+
+          <div class="syntax-card">
+            <span class="syntax-badge">@( ... ) Explicit Expression</span>
+            <p class="syntax-desc">
+              คำนวณสูตรหรือเรียกใช้ Expression แบบชัดเจน เช่น <code>&lt;p&gt;ราคารวม: @(price * 1.07m) บาท&lt;/p&gt;</code>
+            </p>
+          </div>
+
+          <div class="syntax-card">
+            <span class="syntax-badge">@if (...) { } Control Flow</span>
+            <p class="syntax-desc">
+              แสดงผล DOM ตามเงื่อนไข เช่น ตรวจสอบสถานะ Login หรือการโหลดข้อมูล <code>@if (isLoading) { &lt;Spinner /&gt; }</code>
+            </p>
+          </div>
+
+          <div class="syntax-card">
+            <span class="syntax-badge">@foreach (...) { } Loop</span>
+            <p class="syntax-desc">
+              วนลูปเรนเดอร์ Element ซ้ำๆ จาก Collection หรือ List เช่น วนลูปตารางสินค้า หรือแสดงรายการ Todo Item
+            </p>
+          </div>
+
+          <div class="syntax-card">
+            <span class="syntax-badge">@code { ... } State &amp; Logic</span>
+            <p class="syntax-desc">
+              บล็อกหลักสำหรับเขียนตัวแปร State, Properties, Methods, และ Event Handlers ทางภาษา C# ภายในไฟล์ <code>.razor</code>
+            </p>
+          </div>
+
+          <div class="syntax-card">
+            <span class="syntax-badge">@page "/route" Routing</span>
+            <p class="syntax-desc">
+              กำหนดให้ Component นี้กลายเป็นหน้าเว็บ (Page) ที่เข้าถึงได้ผ่าน URL Path เช่น <code>@page "/products"</code>
+            </p>
+          </div>
+        </div>
+
+        <!-- Code Block Example for Razor Syntax -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>UserProfile.razor — โครงสร้างมาตรฐานของ Razor Component</span>
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">คัดลอก</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code>@page "/profile/{UserId:int}"
+@inject HttpClient Http
+
+&lt;div class="user-card"&gt;
+    &lt;h2&gt;โปรไฟล์ผู้ใช้: @userName&lt;/h2&gt;
+    
+    @* การใช้เงื่อนไขตรวจสอบสถานะ *@
+    @if (isVipMember)
+    {
+        &lt;span class="badge badge-gold"&gt;👑 สมาชิก VIP&lt;/span&gt;
+    }
+    else
+    {
+        &lt;span class="badge badge-normal"&gt;👤 สมาชิกทั่วไป&lt;/span&gt;
+    }
+
+    &lt;h3&gt;ทักษะที่เชี่ยวชาญ:&lt;/h3&gt;
+    &lt;ul&gt;
+        @* การวนลูปเรนเดอร์รายการ *@
+        @foreach (var skill in skills)
+        {
+            &lt;li&gt;⚡ @skill&lt;/li&gt;
+        }
+    &lt;/ul&gt;
+
+    &lt;button class="btn btn-primary" @onclick="UpgradeToVip"&gt;
+        อัปเกรดเป็น VIP
+    &lt;/button&gt;
+&lt;/div&gt;
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+
+    private string userName = "สมชาย สายโค้ด";
+    private bool isVipMember = false;
+    private List&lt;string&gt; skills = new() { "C#", "ASP.NET Core", "Blazor", "SQL" };
+
+    private void UpgradeToVip()
+    {
+        isVipMember = true;
+    }
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">💡 คำสั่ง Directives ที่สำคัญอื่นๆ ใน Blazor</div>
+          <ul style="margin: 6px 0 0 16px; padding: 0; color: var(--text-secondary); font-size: 0.88rem;">
+            <li><code>@inject ISomeService Service</code> — ดึง Dependency Injection Service มาใช้งานในคอมโพเนนต์</li>
+            <li><code>@using MyProject.Models</code> — Import Namespace ที่ต้องการ</li>
+            <li><code>@attribute [Authorize]</code> — กำหนดสิทธิ์ความปลอดภัยในการเข้าถึงหน้า</li>
+            <li><code>@rendermode InteractiveServer</code> หรือ <code>InteractiveWebAssembly</code> — กำหนด Render Mode ใน .NET 8</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+           Section 3: Event Handling & Data Binding
+           ══════════════════════════════════════════════════════════ -->
+      <section class="lesson-section reveal">
+        <div class="section-header">
+          <div class="section-number" style="background: linear-gradient(135deg, #512bd4, #8a5cf6); color: #fff;">03</div>
+          <h2>Event Handling &amp; Data Binding (การจัดการอีเวนต์และการผูกข้อมูล)</h2>
+        </div>
+
+        <p>
+          ใน Blazor การติดต่อระหว่าง HTML Controls และตัวแปรใน C# ถูกจัดการผ่านระบบ <strong>Data Binding</strong> และ <strong>Event Handling</strong> อย่างเป็นธรรมชาติและทรงพลัง
+        </p>
+
+        <!-- Binding Comparison Cards -->
+        <div class="binding-comparison">
+          <div class="binding-card one-way">
+            <h3 style="color: var(--accent-warning); margin-bottom: 8px;">1️⃣ One-way Data Binding</h3>
+            <p class="text-sm text-secondary">
+              ข้อมูลส่งทิศทางเดียวจาก <strong>C# State ➔ HTML DOM</strong> เมื่อค่าใน C# เปลี่ยน หน้าจอจะเปลี่ยนตาม แต่ถ้าผู้ใช้แก้ไขค่าในหน้าจอ ตัวแปรใน C# จะ <em>ไม่เปลี่ยน</em>
+            </p>
+            <div class="code-block-wrapper" style="margin: 10px 0;">
+              <div class="code-block-body">
+                <pre class="language-csharp"><code>&lt;!-- แสดงผลข้อความธรรมดา --&gt;
+&lt;p&gt;สวัสดีคุณ @currentUser&lt;/p&gt;
+
+&lt;!-- กำหนด Attribute ให้ input (ไม่เปลี่ยนค่ากลับ) --&gt;
+&lt;input type="text" value="@currentUser" /&gt;</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="binding-card two-way">
+            <h3 style="color: var(--accent-success); margin-bottom: 8px;">2️⃣ Two-way Data Binding (`@bind`)</h3>
+            <p class="text-sm text-secondary">
+              ข้อมูลเชื่อมต่อสองทาง <strong>C# State ⇄ HTML DOM</strong> เมื่อตัวแปร C# เปลี่ยน ค่าบนจอเปลี่ยน และเมื่อผู้ใช้พิมพ์แก้ไขในช่อง Input ตัวแปรใน C# จะ <strong>อัปเดตอัตโนมัติ</strong>
+            </p>
+            <div class="code-block-wrapper" style="margin: 10px 0;">
+              <div class="code-block-body">
+                <pre class="language-csharp"><code>&lt;!-- Two-way Binding แบบมาตรฐาน (อัปเดตเมื่อ onchange) --&gt;
+&lt;input @bind="searchKeyword" /&gt;
+
+&lt;!-- Two-way Binding แบบ Real-time ทันทีที่พิมพ์ --&gt;
+&lt;input @bind="searchKeyword" @bind:event="oninput" /&gt;</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Handling Explanations -->
+        <h3 class="mt-xl mb-md">🎯 Event Handling ใน Blazor</h3>
+        <p>
+          เราสามารถผูก HTML Events เช่น <code>onclick</code>, <code>onchange</code>, <code>onkeydown</code> เข้ากับ Method ภาษา C# โดยใส่เครื่องหมาย <code>@</code> นำหน้า:
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚡</span>
+              <span>ตัวอย่างรูปแบบการผูก Event หลากหลายสไตล์</span>
+            </div>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code>@* 1. เรียก Method ตรงๆ โดยไม่มี Parameter *@
+&lt;button @onclick="SaveData"&gt;บันทึก&lt;/button&gt;
+
+@* 2. ส่ง Parameter ผ่าน Lambda Expression *@
+&lt;button @onclick="() =&gt; DeleteProduct(product.Id)"&gt;ลบสินค้านี้&lt;/button&gt;
+
+@* 3. รับ Event Arguments เช่น MouseEventArgs หรือ KeyboardEventArgs *@
+&lt;div @onclick="HandleClickCoordinates"&gt;คลิกเพื่อดูพิกัด X, Y&lt;/div&gt;
+&lt;input @onkeydown="HandleKeyPress" placeholder="กดปุ่มบนคีย์บอร์ด..." /&gt;
+
+@code {
+    private void SaveData() { /* ทำงานเมื่อคลิก */ }
+    private void DeleteProduct(int id) { /* ลบสินค้าตาม ID */ }
+    
+    private void HandleClickCoordinates(MouseEventArgs e)
+    {
+        Console.WriteLine($"คลิกที่พิกัด: X={e.ClientX}, Y={e.ClientY}");
+    }
+
+    private void HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") {
+            Console.WriteLine("ผู้ใช้กดปุ่ม Enter!");
+        }
+    }
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+           Section 4: Interactive Simulator Sandbox & Live Code Block
+           ══════════════════════════════════════════════════════════ -->
+      <section class="lesson-section reveal">
+        <div class="section-header">
+          <div class="section-number" style="background: linear-gradient(135deg, #512bd4, #8a5cf6); color: #fff;">04</div>
+          <h2>ห้องทดลองเสมือน: Blazor Component Sandbox Live Simulator</h2>
+        </div>
+
+        <p>
+          ทดลองสังเกตการทำงานของ State และ Data Binding ใน Blazor แบบเสมือนจริง ลองกดปุ่มหรือพิมพ์ในช่อง Input ด้านขวา เพื่อดูการเปลี่ยนแปลงค่าตัวแปรในโค้ด C# ทางด้านซ้าย!
+        </p>
+
+        <!-- Live Blazor Simulator Widget -->
+        <div class="live-blazor-sim">
+          <div class="sim-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.1rem;">⚡</span>
+              <strong style="font-family: var(--font-heading);">Blazor Component Live Visualizer</strong>
+            </div>
+            <div class="sim-tabs">
+              <button class="sim-tab-btn active" id="tab-counter-btn" onclick="switchSimTab('counter')">Counter.razor</button>
+              <button class="sim-tab-btn" id="tab-todo-btn" onclick="switchSimTab('todo')">TodoApp.razor</button>
+            </div>
+          </div>
+
+          <div class="sim-body">
+            <!-- Left Pane: Code View -->
+            <div class="sim-code-pane">
+              <!-- Counter Code Snippet -->
+              <div id="code-view-counter">
+                <pre class="language-csharp"><code>@page "/counter"
+
+&lt;h3&gt;ตัวนับจำนวน (Counter)&lt;/h3&gt;
+
+&lt;p&gt;ค่าปัจจุบัน: &lt;strong&gt;@currentCount&lt;/strong&gt;&lt;/p&gt;
+
+&lt;button class="btn btn-primary" @onclick="IncrementCount"&gt;
+    + เพิ่มจำนวน
+&lt;/button&gt;
+&lt;button class="btn btn-outline" @onclick="DecrementCount"&gt;
+    - ลดจำนวน
+&lt;/button&gt;
+&lt;button class="btn btn-ghost" @onclick="ResetCount"&gt;
+    รีเซ็ต
+&lt;/button&gt;
+
+@code {
+    // C# Component State
+    private int currentCount = <span id="code-state-count" style="color: #7ee787; font-weight: bold;">0</span>;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    private void DecrementCount()
+    {
+        if (currentCount &gt; 0) currentCount--;
+    }
+
+    private void ResetCount()
+    {
+        currentCount = 0;
+    }
+}</code></pre>
+              </div>
+
+              <!-- Todo Code Snippet -->
+              <div id="code-view-todo" style="display: none;">
+                <pre class="language-csharp"><code>@page "/todo"
+
+&lt;h3&gt;รายการสิ่งที่ต้องทำ (Todo List)&lt;/h3&gt;
+
+&lt;div class="input-group"&gt;
+    &lt;input @bind="newTodoText" placeholder="พิมพ์งานใหม่..." /&gt;
+    &lt;button @onclick="AddTodo"&gt;+ เพิ่ม&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+    @foreach (var todo in todos)
+    {
+        &lt;li&gt;
+            &lt;input type="checkbox" @bind="todo.IsDone" /&gt;
+            &lt;span class="@(todo.IsDone ? "done" : "")"&gt;@todo.Title&lt;/span&gt;
+        &lt;/li&gt;
+    }
+&lt;/ul&gt;
+
+@code {
+    private string newTodoText = "";
+    private List&lt;TodoItem&gt; todos = new()
+    {
+        new TodoItem { Title = "เรียน Blazor พื้นฐาน", IsDone = true },
+        new TodoItem { Title = "ทำแบบฝึกหัด 5 ข้อ", IsDone = false }
+    };
+
+    private void AddTodo()
+    {
+        if (!string.IsNullOrWhiteSpace(newTodoText))
+        {
+            todos.Add(new TodoItem { Title = newTodoText, IsDone = false });
+            newTodoText = ""; // Clear input
+        }
+    }
+}</code></pre>
+              </div>
+            </div>
+
+            <!-- Right Pane: Live Rendered Output -->
+            <div class="sim-render-pane">
+              <span class="render-label">🟢 Browser Live DOM</span>
+
+              <!-- Counter Interactive UI -->
+              <div id="render-view-counter" class="counter-widget">
+                <h4 style="margin: 0; font-size: 0.95rem; color: var(--text-secondary);">ตัวนับจำนวน (Counter)</h4>
+                <div class="counter-display" id="sim-counter-num">0</div>
+                <div class="counter-actions">
+                  <button class="btn btn-primary btn-sm" onclick="simIncrement()">+ เพิ่มจำนวน</button>
+                  <button class="btn btn-outline btn-sm" onclick="simDecrement()">- ลดจำนวน</button>
+                  <button class="btn btn-ghost btn-sm" onclick="simReset()">รีเซ็ต</button>
+                </div>
+                <div style="margin-top: var(--space-md); font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-code);">
+                  State re-rendered via <span style="color: var(--accent-info);">StateHasChanged()</span>
+                </div>
+              </div>
+
+              <!-- Todo Interactive UI -->
+              <div id="render-view-todo" class="todo-widget" style="display: none;">
+                <h4 style="margin: 0 0 10px 0; font-size: 0.95rem; color: var(--text-secondary);">รายการสิ่งที่ต้องทำ (Todo List)</h4>
+                <div class="todo-input-group">
+                  <input type="text" id="sim-todo-input" class="todo-input" placeholder="พิมพ์งานใหม่ที่นี่..." onkeydown="if(event.key==='Enter') simAddTodo()">
+                  <button class="btn btn-primary btn-sm" onclick="simAddTodo()">+ เพิ่ม</button>
+                </div>
+                <ul class="todo-list-ui" id="sim-todo-list">
+                  <!-- Rendered dynamically via JS -->
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+           Section 5: Inline Quiz Engine
+           ══════════════════════════════════════════════════════════ -->
+      <section class="lesson-section reveal">
+        <div class="section-header">
+          <div class="section-number" style="background: linear-gradient(135deg, #512bd4, #8a5cf6); color: #fff;">05</div>
+          <h2>แบบทดสอบท้ายบทเรียน: Blazor &amp; Razor Syntax</h2>
+        </div>
+
+        <p class="text-secondary mb-lg">
+          ทดสอบความเข้าใจเกี่ยวกับ Blazor Hosting Models, กลไกการทำงานของ Razor Syntax, และระบบ Two-way Data Binding (ตอบถูกครบรับทันที +100 XP)
+        </p>
+
+        <!-- Quiz Container rendered by QuizEngine -->
+        <div id="blazor-intro-quiz"></div>
+      </section>
+
+      <!-- ─── Next Lesson Banner ─── -->
+      <div class="card mt-2xl reveal" style="border-color: var(--border-active); background: linear-gradient(135deg, rgba(81, 43, 212, 0.15) 0%, rgba(22, 27, 34, 0.85) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge badge-success mb-xs">🎉 ยอดเยี่ยม! ผ่านบทเรียน Blazor Intro</span>
+            <h3 style="margin-top: 4px; margin-bottom: 4px;">พร้อมไปต่อกับ Blazor Components &amp; Lifecycle แล้วหรือยัง?</h3>
+            <p class="text-muted" style="margin-bottom: 0;">เรียนรู้เรื่อง Component Architecture, Parameters, Cascading Values, EventCallback และ Lifecycle Methods</p>
+          </div>
+          <div>
+            <a href="blazor-components.html" class="btn btn-primary btn-lg">
+              <span>ไปบทเรียนถัดไป: Blazor Components →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <!-- Live Simulator Logic & Quiz Setup Script -->
+  <script>
+    /* ─── Simulator Tab Switcher ─── */
+    function switchSimTab(tab) {
+      const counterBtn = document.getElementById('tab-counter-btn');
+      const todoBtn = document.getElementById('tab-todo-btn');
+      const codeCounter = document.getElementById('code-view-counter');
+      const codeTodo = document.getElementById('code-view-todo');
+      const renderCounter = document.getElementById('render-view-counter');
+      const renderTodo = document.getElementById('render-view-todo');
+
+      if (tab === 'counter') {
+        counterBtn.classList.add('active');
+        todoBtn.classList.remove('active');
+        codeCounter.style.display = 'block';
+        codeTodo.style.display = 'none';
+        renderCounter.style.display = 'block';
+        renderTodo.style.display = 'none';
+      } else {
+        todoBtn.classList.add('active');
+        counterBtn.classList.remove('active');
+        codeTodo.style.display = 'block';
+        codeCounter.style.display = 'none';
+        renderTodo.style.display = 'block';
+        renderCounter.style.display = 'none';
+        renderTodoList();
+      }
+    }
+
+    /* ─── Counter Simulator State ─── */
+    let counterValue = 0;
+    function updateCounterUI() {
+      const numElem = document.getElementById('sim-counter-num');
+      const codeElem = document.getElementById('code-state-count');
+      numElem.textContent = counterValue;
+      codeElem.textContent = counterValue;
+
+      numElem.classList.add('bump');
+      setTimeout(() => numElem.classList.remove('bump'), 150);
+    }
+
+    function simIncrement() {
+      counterValue++;
+      updateCounterUI();
+    }
+
+    function simDecrement() {
+      if (counterValue > 0) {
+        counterValue--;
+        updateCounterUI();
+      }
+    }
+
+    function simReset() {
+      counterValue = 0;
+      updateCounterUI();
+    }
+
+    /* ─── Todo Simulator State ─── */
+    let todoItems = [
+      { id: 1, title: 'เรียน Blazor พื้นฐาน & Razor', isDone: true },
+      { id: 2, title: 'ทำแบบฝึกหัด Quiz 5 ข้อ', isDone: false },
+      { id: 3, title: 'ทำความเข้าใจ 3 Hosting Models', isDone: true }
+    ];
+
+    function renderTodoList() {
+      const listElem = document.getElementById('sim-todo-list');
+      if (!listElem) return;
+      listElem.innerHTML = '';
+
+      todoItems.forEach(item => {
+        const li = document.createElement('li');
+        li.className = `todo-item-ui ${item.isDone ? 'done' : ''}`;
+        li.innerHTML = `
+          <input type="checkbox" ${item.isDone ? 'checked' : ''} onchange="simToggleTodo(${item.id})">
+          <span>${escapeHtml(item.title)}</span>
+          <button class="todo-del-btn" onclick="simDeleteTodo(${item.id})" title="ลบรายการ">✕</button>
+        `;
+        listElem.appendChild(li);
+      });
+    }
+
+    function simAddTodo() {
+      const input = document.getElementById('sim-todo-input');
+      const text = input.value.trim();
+      if (text) {
+        todoItems.push({
+          id: Date.now(),
+          title: text,
+          isDone: false
+        });
+        input.value = '';
+        renderTodoList();
+      }
+    }
+
+    function simToggleTodo(id) {
+      const item = todoItems.find(t => t.id === id);
+      if (item) {
+        item.isDone = !item.isDone;
+        renderTodoList();
+      }
+    }
+
+    function simDeleteTodo(id) {
+      todoItems = todoItems.filter(t => t.id !== id);
+      renderTodoList();
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    /* ─── Copy Code Utility ─── */
+    function copyCode(button) {
+      const codeBlock = button.closest('.code-block-wrapper').querySelector('pre code');
+      if (codeBlock) {
+        navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+          const originalText = button.innerText;
+          button.innerText = 'คัดลอกแล้ว! ✓';
+          button.classList.add('copied');
+          setTimeout(() => {
+            button.innerText = originalText;
+            button.classList.remove('copied');
+          }, 2000);
+        });
+      }
+    }
+
+    /* ─── Page Initialization & Quiz ─── */
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize Todo initial rendering
+      renderTodoList();
+
+      // Mark Lesson Complete in Progress Tracker
+      if (typeof Progress !== 'undefined') {
+        Progress.completeLesson('blazor-intro');
+        Progress.setModuleProgress('blazor', 50);
+      }
+
+      // Quiz Questions Definition
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'Blazor WebAssembly (Client-side) ประมวลผลและรันโค้ดภาษา C# บน Web Browser ของผู้ใช้ผ่านเทคโนโลยีใด?',
+          options: [
+            'การแปลง C# เป็น JavaScript ก่อนส่งไปที่ Browser',
+            'รัน C# บน Browser โดยตรงผ่าน .NET WebAssembly Runtime (WASM)',
+            'ใช้ Node.js เป็น Runtime ฝั่ง Client',
+            'ใช้ Flash Player Plugin ในการรันไฟล์ DLL'
+          ],
+          answer: 1,
+          explanation: 'Blazor WebAssembly โหลดไฟล์ .NET WebAssembly Runtime และคอมไพล์โค้ด C# เป็น WebAssembly (WASM) เพื่อรันใน Sandbox ของ Browser ได้โดยตรงอย่างปลอดภัย'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'Blazor Server ใช้โปรโตคอลหรือช่องทางใดในการสื่อสารและส่งการอัปเดตหน้าจอ (DOM Diff) ระหว่าง Browser กับ Server แบบ Real-time?',
+          options: [
+            'REST API HTTP POST ทุกๆ 1 วินาที',
+            'gRPC Streaming ผ่าน TCP Socket แบบ Native',
+            'SignalR (WebSockets) แบบ Real-time สองทาง',
+            'FTP File Transfer Protocol'
+          ],
+          answer: 2,
+          explanation: 'Blazor Server เปิดการเชื่อมต่อ Real-time สองทางผ่าน SignalR (WebSocket) เพื่อส่งอีเวนต์จาก Client ไปคำนวณบน Server และส่งเฉพาะส่วนต่างของ DOM (UI Diff) กลับมาอัปเดตที่ Browser'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'ฟีเจอร์ "Interactive Auto Mode" ใน Blazor Web App ของ .NET 8/9 ทำงานอย่างไร?',
+          options: [
+            'รันเฉพาะบน Desktop เท่านั้น ไม่รองรับ Mobile Browser',
+            'เริ่มต้นโหลดหน้าแรกด้วย Server SSR ทันที แล้วสลับไปรันบน WebAssembly เมื่อดาวน์โหลดไฟล์เสร็จในพื้นหลัง',
+            'แปลงโค้ด C# เป็นภาษา C++ อัตโนมัติเพื่อให้เร็วขึ้น',
+            'บังคับให้ผู้ใช้ต้องติดตั้งโปรแกรม .NET SDK ลงในเครื่องก่อนเข้าเว็บ'
+          ],
+          answer: 1,
+          explanation: 'Interactive Auto Mode ออกแบบมาเพื่อแก้ปัญหา Cold Start ของ WASM โดยครั้งแรกจะเรนเดอร์ผ่าน Server เพื่อให้หน้าเว็บขึ้นทันที จากนั้นเมื่อดาวน์โหลด WASM Bundle ครบแล้ว การเข้าชมครั้งถัดไปจะรันบน WebAssembly Client-side 100%'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'หากต้องการสร้าง Two-way Data Binding ในช่อง `<input>` ให้ตัวแปรใน C# อัปเดตค่าทันทีในทุกๆ ตัวอักษรที่ผู้ใช้พิมพ์ ต้องใช้ Directive ใด?',
+          options: [
+            '<input value="@searchKeyword" />',
+            '<input @bind="searchKeyword" @bind:event="oninput" />',
+            '<input @onclick="searchKeyword" />',
+            '<input csharp-model="searchKeyword" />'
+          ],
+          answer: 1,
+          explanation: 'ไวยากรณ์ @bind="searchKeyword" จะผูกข้อมูลสองทาง โดยการระบุ @bind:event="oninput" จะเปลี่ยน trigger จากเดิมที่รอ onchange (เมื่อคลิกออกนอกช่อง) มาเป็น oninput (อัปเดตทุกครั้งที่พิมพ์)'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'บล็อกคำสั่งใดในไฟล์ `.razor` ที่ใช้สำหรับประกาศตัวแปร State, Properties, Methods และ Event Handlers ในภาษา C#?',
+          options: [
+            '@functions { ... }',
+            '@csharp { ... }',
+            '@code { ... }',
+            '@script { ... }'
+          ],
+          answer: 2,
+          explanation: 'บล็อก @code { ... } เป็นบล็อกหลักใน Blazor ที่ใช้สำหรับเขียนโค้ด C# ทั้งหมดของคอมโพเนนต์ เช่น ประกาศตัวแปร จัดการ State และสร้าง Method'
+        }
+      ];
+
+      // Initialize Quiz Engine
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('blazor-intro-quiz', quizQuestions, {
+          quizId: 'blazor-intro',
+          showTimer: false,
+          showExplanation: true,
+          onComplete: () => {
+            if (typeof Progress !== 'undefined') {
+              Progress.completeLesson('blazor-intro');
+              Progress.recordQuizResult('blazor-intro', 5, 5);
+            }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

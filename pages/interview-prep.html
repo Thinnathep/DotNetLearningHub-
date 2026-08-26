@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เตรียมตัวสัมภาษณ์งาน Junior .NET Developer — DotNet Learning Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">💼</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน</a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP</a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections & LINQ</a>
+    <a href="./csharp-advanced.html" class="sidebar-link"><span class="link-icon">📕</span> C# ขั้นสูง</a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET</a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection</a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware</a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link"><span class="link-icon">🎮</span> SQL Playground</a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link"><span class="link-icon">🧩</span> Blazor Components</a>
+    <a href="./xaml-basics.html" class="sidebar-link"><span class="link-icon">📐</span> XAML พื้นฐาน</a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML & JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps & Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git & CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link"><span class="link-icon">🛡️</span> Secure Coding</a>
+
+    <div class="sidebar-section-title">🟡 Web & คุณภาพ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link"><span class="link-icon">👀</span> Code Review</a>
+    <a href="./sdlc-agile.html" class="sidebar-link"><span class="link-icon">📋</span> SDLC & Agile</a>
+    <a href="./tech-docs.html" class="sidebar-link"><span class="link-icon">📝</span> Technical Docs</a>
+    <a href="./architecture.html" class="sidebar-link"><span class="link-icon">🏛️</span> Architecture</a>
+
+    <div class="sidebar-section-title">🎮 Games & Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link active"><span class="link-icon">💼</span> เตรียมสัมภาษณ์ <span class="link-badge badge-new">Simulator</span></a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header reveal">
+            <div class="breadcrumb">
+                <a href="../index.html">🏠 หน้าแรก</a>
+                <span>/</span>
+                <span>Special Zone</span>
+                <span>/</span>
+                <span>เตรียมตัวสัมภาษณ์งาน</span>
+            </div>
+            <div class="page-title">
+                <div class="title-icon" style="background: var(--gradient-primary); color: #fff;">💼</div>
+                <h1>คลังคำถาม & จำลองสัมภาษณ์งาน Junior .NET Developer</h1>
+            </div>
+            <p class="page-description">
+                รวมคำถามสัมภาษณ์งานจริงทั้ง Technical และ Behavioral, เทคนิคการตอบด้วยเทคนิค STAR Method และระบบจำลองสัมภาษณ์เสมือนจริงเพื่อคว้างานแรกของคุณ!
+            </p>
+        </div>
+
+        <!-- STAR Method Guide -->
+        <section class="lesson-section reveal">
+            <div class="concept-card">
+                <div class="concept-header">
+                    <span class="concept-emoji">⭐</span>
+                    <span class="concept-title">เทคนิคการตอบคำถามสัมภาษณ์ด้วย STAR Method</span>
+                </div>
+                <div class="concept-body">
+                    <div class="grid grid-4">
+                        <div class="card">
+                            <h4 style="color: var(--accent-primary);">S - Situation (สถานการณ์)</h4>
+                            <p class="text-xs">เล่าบริบทและสภาพแวดล้อมของโปรเจกต์สั้นๆ</p>
+                        </div>
+                        <div class="card">
+                            <h4 style="color: var(--accent-success);">T - Task (โจทย์/เป้าหมาย)</h4>
+                            <p class="text-xs">อธิบายปัญหาที่ต้องแก้ หรือฟีเจอร์ที่ได้รับมอบหมาย</p>
+                        </div>
+                        <div class="card">
+                            <h4 style="color: var(--accent-warning);">A - Action (การลงมือทำ)</h4>
+                            <p class="text-xs">อธิบายสิ่งที่เรา <strong>ลงมือทำด้วยตนเอง</strong> เช่น เลือกใช้ DI, Optimize SQL, ออกแบบ DTO</p>
+                        </div>
+                        <div class="card">
+                            <h4 style="color: var(--accent-info);">R - Result (ผลลัพธ์ที่วัดได้)</h4>
+                            <p class="text-xs">สรุปผลลัพธ์ที่เป็นตัวเลข เช่น "API ตอบสนองเร็วขึ้น 40%, รัน Unit Test ผ่าน 100%"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Top 10 Technical Interview Questions (Accordion) -->
+        <section class="lesson-section reveal">
+            <h2 class="mb-lg">🎯 10 คำถามสัมภาษณ์ทางเทคนิคยอดฮิต พร้อมแนวทางตอบระดับ Senior</h2>
+
+            <div class="accordion-item">
+                <button class="accordion-trigger" aria-expanded="false">
+                    <span>1. ความแตกต่างระหว่าง AddTransient, AddScoped และ AddSingleton ใน ASP.NET Core คืออะไร?</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="accordion-content">
+                    <div class="accordion-body text-sm">
+                        <p><strong>แนวทางการตอบ:</strong><br>
+                        • <strong>Transient:</strong> สร้าง Instance ใหม่ทุกครั้งที่มีการร้องขอ เหมาะสำหรับ Stateless helper service<br>
+                        • <strong>Scoped:</strong> สร้าง 1 Instance ต่อ 1 HTTP Request และแชร์ร่วมกันใน Request นั้น เหมาะสำหรับ <code>DbContext</code> และ Business Services<br>
+                        • <strong>Singleton:</strong> สร้างเพียงครั้งเดียวตลอดอายุแอปพลิเคชัน เหมาะสำหรับ In-Memory Cache หรือ Logger<br>
+                        ⚠️ <strong>จุดเพิ่มคะแนน:</strong> พูดถึงความเสี่ยงของ <strong>Captive Dependency</strong> ว่าห้ามฉีด Scoped เข้า Singleton เด็ดขาด</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-trigger" aria-expanded="false">
+                    <span>2. Asynchronous Programming (async/await) ใน C# ทำงานอย่างไร และต่างจาก Multi-threading อย่างไร?</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="accordion-content">
+                    <div class="accordion-body text-sm">
+                        <p><strong>แนวทางการตอบ:</strong><br>
+                        • <code>async/await</code> ใน C# เป็นกลไกแบบ <strong>Non-blocking I/O</strong> ที่คืน Thread กลับสู่ Thread Pool ระหว่างรอการตอบกลับจาก Database หรือ Network โดยไม่สร้าง Thread ใหม่ขึ้นมาให้สิ้นเปลือง<br>
+                        • ช่วยให้ Web Server รองรับ Concurrent Requests ได้จำนวนมหาศาลโดยไม่เกิด Thread Starvation<br>
+                        ⚠️ <strong>จุดเพิ่มคะแนน:</strong> เน้นย้ำว่าห้ามใช้ <code>.Result</code> หรือ <code>.Wait()</code> เพราะจะบล็อก Thread และเสี่ยงเกิด Deadlock</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-trigger" aria-expanded="false">
+                    <span>3. ปัญหา N+1 Query Problem ใน Entity Framework Core คืออะไร และแก้อย่างไร?</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="accordion-content">
+                    <div class="accordion-body text-sm">
+                        <p><strong>แนวทางการตอบ:</strong><br>
+                        • เกิดจากการดึงข้อมูลหลัก 1 Query แล้ววนลูปส่ง Query ย่อยไปดึงข้อมูลลูกอีก N ครั้ง (รวมเป็น 1 + N Queries) ทำให้ Database โดนยิงรัวจนช้า<br>
+                        • <strong>วิธีแก้:</strong> ใช้ <strong>Eager Loading</strong> ด้วยคำสั่ง <code>.Include(x => x.OrderItems)</code> หรือใช้ DTO Projection ด้วย <code>.Select()</code> เพื่อรวมเป็น SQL JOIN ตัวเดียว</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-trigger" aria-expanded="false">
+                    <span>4. ทำไมถึงควรใช้ AsNoTracking() ใน EF Core?</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="accordion-content">
+                    <div class="accordion-body text-sm">
+                        <p><strong>แนวทางการตอบ:</strong><br>
+                        • เมื่อเรียก Query ข้อมูลแบบ Read-Only การใส่ <code>.AsNoTracking()</code> จะบอกให้ EF Core <strong>ปิดระบบ Change Tracker</strong> ไม่ต้องจดจำสถานะของ Entity ใน Memory<br>
+                        • ส่งผลให้ประหยัด RAM มหาศาลและ Query เร็วขึ้นกว่าเดิมอย่างเห็นได้ชัด</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-trigger" aria-expanded="false">
+                    <span>5. ในการรักษาความปลอดภัยของ Web API เหตุใดการซ่อนปุ่มบน UI ถึงไม่เพียงพอ?</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="accordion-content">
+                    <div class="accordion-body text-sm">
+                        <p><strong>แนวทางการตอบ:</strong><br>
+                        • UI เป็นเพียง Client-side ซึ่งผู้ไม่หวังดีสามารถใช้ DevTools หรือยิงคำขอตรงผ่าน Postman/cURL เข้าหา API ได้เสมอ (Client-side Bypass)<br>
+                        • <strong>มาตรการที่ถูกต้อง:</strong> ต้องใช้หลักการ <strong>Database-First Security & API Authorization</strong> โดยตรวจสอบสิทธิ์ด้วย <code>[Authorize]</code> และตรวจสอบความเป็นเจ้าของข้อมูลที่ระดับ Database Row-Level Security เสมอ</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mock Interview Simulator -->
+        <section class="lesson-section reveal">
+            <h2 class="mb-lg">🤖 แบบจำลองการสอบสัมภาษณ์ (Interactive Mock Interview)</h2>
+            <div id="interview-simulator-container"></div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/quiz-engine.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'กรรมการถาม: "ถ้าแอปพลิเคชันของคุณเจอปัญหา Memory Leak หลัง Deploy ขึ้น Production จุดแรกที่คุณจะเข้าไปตรวจสอบในโค้ด ASP.NET Core คืออะไร?"',
+                options: [
+                    'ตรวจสอบการลงทะเบียน DI ว่ามี Captive Dependency (ฉีด Scoped เข้า Singleton) หรือมีการลืม Dispose Unmanaged Resources หรือไม่',
+                    'ลบฐานข้อมูลทิ้งแล้วสร้างใหม่',
+                    'เปลี่ยนภาษาเขียนโปรแกรม',
+                    'ปิดเซิร์ฟเวอร์ทุก 1 ชั่วโมง'
+                ],
+                answer: 0,
+                explanation: 'Captive Dependency และการไม่ Dispose IDisposable เป็นสาเหตุอันดับหนึ่งของ Memory Leak ใน .NET',
+                difficulty: 'mid'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'กรรมการถาม: "คุณจะอธิบายความแตกต่างระหว่าง Interface และ Abstract Class ให้ผู้ร่วมทีมฟังอย่างไร?"',
+                options: [
+                    'Interface คือข้อตกลง (Contract) กำหนดเฉพาะโครงสร้างโดยไม่มี Logic (ทำอะไรได้บ้าง), ส่วน Abstract Class คือคลาสแม่ที่สามารถใส่ Implementation พื้นฐานและแชร์ State ร่วมกันได้',
+                    'Interface ทำงานได้เฉพาะกับ Database ส่วน Abstract Class ทำงานบนหน้าจอ',
+                    'เหมือนกันทุกอย่าง ไม่มีข้อแตกต่าง',
+                    'Interface ใช้ได้เฉพาะในภาษา Java'
+                ],
+                answer: 0,
+                explanation: 'Interface กำหนด "Can-Do" (พฤติกรรม) ส่วน Abstract Class กำหนด "Is-A" (สายพันธุ์/โครงสร้างพื้นฐาน)',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'กรรมการถาม: "เมื่อมีเพื่อนในทีมเปิด PR ที่มีคำสั่ง using (var client = new HttpClient()) คุณจะให้ Feedback อย่างไร?"',
+                options: [
+                    'แนะนำให้เปลี่ยนไปใช้ IHttpClientFactory (Typed Client) เพื่อป้องกันปัญหา Socket Exhaustion และ DNS Stale Cache',
+                    'กด Approve ผ่านทันที',
+                    'บอกให้ลบโค้ดส่วนนั้นทิ้งแล้วไม่ต้องเชื่อมต่อ API',
+                    'บอกว่าโค้ดสมบูรณ์แบบแล้ว'
+                ],
+                answer: 0,
+                explanation: 'นี่คือ Best Practice ของการทำ Code Review เชิงสร้างสรรค์พร้อมอธิบายเหตุผลทางเทคนิค',
+                difficulty: 'mid'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'กรรมการถาม: "ถ้าระบบ Web API ตอบสนองช้ามากเมื่อมีผู้ใช้พร้อมกัน 1,000 คน คุณมีแนวทางวิเคราะห์และปรับปรุงอย่างไร?"',
+                options: [
+                    'เช็คว่ามี Blocking Code (.Result/.Wait) หรือไม่, ใส่ AsNoTracking() ใน Read queries, เช็ค Index ใน Database และเพิ่ม In-Memory / Distributed Caching (Redis)',
+                    'บอกลูกค้าให้ใช้งานทีละคน',
+                    'ลดความละเอียดของหน้าจอ',
+                    'เปลี่ยนไปใช้ภาษา HTML ธรรมดา'
+                ],
+                answer: 0,
+                explanation: 'การตรวจสอบ Database Indexing, Caching, และ Non-blocking Async I/O เป็นสเต็ปการ Optimize ที่เป็นระบบ',
+                difficulty: 'mid'
+            }
+        ];
+
+        QuizEngine.start('interview-simulator-container', questions, {
+            quizId: 'interview-prep',
+            onComplete: () => {
+                Progress.completeLesson('interview-prep');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL พื้นฐานสำหรับ Backend .NET Developer — DotNet Learning Hub</title>
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <style>
+    /* ─── Database Track Theme Accents ─── */
+    :root {
+      --cat-sql-color: #38bdf8;
+      --cat-sql-glow: rgba(56, 189, 248, 0.25);
+      --sql-join-inner: #38bdf8;
+      --sql-join-left: #4ade80;
+      --sql-join-right: #fb923c;
+      --sql-join-full: #c084fc;
+    }
+
+    /* ─── Warehouse Analogy Interactive Grid ─── */
+    .warehouse-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+
+    .warehouse-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .warehouse-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--cat-sql-color), #818cf8);
+    }
+
+    .warehouse-card:hover {
+      border-color: var(--cat-sql-color);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 15px var(--cat-sql-glow);
+    }
+
+    .warehouse-icon {
+      font-size: 2rem;
+      margin-bottom: var(--space-sm);
+      display: inline-block;
+    }
+
+    .warehouse-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .warehouse-subtitle {
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      color: var(--cat-sql-color);
+      margin-bottom: var(--space-sm);
+    }
+
+    .warehouse-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ─── SQL Execution Pipeline Visualizer ─── */
+    .execution-pipeline {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+    }
+
+    .pipeline-steps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+      justify-content: center;
+    }
+
+    .step-node {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      transition: all var(--transition-fast);
+      color: var(--text-secondary);
+    }
+
+    .step-node:hover {
+      border-color: var(--cat-sql-color);
+      color: var(--text-primary);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .step-node.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--cat-sql-color);
+      color: var(--cat-sql-color);
+      box-shadow: 0 0 12px var(--cat-sql-glow);
+      font-weight: 700;
+    }
+
+    .step-node .node-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .step-node.active .node-num {
+      background: var(--cat-sql-color);
+      color: #0b0f19;
+    }
+
+    .pipeline-detail-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      min-height: 180px;
+    }
+
+    .pipeline-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--border-muted);
+    }
+
+    .pipeline-title {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--cat-sql-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pipeline-badge {
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      background: var(--bg-tertiary);
+      color: var(--text-muted);
+    }
+
+    .pipeline-desc {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ─── Interactive JOIN Sandbox ─── */
+    .join-sandbox {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+    }
+
+    .join-tab-bar {
+      display: flex;
+      gap: var(--space-xs);
+      background: var(--bg-tertiary);
+      padding: 6px;
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-lg);
+      flex-wrap: wrap;
+    }
+
+    .join-tab-btn {
+      flex: 1;
+      min-width: 120px;
+      padding: 10px 14px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 0.85rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-align: center;
+    }
+
+    .join-tab-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .join-tab-btn.active {
+      background: var(--bg-card);
+      color: var(--cat-sql-color);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-default);
+    }
+
+    .join-preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    @media (max-width: 768px) {
+      .join-preview-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .table-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+    }
+
+    .table-caption {
+      padding: 8px 12px;
+      background: var(--bg-tertiary);
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-default);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .mock-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+    }
+
+    .mock-table th, .mock-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-muted);
+      text-align: left;
+    }
+
+    .mock-table th {
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+
+    .mock-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .mock-table tr.highlight-match td {
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .mock-table td.null-val {
+      color: var(--syn-keyword);
+      font-style: italic;
+      opacity: 0.7;
+    }
+
+    /* ─── Production Danger Alert ─── */
+    .danger-terminal {
+      background: rgba(248, 81, 73, 0.06);
+      border: 2px solid rgba(248, 81, 73, 0.4);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+      position: relative;
+      box-shadow: 0 0 20px rgba(248, 81, 73, 0.1);
+    }
+
+    .danger-terminal::before {
+      content: '⚠️ CRITICAL PRODUCTION WARNING';
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #f85149;
+      color: #0b0f19;
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 0.72rem;
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── Comparison Matrix ─── */
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-md) 0;
+      font-size: 0.9rem;
+    }
+
+    .matrix-table th {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      padding: 12px 16px;
+      text-align: left;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      border: 1px solid var(--border-default);
+    }
+
+    .matrix-table td {
+      padding: 12px 16px;
+      border: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      line-height: 1.6;
+    }
+
+    .matrix-table tr:hover td {
+      background: var(--bg-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <a href="../index.html" class="site-logo">
+      <div class="logo-icon">🟣</div>
+      <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าหลัก (Dashboard)</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="./csharp-basics.html" class="sidebar-link">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="./csharp-oop.html" class="sidebar-link">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="./csharp-linq.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>LINQ &amp; Collections (Level 3)</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="./csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>Async/Await &amp; Advanced (Lv 4)</span>
+        <span class="sidebar-badge badge-new">Lv 4</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🌐 Track .NET &amp; Web API</div>
+      <a href="./dotnet-overview.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 &amp; CLI Overview</span>
+      </a>
+      <a href="./aspnet-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>ASP.NET Core Web API</span>
+      </a>
+      <a href="./ef-core.html" class="sidebar-link">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+      </a>
+      <a href="./blazor.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Blazor Web Apps</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🛠️ Track Database &amp; Quality</div>
+      <a href="./sql-basics.html" class="sidebar-link active">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; T-SQL</span>
+      </a>
+      <a href="./architecture.html" class="sidebar-link">
+        <span class="link-icon">🏛️</span>
+        <span>Clean Architecture &amp; Patterns</span>
+      </a>
+      <a href="./testing.html" class="sidebar-link">
+        <span class="link-icon">🧪</span>
+        <span>Unit Testing &amp; xUnit</span>
+      </a>
+      <a href="./devops.html" class="sidebar-link">
+        <span class="link-icon">🐳</span>
+        <span>Docker &amp; CI/CD</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header animate-fade-in">
+        <div class="breadcrumb">
+          <a href="../index.html">หน้าหลัก</a>
+          <span>/</span>
+          <span>Database Track</span>
+          <span>/</span>
+          <span class="text-primary">SQL พื้นฐาน</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(56, 189, 248, 0.2); color: var(--cat-sql-color); border: 1px solid rgba(56, 189, 248, 0.4);">📊</div>
+          <div>
+            <h1>SQL พื้นฐานสำหรับ Backend .NET Developer</h1>
+            <div class="page-description">ทำความเข้าใจ Relational Database, เจาะลึกลำดับการประมวลผลจริงของ SQL Engine (Execution Order), คำสั่ง CRUD, การรวมตารางด้วย JOINs และ Aggregate Functions อย่างมั่นใจ</div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="level-tag level-basic">⭐ พื้นฐาน</span></span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>เวลาเรียน: <strong>~45 นาที</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>รางวัล: <strong>+100 XP</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>💾</span>
+            <span>รองรับ T-SQL / PostgreSQL / MySQL / SQLite</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Analogy: คลังสินค้าอัจฉริยะ ─── -->
+      <div class="concept-card reveal" style="border-color: rgba(56, 189, 248, 0.3);">
+        <div class="concept-header" style="background: rgba(56, 189, 248, 0.08);">
+          <div class="concept-emoji">🏭</div>
+          <div>
+            <div class="concept-title" style="color: var(--cat-sql-color);">เปรียบเทียบให้เห็นภาพ: คลังสินค้าอัจฉริยะ (The Smart Warehouse Analogy)</div>
+            <div class="text-muted" style="font-size: 0.8rem;">ทำไมข้อมูลถึงต้องถูกจัดเรียงเป็นตาราง และเราคุยกับฐานข้อมูลอย่างไร?</div>
+          </div>
+        </div>
+        <div class="concept-body">
+          <div class="analogy-box" style="background: rgba(56, 189, 248, 0.05); border-color: rgba(56, 189, 248, 0.2);">
+            <div class="analogy-label" style="color: var(--cat-sql-color);">💡 เปรียบเทียบเชิงสถาปัตยกรรม</div>
+            <p class="analogy-text">
+              ลองจินตนาการว่า <strong>Database (ฐานข้อมูล)</strong> คือโกดังสินค้าอัจฉริยะขนาดใหญ่ของบริษัท ที่มีหุ่นยนต์อัตโนมัติคอยวิ่งหยิบของให้เราตามคำสั่งภาษา <strong>SQL (Structured Query Language)</strong> ซึ่งเปรียบเสมือนใบเบิกสินค้าที่ระบุเงื่อนไขอย่างชัดเจน
+            </p>
+          </div>
+
+          <div class="warehouse-grid">
+            <div class="warehouse-card">
+              <div class="warehouse-icon">🗄️</div>
+              <div class="warehouse-title">Table (ตาราง)</div>
+              <div class="warehouse-subtitle">เช่น Products, Customers</div>
+              <div class="warehouse-desc">
+                <strong>ชั้นวางของแยกหมวดหมู่</strong> ในโกดัง เช่น ชั้นวางสินค้าอิเล็กทรอนิกส์ หรือชั้นวางเฟอร์นิเจอร์ แต่ละชั้นจะเก็บของชนิดเดียวกันเท่านั้น
+              </div>
+            </div>
+
+            <div class="warehouse-card">
+              <div class="warehouse-icon">📦</div>
+              <div class="warehouse-title">Row / Record (แถว)</div>
+              <div class="warehouse-subtitle">แถวข้อมูล 1 รายการ</div>
+              <div class="warehouse-desc">
+                <strong>กล่องสินค้าแต่ละชิ้น</strong> ที่วางอยู่บนชั้น วางเรียงกันทีละแถว แต่ละกล่องคือสินค้า 1 ชิ้นที่มีข้อมูลเฉพาะตัว
+              </div>
+            </div>
+
+            <div class="warehouse-card">
+              <div class="warehouse-icon">🏷️</div>
+              <div class="warehouse-title">Column / Field (คอลัมน์)</div>
+              <div class="warehouse-subtitle">เช่น Price, StockQuantity</div>
+              <div class="warehouse-desc">
+                <strong>ป้ายสติกเกอร์บอกคุณสมบัติ</strong> ที่แปะอยู่ข้างกล่องสินค้าทุกใบ เช่น ป้ายรหัสสินค้า, ป้ายชื่อสินค้า, ป้ายราคา และวันหมดอายุ
+              </div>
+            </div>
+
+            <div class="warehouse-card">
+              <div class="warehouse-icon">🔑</div>
+              <div class="warehouse-title">Primary Key (PK)</div>
+              <div class="warehouse-subtitle">คีย์หลักที่ไม่ซ้ำใคร</div>
+              <div class="warehouse-desc">
+                <strong>Serial Number / Barcode ประจำกล่อง</strong> ที่ไม่มีทางซ้ำกับกล่องใบไหนในโลก ใช้ระบุตัวตนของกล่องได้อย่างถูกต้อง 100% เสมอ
+              </div>
+            </div>
+
+            <div class="warehouse-card">
+              <div class="warehouse-icon">🔗</div>
+              <div class="warehouse-title">Foreign Key (FK)</div>
+              <div class="warehouse-subtitle">คีย์นอกสำหรับเชื่อมโยง</div>
+              <div class="warehouse-desc">
+                <strong>ใบรายการสั่งซื้อที่อ้างอิงรหัสกล่อง</strong> เช่น ในใบสั่งซื้อ (Order) แปะรหัส CustomerId เพื่อบอกว่าของชิ้นนี้จะถูกส่งไปให้ลูกค้าคนใด
+              </div>
+            </div>
+
+            <div class="warehouse-card">
+              <div class="warehouse-icon">🤖</div>
+              <div class="warehouse-title">SQL Query Engine</div>
+              <div class="warehouse-subtitle">ตัวประมวลผลคำสั่ง</div>
+              <div class="warehouse-desc">
+                <strong>หุ่นยนต์จัดการคลังสินค้า</strong> เมื่อคุณส่งโค้ด SQL มา หุ่นยนต์จะคำนวณเส้นทางหยิบของที่เร็วที่สุด (Execution Plan) แล้วนำผลลัพธ์มาส่งให้คุณ
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Section 1: ลำดับการประมวลผลจริง (SQL Order of Execution) ─── -->
+      <section class="lesson-section reveal" id="execution-order">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(56, 189, 248, 0.15); color: var(--cat-sql-color); border: 1px solid var(--cat-sql-color);">01</div>
+          <div>
+            <h2 class="section-title">ลำดับการประมวลผลจริงของคำสั่ง SQL (Order of Execution)</h2>
+            <div class="section-subtitle">ความลับสำคัญที่สุดที่ Backend Developer ต้องเข้าใจ: ทำไมเราเขียน SELECT ก่อน แต่ฐานข้อมูลรัน SELECT ทีหลัง?</div>
+          </div>
+        </div>
+
+        <p>
+          มือใหม่ส่วนใหญ่มักเข้าใจผิดว่า SQL Engine จะประมวลผลคำสั่งจาก <strong>บนลงล่าง ซ้ายไปขวา</strong> เหมือนภาษาโปรแกรมทั่วไป แต่ในความเป็นจริง SQL เป็นภาษาแบบ <em>Declarative</em> (เราบอกผลลัพธ์ที่ต้องการ ไม่ใช่ขั้นตอนทีละบรรทัด) ตัว <strong>Database Query Engine</strong> จะทำงานตามลำดับตรรกะภายในที่ต่างจากสิ่งที่เราเขียนอย่างสิ้นเชิง!
+        </p>
+
+        <!-- Syntax Comparison Box -->
+        <div class="grid grid-2 mb-lg">
+          <div class="card" style="border-color: var(--border-default);">
+            <h4 style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: var(--space-sm);">✍️ 1. ลำดับสิ่งที่เราเขียน (Lexical Syntax Order)</h4>
+            <div class="code-block-wrapper" style="margin: 0;">
+              <div class="code-block-body">
+                <pre><code class="language-sql">1. SELECT [DISTINCT] Columns, Expressions
+2. FROM TableA JOIN TableB ON Condition
+3. WHERE Row_Filters
+4. GROUP BY Group_Columns
+5. HAVING Group_Filters
+6. ORDER BY Sort_Columns ASC|DESC
+7. OFFSET / FETCH (LIMIT / TOP);</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="border-color: var(--cat-sql-color); background: rgba(56, 189, 248, 0.03);">
+            <h4 style="color: var(--cat-sql-color); font-size: 0.95rem; margin-bottom: var(--space-sm);">⚙️ 2. ลำดับที่ SQL Engine ประมวลผลจริง (Logical Execution Order)</h4>
+            <div class="code-block-wrapper" style="margin: 0;">
+              <div class="code-block-body">
+                <pre><code class="language-sql">1. FROM & JOIN     ➔ ค้นหาและจับคู่ตารางต้นทางเข้า Memory
+2. WHERE           ➔ กรองแถวที่ไม่ต้องการทิ้งก่อนทันที
+3. GROUP BY        ➔ จัดกลุ่มแถวที่เหลือเข้าด้วยกัน
+4. HAVING          ➔ กรองกลุ่มที่ไม่ผ่านเกณฑ์ Aggregate ทิ้ง
+5. SELECT          ➔ เลือกคอลัมน์ คำนวณนิพจน์ และสร้าง Alias
+6. DISTINCT        ➔ ตัดแถวข้อมูลที่ผลลัพธ์ซ้ำกันออก
+7. ORDER BY        ➔ จัดเรียงลำดับแถวผลลัพธ์
+8. OFFSET / LIMIT  ➔ ตัดจำนวนแถวส่งกลับ (Pagination)</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Execution Pipeline Visualizer -->
+        <div class="execution-pipeline">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md); flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-primary);">🎛️ Interactive Visualizer: จำลองขั้นตอนการทำงานของ SQL Engine</h3>
+              <p class="text-muted" style="margin: 2px 0 0 0; font-size: 0.85rem;">คลิกแต่ละขั้นตอนเพื่อดูการประมวลผลและการเปลี่ยนแปลงข้อมูลใน Memory</p>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn btn-outline btn-sm" id="prev-step-btn">← ก่อนหน้า</button>
+              <button class="btn btn-primary btn-sm" id="next-step-btn">ถัดไป →</button>
+            </div>
+          </div>
+
+          <!-- Pipeline Step Buttons -->
+          <div class="pipeline-steps" id="pipeline-steps-container">
+            <div class="step-node active" data-step="1"><span class="node-num">1</span> FROM &amp; JOIN</div>
+            <div class="step-node" data-step="2"><span class="node-num">2</span> WHERE</div>
+            <div class="step-node" data-step="3"><span class="node-num">3</span> GROUP BY</div>
+            <div class="step-node" data-step="4"><span class="node-num">4</span> HAVING</div>
+            <div class="step-node" data-step="5"><span class="node-num">5</span> SELECT</div>
+            <div class="step-node" data-step="6"><span class="node-num">6</span> DISTINCT</div>
+            <div class="step-node" data-step="7"><span class="node-num">7</span> ORDER BY</div>
+            <div class="step-node" data-step="8"><span class="node-num">8</span> OFFSET / TOP</div>
+          </div>
+
+          <!-- Dynamic Step Description Box -->
+          <div class="pipeline-detail-card">
+            <div class="pipeline-header">
+              <div class="pipeline-title" id="pipeline-title">
+                <span>📍 ขั้นตอนที่ 1: FROM &amp; JOIN (ระบุแหล่งข้อมูล)</span>
+              </div>
+              <span class="pipeline-badge" id="pipeline-badge">Step 1 of 8</span>
+            </div>
+            <div class="pipeline-desc" id="pipeline-desc">
+              SQL Engine เริ่มต้นด้วยการระบุตารางต้นทางใน <code>FROM</code> หากมีการใช้ <code>JOIN</code> ฐานข้อมูลจะทำการจับคู่แถวข้อมูลตามเงื่อนไข <code>ON</code> เพื่อสร้างตารางผลลัพธ์ชั่วคราว (Working Table) ขึ้นมาใน Memory เพื่อใช้สำหรับขั้นตอนต่อไป
+            </div>
+            <div style="margin-top: var(--space-md); padding: 10px 14px; background: var(--bg-tertiary); border-radius: var(--radius-sm); border-left: 3px solid var(--cat-sql-color); font-size: 0.85rem; font-family: var(--font-code);" id="pipeline-code-preview">
+              <span style="color: var(--syn-keyword);">FROM</span> Orders o <span style="color: var(--syn-keyword);">INNER JOIN</span> Customers c <span style="color: var(--syn-keyword);">ON</span> o.CustomerId = c.Id
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">💡 คำถามยอดฮิตสัมภาษณ์งาน: ทำไมเราถึงใช้ Column Alias ใน WHERE ไม่ได้?</div>
+          <p style="margin-bottom: 4px;">
+            สมมติคุณเขียน: <code>SELECT Price * 0.9 AS DiscountPrice FROM Products WHERE DiscountPrice &lt; 500</code><br>
+            <strong>คำตอบ:</strong> จะเกิด Error ทันที! เพราะ <code>WHERE</code> ทำงานใน <strong>ขั้นตอนที่ 2</strong> ในขณะที่ <code>SELECT</code> (ผู้ให้กำเนิดชื่อ <code>DiscountPrice</code>) ทำงานใน <strong>ขั้นตอนที่ 5</strong> ในจังหวะที่ WHERE รัน Engine จึงยังไม่รู้จักชื่อ Alias นั้นเลย!
+          </p>
+          <p style="margin-bottom: 0; color: var(--accent-success);">
+            👉 แต่คุณสามารถใช้ <code>DiscountPrice</code> ใน <code>ORDER BY</code> (ขั้นตอนที่ 7) ได้ เพราะ ORDER BY ทำงานหลัง SELECT!
+          </p>
+        </div>
+      </section>
+
+      <!-- ─── Section 2: คำสั่ง CRUD พื้นฐาน ─── -->
+      <section class="lesson-section reveal" id="crud-commands">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(56, 189, 248, 0.15); color: var(--cat-sql-color); border: 1px solid var(--cat-sql-color);">02</div>
+          <div>
+            <h2 class="section-title">คำสั่ง CRUD พื้นฐาน (Create, Read, Update, Delete)</h2>
+            <div class="section-subtitle">หัวใจหลักในการอ่าน เขียน แก้ไข และลบข้อมูลในฐานข้อมูลของ Backend API</div>
+          </div>
+        </div>
+
+        <!-- 1. READ: SELECT & WHERE -->
+        <h3 style="color: var(--text-primary); margin-top: var(--space-xl);"><span style="color: var(--syn-keyword);">1. READ</span> — คำสั่ง SELECT และตัวกรอง WHERE</h3>
+        <p>
+          การค้นหาข้อมูลที่มีประสิทธิภาพขึ้นอยู่กับการเลือกคอลัมน์ที่จำเป็น (หลีกเลี่ยง <code>SELECT *</code> ในงานจริงบน Production) และการระบุเงื่อนไขด้วย <code>WHERE</code> ที่แม่นยำ:
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>01_Select_Queries.sql</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy', 2000)">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-sql">-- 1. การเลือกเฉพาะคอลัมน์ที่ต้องการ (Best Practice)
+SELECT Id, ProductName, UnitPrice, UnitsInStock
+FROM Products;
+
+-- 2. เงื่อนไขเปรียบเทียบตัวเลขและตรรกะ (AND, OR, NOT)
+SELECT ProductName, UnitPrice, UnitsInStock
+FROM Products
+WHERE UnitPrice >= 500 AND UnitsInStock > 0;
+
+-- 3. การใช้ IN สำหรับตรวจสอบค่าในกลุ่มที่กำหนด
+SELECT Id, CustomerName, City
+FROM Customers
+WHERE City IN ('Bangkok', 'Chiang Mai', 'Phuket');
+
+-- 4. การใช้ BETWEEN สำหรับช่วงข้อมูล (รวมหัวท้าย Inclusive)
+SELECT OrderId, OrderDate, TotalAmount
+FROM Orders
+WHERE OrderDate BETWEEN '2026-01-01' AND '2026-06-30';
+
+-- 5. การค้นหาข้อความด้วย LIKE (Pattern Matching)
+-- % แทนตัวอักษร 0 ตัวขึ้นไป, _ แทนตัวอักษรใดๆ 1 ตัวพอดี
+SELECT ProductName, Category
+FROM Products
+WHERE ProductName LIKE 'MacBook%'   -- ขึ้นต้นด้วย MacBook
+   OR ProductName LIKE '%Pro%'      -- มีคำว่า Pro อยู่ตรงไหนก็ได้
+   OR ProductName LIKE '_hone';     -- ลงท้ายด้วย hone มี 1 ตัวข้างหน้า เช่น Phone
+
+-- 6. การตรวจสอบค่าว่าง NULL (ห้ามใช้ = NULL เด็ดขาด!)
+SELECT CustomerId, CompanyName, Phone
+FROM Customers
+WHERE Phone IS NULL; -- หรือ IS NOT NULL</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">OUTPUT TABLE PREVIEW:</span>
+            <div style="overflow-x: auto; margin-top: 8px;">
+              <table class="mock-table" style="background: var(--bg-primary);">
+                <thead>
+                  <tr><th>Id</th><th>ProductName</th><th>UnitPrice</th><th>UnitsInStock</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>101</td><td>MacBook Air M3</td><td>39,900.00</td><td>15</td></tr>
+                  <tr><td>102</td><td>MacBook Pro 16"</td><td>89,900.00</td><td>8</td></tr>
+                  <tr><td>105</td><td>iPhone 16 Pro</td><td>41,900.00</td><td>24</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. CREATE: INSERT INTO -->
+        <h3 style="color: var(--text-primary); margin-top: var(--space-2xl);"><span style="color: var(--syn-keyword);">2. CREATE</span> — คำสั่ง INSERT INTO (Single &amp; Batch Insert)</h3>
+        <p>
+          การเพิ่มข้อมูลลงตาราง สามารถทำได้ทั้งแบบเพิ่มทีละแถว และการทำ <strong>Batch Multi-Row Insert</strong> เพื่อลด Round-trip Network I/O ระหว่าง .NET Application กับ SQL Server:
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>02_Insert_Queries.sql</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy', 2000)">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-sql">-- แบบที่ 1: เพิ่มข้อมูลแถวเดียว (Single Row Insert)
+INSERT INTO Categories (CategoryName, Description, IsActive)
+VALUES ('Electronics', 'Smartphones, Laptops and Gadgets', 1);
+
+-- แบบที่ 2: เพิ่มหลายแถวพร้อมกันในคำสั่งเดียว (Batch Insert - แนะนำมากสำหรับ Performance)
+INSERT INTO Products (ProductName, CategoryId, UnitPrice, UnitsInStock)
+VALUES 
+    ('Dell XPS 15', 1, 65000.00, 10),
+    ('Sony WH-1000XM5', 1, 13900.00, 25),
+    ('iPad Pro 11"', 1, 32900.00, 18);
+
+-- ใน SQL Server: การอ่านค่า Auto-Increment ID ที่เพิ่งถูก Insert ออกมาทันที
+-- ใน C# Dapper หรือ ADO.NET นิยมใช้ SCOPE_IDENTITY() หรือ OUTPUT INSERTED.Id
+INSERT INTO Customers (CustomerName, Email)
+OUTPUT INSERTED.Id, INSERTED.CreatedAt
+VALUES ('John Doe', 'john.doe@email.com');</code></pre>
+          </div>
+        </div>
+
+        <!-- 3. UPDATE & DELETE + WARNING -->
+        <h3 style="color: var(--text-primary); margin-top: var(--space-2xl);"><span style="color: var(--syn-keyword);">3. UPDATE &amp; DELETE</span> — การแก้ไขและลบข้อมูล</h3>
+
+        <!-- DANGER TERMINAL ALERT -->
+        <div class="danger-terminal">
+          <h3 style="color: #f85149; margin-top: 0; display: flex; align-items: center; gap: 8px;">
+            <span>🚨</span> กฎเหล็กข้อห้ามตาย: ห้ามรัน UPDATE หรือ DELETE โดยไม่มี WHERE เด็ดขาด!
+          </h3>
+          <p style="color: var(--text-primary); font-size: 0.92rem; line-height: 1.6;">
+            หากคุณเผลอรัน <code>UPDATE Products SET UnitPrice = 0;</code> หรือ <code>DELETE FROM Customers;</code> โดยลืมใส่ <code>WHERE</code> ข้อมูล <strong>ทั้งตาราง</strong> จะถูกเขียนทับหรือลบหายเกลี้ยงทันทีในเสี้ยววินาที!
+          </p>
+
+          <div style="background: rgba(0,0,0,0.3); border-radius: var(--radius-md); padding: var(--space-md); margin-top: var(--space-md);">
+            <div style="font-weight: 700; color: #ff7b72; margin-bottom: 6px; font-size: 0.85rem;">🛡️ วิถีความปลอดภัยของมืออาชีพ (Safe Execution Checklist):</div>
+            <ol style="margin: 0; padding-left: 20px; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7;">
+              <li><strong>รัน SELECT ก่อนเสมอ:</strong> ก่อนจะ UPDATE/DELETE ให้เขียน <code>SELECT * FROM ... WHERE [เงื่อนไข]</code> ดูก่อนว่าจำนวนแถวที่โดนตรงกับที่เราตั้งใจหรือไม่</li>
+              <li><strong>ใช้ Transaction เสมอเวลาแมนนวล:</strong> ครอบด้วย <code>BEGIN TRANSACTION;</code> ตรวจสอบผลลัพธ์ ถ้าถูกต้องจึง <code>COMMIT;</code> ถ้าพลาดให้ <code>ROLLBACK;</code> ทันที</li>
+              <li><strong>ระบบ Production นิยม Soft Delete:</strong> อัปเดตแฟล็ก <code>IsDeleted = 1</code> และ <code>DeletedAt = GETUTCDATE()</code> แทนการลบข้อมูลทิ้งจริง (Hard Delete)</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>03_Update_Delete_Safe.sql</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy', 2000)">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-sql">-- ตัวอย่างการ UPDATE อย่างปลอดภัย
+UPDATE Products
+SET UnitPrice = UnitPrice * 1.05,  -- ปรับราคาขึ้น 5%
+    UpdatedAt = GETUTCDATE()
+WHERE CategoryId = 1 AND UnitsInStock > 0;
+
+-- ตัวอย่างการทำ Safe Delete ด้วย Explicit Transaction ใน SQL Server
+BEGIN TRANSACTION;
+
+    -- ลบเฉพาะสินค้าที่ถูกยกเลิกการขายและไม่มีสต็อกเหลือ
+    DELETE FROM Products
+    WHERE IsDiscontinued = 1 AND UnitsInStock = 0;
+
+    -- ตรวจสอบจำนวนแถวที่ได้รับผลกระทบ (Affected Rows)
+    SELECT @@ROWCOUNT AS RowsDeleted;
+
+-- หากจำนวนแถวถูกต้องให้รัน COMMIT; 
+-- หากพบว่าลบผิดพลาดให้รัน ROLLBACK; ทันที
+COMMIT TRANSACTION;</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 3: การรวมตารางด้วย JOINs ─── -->
+      <section class="lesson-section reveal" id="joins">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(56, 189, 248, 0.15); color: var(--cat-sql-color); border: 1px solid var(--cat-sql-color);">03</div>
+          <div>
+            <h2 class="section-title">การรวมตารางด้วย SQL JOINs (Table Relationships)</h2>
+            <div class="section-subtitle">หัวใจของ Relational Database — การดึงข้อมูลที่มีความสัมพันธ์กันจากหลายตารางมาประกอบร่างเป็นผลลัพธ์เดียว</div>
+          </div>
+        </div>
+
+        <p>
+          ในระบบฐานข้อมูลเชิงสัมพันธ์ (RDBMS) ข้อมูลจะถูกแยกตารางเพื่อลดความซ้ำซ้อน (Database Normalization) เช่น แยกข้อมูล <code>Customers</code> (ลูกค้า) ออกจาก <code>Orders</code> (คำสั่งซื้อ) เมื่อเราต้องการดูว่า <em>"ลูกค้าชื่ออะไร สั่งซื้อออเดอร์หมายเลขใดบ้าง"</em> เราจึงต้องใช้ <strong>JOIN</strong> เชื่อมโยง Primary Key และ Foreign Key เข้าด้วยกัน
+        </p>
+
+        <!-- Interactive JOIN Sandbox -->
+        <div class="join-sandbox">
+          <div style="margin-bottom: var(--space-md);">
+            <h3 style="margin: 0; font-size: 1.1rem; color: var(--cat-sql-color);">🧩 Interactive JOIN Visualizer: ทดลองคลิกเพื่อดูความแตกต่างของ JOIN แต่ละแบบ</h3>
+            <p class="text-muted" style="margin: 4px 0 0 0; font-size: 0.85rem;">ดูข้อมูลจำลองของตาราง Customers และ Orders ด้านล่าง แล้วสังเกตว่าผลลัพธ์เปลี่ยนไปอย่างไร</p>
+          </div>
+
+          <!-- Tab buttons for each Join type -->
+          <div class="join-tab-bar">
+            <button class="join-tab-btn active" data-join="inner">🔵 INNER JOIN</button>
+            <button class="join-tab-btn" data-join="left">🟢 LEFT JOIN</button>
+            <button class="join-tab-btn" data-join="right">🟠 RIGHT JOIN</button>
+            <button class="join-tab-btn" data-join="full">🟣 FULL OUTER JOIN</button>
+          </div>
+
+          <!-- Mock Source Tables Preview -->
+          <div class="join-preview-grid">
+            <div class="table-container">
+              <div class="table-caption">
+                <span>ตารางซ้าย: Customers (ลูกค้า)</span>
+                <span class="text-muted">4 Rows</span>
+              </div>
+              <table class="mock-table">
+                <thead>
+                  <tr><th>CustomerId (PK)</th><th>CustomerName</th><th>City</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="cust-row" data-cust-id="1"><td>1</td><td>สมชาย (Somchai)</td><td>Bangkok</td></tr>
+                  <tr class="cust-row" data-cust-id="2"><td>2</td><td>สมหญิง (Somying)</td><td>Chiang Mai</td></tr>
+                  <tr class="cust-row" data-cust-id="3"><td>3</td><td>วิชัย (Wichai)</td><td>Phuket</td></tr>
+                  <tr class="cust-row" data-cust-id="4"><td>4</td><td>กานดา (Kanda)</td><td>Bangkok</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-container">
+              <div class="table-caption">
+                <span>ตารางขวา: Orders (คำสั่งซื้อ)</span>
+                <span class="text-muted">4 Rows</span>
+              </div>
+              <table class="mock-table">
+                <thead>
+                  <tr><th>OrderId (PK)</th><th>CustomerId (FK)</th><th>Amount</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="ord-row" data-cust-id="1"><td>101</td><td>1 (สมชาย)</td><td>1,500 ฿</td></tr>
+                  <tr class="ord-row" data-cust-id="1"><td>102</td><td>1 (สมชาย)</td><td>4,200 ฿</td></tr>
+                  <tr class="ord-row" data-cust-id="2"><td>103</td><td>2 (สมหญิง)</td><td>890 ฿</td></tr>
+                  <tr class="ord-row" data-cust-id="99"><td>104</td><td>99 (ไม่ระบุลูกค้า)</td><td>3,100 ฿</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Live Result Output Box -->
+          <div class="card" style="background: var(--bg-secondary); border-color: var(--border-active);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-sm); flex-wrap: wrap; gap: 8px;">
+              <h4 id="join-result-title" style="margin: 0; color: var(--cat-sql-color); font-size: 0.95rem;">
+                ผลลัพธ์ของ INNER JOIN (แสดงเฉพาะแถวที่ Key ตรงกันทั้งสองตาราง)
+              </h4>
+              <span class="badge badge-primary" id="join-result-badge">3 Records Found</span>
+            </div>
+
+            <div class="code-block-wrapper" style="margin: var(--space-xs) 0 var(--space-md) 0;">
+              <div class="code-block-body">
+                <pre><code class="language-sql" id="join-query-code">SELECT c.CustomerId, c.CustomerName, o.OrderId, o.Amount
+FROM Customers c
+INNER JOIN Orders o ON c.CustomerId = o.CustomerId;</code></pre>
+              </div>
+            </div>
+
+            <!-- Dynamic Result Table -->
+            <div class="table-container">
+              <table class="mock-table" id="join-result-table">
+                <thead>
+                  <tr>
+                    <th>c.CustomerId</th>
+                    <th>c.CustomerName</th>
+                    <th>o.OrderId</th>
+                    <th>o.Amount</th>
+                    <th>หมายเหตุความสัมพันธ์</th>
+                  </tr>
+                </thead>
+                <tbody id="join-result-tbody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+            
+            <p id="join-explanation" class="text-secondary" style="font-size: 0.88rem; margin: var(--space-md) 0 0 0; line-height: 1.6;">
+              💡 <strong>INNER JOIN:</strong> ดึงเฉพาะลูกค้าที่ <em>เคยมีประวัติการสั่งซื้อ</em> (สมชายมี 2 ออเดอร์, สมหญิงมี 1 ออเดอร์) ส่วนวิชัยและกานดา (ไม่มีออเดอร์) และออเดอร์ 104 (ไม่มีลูกค้า) จะถูกตัดทิ้งทั้งหมด
+            </p>
+          </div>
+        </div>
+
+        <!-- Join Summary Comparison Matrix -->
+        <h3 style="color: var(--text-primary); margin-top: var(--space-xl);">📋 สรุปเปรียบเทียบประเภทของ SQL JOINs</h3>
+        <div style="overflow-x: auto;">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th style="width: 18%;">ประเภท JOIN</th>
+                <th style="width: 42%;">พฤติกรรมการดึงข้อมูล</th>
+                <th style="width: 40%;">ตัวอย่าง Use Case ในงานจริง</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family: var(--font-code); font-weight: 700; color: var(--sql-join-inner);">INNER JOIN</td>
+                <td>เอาเฉพาะแถวที่มีค่าเชื่อมโยง (Key) <strong>ตรงกันทั้งสองฝั่ง</strong> ตารางซ้ายและขวา</td>
+                <td>ดึงใบเสร็จรับเงินที่ต้องมีข้อมูลทั้งลูกค้าและสินค้าครบถ้วน</td>
+              </tr>
+              <tr>
+                <td style="font-family: var(--font-code); font-weight: 700; color: var(--sql-join-left);">LEFT JOIN</td>
+                <td>เอา <strong>ตารางซ้ายมาทั้งหมด 100%</strong> หากตารางขวาไม่มีข้อมูลคู่ ให้เติมค่าเป็น <code>NULL</code></td>
+                <td>แสดงรายชื่อลูกค้าทั้งหมด และดูยอดซื้อ (ลูกค้าที่ไม่เคยซื้อจะได้ค่า <code>NULL</code>)</td>
+              </tr>
+              <tr>
+                <td style="font-family: var(--font-code); font-weight: 700; color: var(--sql-join-right);">RIGHT JOIN</td>
+                <td>เอา <strong>ตารางขวามาทั้งหมด 100%</strong> หากตารางซ้ายไม่มีข้อมูลคู่ ให้เติมค่าเป็น <code>NULL</code></td>
+                <td>คล้าย LEFT JOIN แต่มักเลี่ยงใช้โดยการสลับตารางมาอยู่ฝั่งซ้ายแทนเพื่อให้อ่านเข้าใจง่ายขึ้น</td>
+              </tr>
+              <tr>
+                <td style="font-family: var(--font-code); font-weight: 700; color: var(--sql-join-full);">FULL OUTER JOIN</td>
+                <td>เอา <strong>ทุกแถวของทั้งสองตาราง</strong> มารวมกัน แถวไหนจับคู่ไม่ได้ก็จะใส่ <code>NULL</code></td>
+                <td>การทำ Data Reconciliation ตรวจสอบความไม่สอดคล้องของข้อมูล 2 ฝั่ง</td>
+              </tr>
+              <tr>
+                <td style="font-family: var(--font-code); font-weight: 700; color: var(--accent-warning);">CROSS JOIN</td>
+                <td>ผลคูณคาร์ทีเชียน (Cartesian Product) นำทุกแถวของ A มาจับคู่กับทุกแถวของ B ($M \times N$)</td>
+                <td>การสร้างตาราง Matrix สินค้า x ไซส์เสื้อ x สี ทั้งหมดที่เป็นไปได้</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ─── Section 4: Aggregate Functions & GROUP BY ─── -->
+      <section class="lesson-section reveal" id="aggregates">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(56, 189, 248, 0.15); color: var(--cat-sql-color); border: 1px solid var(--cat-sql-color);">04</div>
+          <div>
+            <h2 class="section-title">Aggregate Functions &amp; GROUP BY / HAVING</h2>
+            <div class="section-subtitle">การคำนวณและสรุปสถิติข้อมูลชุดใหญ่ และความแตกต่างระหว่าง WHERE vs HAVING</div>
+          </div>
+        </div>
+
+        <p>
+          ในระบบ Dashboard, Reporting หรือ Analytics หลังบ้านของ .NET เราต้องทำการสรุปผลตัวเลขสถิติ เช่น ยอดขายรวม ยอดสั่งซื้อเฉลี่ย หรือจำนวนสินค้าคงเหลือ ซึ่ง SQL มีฟังก์ชันคำนวณสรุปผล (Aggregate Functions) มาตรฐาน 5 ตัวหลัก:
+        </p>
+
+        <div class="grid grid-3 mb-lg">
+          <div class="card" style="padding: var(--space-md);">
+            <div style="font-family: var(--font-code); font-size: 1.1rem; color: var(--cat-sql-color); font-weight: 700;">COUNT()</div>
+            <div class="text-muted" style="font-size: 0.85rem; margin-top: 4px;">นับจำนวนแถวข้อมูล</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px;"><code>COUNT(*)</code> นับทุกแถว<br><code>COUNT(Col)</code> ไม่นับ NULL</div>
+          </div>
+
+          <div class="card" style="padding: var(--space-md);">
+            <div style="font-family: var(--font-code); font-size: 1.1rem; color: var(--accent-success); font-weight: 700;">SUM()</div>
+            <div class="text-muted" style="font-size: 0.85rem; margin-top: 4px;">หาผลรวมตัวเลข</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px;">เช่น ยอดขายรวมทั้งหมดของเดือน <code>SUM(TotalAmount)</code></div>
+          </div>
+
+          <div class="card" style="padding: var(--space-md);">
+            <div style="font-family: var(--font-code); font-size: 1.1rem; color: var(--accent-info); font-weight: 700;">AVG()</div>
+            <div class="text-muted" style="font-size: 0.85rem; margin-top: 4px;">หาค่าเฉลี่ยตัวเลข</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px;">เช่น ค่าเฉลี่ยยอดบิลต่อออเดอร์ <code>AVG(Amount)</code></div>
+          </div>
+
+          <div class="card" style="padding: var(--space-md);">
+            <div style="font-family: var(--font-code); font-size: 1.1rem; color: var(--accent-warning); font-weight: 700;">MIN()</div>
+            <div class="text-muted" style="font-size: 0.85rem; margin-top: 4px;">หาค่าน้อยที่สุด</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px;">เช่น ราคาสินค้าที่ถูกที่สุดในแผนก <code>MIN(UnitPrice)</code></div>
+          </div>
+
+          <div class="card" style="padding: var(--space-md);">
+            <div style="font-family: var(--font-code); font-size: 1.1rem; color: var(--syn-keyword); font-weight: 700;">MAX()</div>
+            <div class="text-muted" style="font-size: 0.85rem; margin-top: 4px;">หาค่ามากที่สุด</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px;">เช่น ออเดอร์ที่มียอดเงินสูงสุด <code>MAX(TotalAmount)</code></div>
+          </div>
+
+          <div class="card" style="padding: var(--space-md);">
+            <div style="font-family: var(--font-code); font-size: 1.1rem; color: #f472b6; font-weight: 700;">GROUP BY</div>
+            <div class="text-muted" style="font-size: 0.85rem; margin-top: 4px;">จัดหมวดหมู่ข้อมูล</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px;">รวมแถวที่ซ้ำกันให้เหลือ 1 แถวต่อกลุ่ม</div>
+          </div>
+        </div>
+
+        <!-- WHERE vs HAVING Battle -->
+        <h3 style="color: var(--text-primary); margin-top: var(--space-2xl);">⚔️ ศึกแห่งความเข้าใจ: WHERE vs HAVING แตกต่างกันอย่างไร?</h3>
+        
+        <div style="overflow-x: auto;">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th style="width: 20%;">หัวข้อเปรียบเทียบ</th>
+                <th style="width: 40%; color: var(--cat-sql-color);">WHERE Clause</th>
+                <th style="width: 40%; color: var(--accent-success);">HAVING Clause</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>ลำดับการทำงาน (Stage)</strong></td>
+                <td>ทำงานใน <strong>Step 2</strong> (ก่อนการจัดกลุ่ม GROUP BY)</td>
+                <td>ทำงานใน <strong>Step 4</strong> (หลังจากการจัดกลุ่ม GROUP BY แล้ว)</td>
+              </tr>
+              <tr>
+                <td><strong>เป้าหมายการกรอง (Target)</strong></td>
+                <td>กรองข้อมูลระดับ <strong>แถวเดี่ยว (Row-level filter)</strong></td>
+                <td>กรองข้อมูลระดับ <strong>กลุ่มผลลัพธ์รวม (Group-level filter)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>การใช้ Aggregate Functions</strong></td>
+                <td><span style="color: var(--accent-danger); font-weight: 700;">❌ ห้ามใช้เด็ดขาด</span> (เช่น <code>WHERE SUM(Price) &gt; 100</code> = Error)</td>
+                <td><span style="color: var(--accent-success); font-weight: 700;">✔️ ใช้งานได้โดยตรง</span> (เช่น <code>HAVING SUM(Price) &gt; 100</code>)</td>
+              </tr>
+              <tr>
+                <td><strong>ประสิทธิภาพ (Performance)</strong></td>
+                <td>เร็วกว่ามาก เพราะตัดแถวทิ้งตั้งแต่ก่อนเอาเข้าหน่วยความจำ</td>
+                <td>ช้ากว่าหากใช้กรองสิ่งที่ไม่ใช่ Aggregate เพราะต้องรัน Group ให้เสร็จก่อน</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Real World Complex SQL Query Example -->
+        <h3 style="color: var(--text-primary); margin-top: var(--space-xl);">💻 ตัวอย่างคำสั่งจริง: วิเคราะห์ยอดขายรวมลูกค้าระดับ VIP</h3>
+        <p>
+          โจทย์: <em>"ต้องการค้นหาลูกค้าที่อาศัยอยู่ในกรุงเทพฯ (Bangkok) ที่มียอดสั่งซื้อรวมเกิน 50,000 บาท และสั่งซื้ออย่างน้อย 2 ครั้ง โดยเรียงลำดับจากยอดซื้อรวมมากไปน้อย"</em>
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>04_Group_By_Having_VIP.sql</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy', 2000)">Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-sql">SELECT 
+    c.CustomerId,
+    c.CustomerName,
+    c.City,
+    COUNT(o.OrderId) AS TotalOrders,
+    SUM(o.TotalAmount) AS TotalSpending,
+    AVG(o.TotalAmount) AS AverageBill
+FROM Customers c
+INNER JOIN Orders o ON c.CustomerId = o.CustomerId
+WHERE c.City = 'Bangkok'                  -- 1. WHERE: กรองเอาเฉพาะลูกค้าในกรุงเทพฯ ก่อน Group
+GROUP BY c.CustomerId, c.CustomerName, c.City -- 2. GROUP BY: จัดกลุ่มตามรหัสลูกค้า
+HAVING SUM(o.TotalAmount) >= 50000        -- 3. HAVING: กรองเฉพาะกลุ่มที่ยอดซื้อรวม >= 50,000
+   AND COUNT(o.OrderId) >= 2              --    และต้องมีออเดอร์ 2 ครั้งขึ้นไป
+ORDER BY TotalSpending DESC;              -- 4. ORDER BY: เรียงลำดับยอดเงินรวมจากมากไปน้อย</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">QUERY RESULT OUTPUT:</span>
+            <div style="overflow-x: auto; margin-top: 8px;">
+              <table class="mock-table" style="background: var(--bg-primary);">
+                <thead>
+                  <tr>
+                    <th>CustomerId</th>
+                    <th>CustomerName</th>
+                    <th>City</th>
+                    <th>TotalOrders</th>
+                    <th>TotalSpending</th>
+                    <th>AverageBill</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1001</td><td>บริษัท เทคโนโลยี สยาม จำกัด</td><td>Bangkok</td><td>5</td><td>145,000.00 ฿</td><td>29,000.00 ฿</td></tr>
+                  <tr><td>1042</td><td>คุณศิริพร เจริญสุข</td><td>Bangkok</td><td>3</td><td>68,500.00 ฿</td><td>22,833.33 ฿</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 5: Inline Quiz ─── -->
+      <section class="lesson-section reveal" id="quiz-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(56, 189, 248, 0.15); color: var(--cat-sql-color); border: 1px solid var(--cat-sql-color);">05</div>
+          <div>
+            <h2 class="section-title">แบบทดสอบวัดความรู้: SQL Fundamentals Quiz</h2>
+            <div class="section-subtitle">ทดสอบความเข้าใจเรื่อง SQL Execution Order, CRUD Safety, JOINs และ GROUP BY/HAVING (5 ข้อ)</div>
+          </div>
+        </div>
+
+        <!-- Quiz Container rendered by QuizEngine -->
+        <div id="sql-basics-quiz"></div>
+      </section>
+
+      <!-- ─── Next Lesson Navigation ─── -->
+      <div class="card mt-2xl reveal" style="border-color: var(--cat-sql-color); background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(22, 27, 34, 0.8) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge badge-success mb-xs">🎉 ยอดเยี่ยม! ผ่านบทเรียน SQL Fundamentals</span>
+            <h3 style="margin-top: 4px; margin-bottom: 4px;">พร้อมไปต่อกับ Entity Framework Core (ORM สำหรับ .NET) แล้วหรือยัง?</h3>
+            <p class="text-muted" style="margin-bottom: 0;">แปลงคำสั่ง SQL ให้กลายเป็น C# LINQ Queries และจัดการ Database Migration แบบมืออาชีพ</p>
+          </div>
+          <div>
+            <a href="./ef-core.html" class="btn btn-primary btn-lg">
+              <span>ไปบทเรียนถัดไป: EF Core →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Mark this lesson in Progress tracker
+      if (typeof Progress !== 'undefined') {
+        Progress.completeLesson('sql-basics');
+        Progress.setModuleProgress('database', 30);
+      }
+
+      // ─── 1. SQL Execution Order Visualizer Controller ───
+      const stepsData = [
+        {
+          num: 1,
+          name: "FROM & JOIN",
+          badge: "Step 1 of 8: ระบุและจับคู่ตาราง",
+          desc: "SQL Engine เริ่มต้นด้วยการค้นหาตารางต้นทางใน <code>FROM</code> หากมี <code>JOIN</code> ฐานข้อมูลจะจับคู่แถวตามเงื่อนไข <code>ON</code> เพื่อสร้างตารางผลลัพธ์ชั่วคราว (Working Virtual Table) ขึ้นมาในหน่วยความจำ",
+          code: "<span style='color: var(--syn-keyword);'>FROM</span> Orders o <span style='color: var(--syn-keyword);'>INNER JOIN</span> Customers c <span style='color: var(--syn-keyword);'>ON</span> o.CustomerId = c.Id"
+        },
+        {
+          num: 2,
+          name: "WHERE",
+          badge: "Step 2 of 8: กรองแถวระดับ Row",
+          desc: "Engine นำตารางจากขั้นตอนที่ 1 มาตรวจสอบเงื่อนไขใน <code>WHERE</code> เพื่อคัดแถวที่ไม่ตรงเงื่อนไขทิ้งทันที <em>(ในขั้นตอนนี้ยังไม่รู้จักชื่อ Alias ที่ตั้งใน SELECT)</em>",
+          code: "<span style='color: var(--syn-keyword);'>WHERE</span> o.OrderDate >= '2026-01-01' <span style='color: var(--syn-keyword);'>AND</span> o.Status = 'Completed'"
+        },
+        {
+          num: 3,
+          name: "GROUP BY",
+          badge: "Step 3 of 8: จัดกลุ่มข้อมูล",
+          desc: "นำแถวที่ผ่านการกรองจาก WHERE มาจัดกลุ่มตามคอลัมน์ที่ระบุใน <code>GROUP BY</code> ข้อมูลที่มีค่าซ้ำกันในคอลัมน์นั้นจะถูกรวมเป็นกลุ่มเดียวกัน เพื่อเตรียมพร้อมสำหรับการคำนวณ Aggregate",
+          code: "<span style='color: var(--syn-keyword);'>GROUP BY</span> c.CustomerId, c.CustomerName"
+        },
+        {
+          num: 4,
+          name: "HAVING",
+          badge: "Step 4 of 8: กรองกลุ่ม Aggregate",
+          desc: "หลังจากจัดกลุ่มแล้ว <code>HAVING</code> จะทำหน้าที่กรองกลุ่มที่ไม่ตรงเงื่อนไขทิ้ง เช่น กรองเอาเฉพาะกลุ่มที่มียอดสั่งซื้อรวม <code>SUM(TotalAmount) >= 10000</code>",
+          code: "<span style='color: var(--syn-keyword);'>HAVING</span> <span style='color: var(--syn-method);'>SUM</span>(o.TotalAmount) >= 10000 <span style='color: var(--syn-keyword);'>AND</span> <span style='color: var(--syn-method);'>COUNT</span>(o.OrderId) >= 2"
+        },
+        {
+          num: 5,
+          name: "SELECT",
+          badge: "Step 5 of 8: เลือกคอลัมน์และสร้าง Alias",
+          desc: "Engine ทำการเลือกเฉพาะคอลัมน์ที่ระบุ คำนวณสูตรหรือนิพจน์ (Expressions) และตั้งชื่อเล่นให้คอลัมน์ (<code>AS ColumnAlias</code>) ตรงจุดนี้ชื่อ Alias จึงเพิ่งเกิดขึ้นในระบบ!",
+          code: "<span style='color: var(--syn-keyword);'>SELECT</span> c.CustomerName, <span style='color: var(--syn-method);'>SUM</span>(o.TotalAmount) <span style='color: var(--syn-keyword);'>AS</span> TotalSpend"
+        },
+        {
+          num: 6,
+          name: "DISTINCT",
+          badge: "Step 6 of 8: ตัดแถวผลลัพธ์ที่ซ้ำ",
+          desc: "หากในคำสั่งมีการระบุคีย์เวิร์ด <code>DISTINCT</code> Engine จะทำการตรวจสอบแถวข้อมูลผลลัพธ์ทั้งหมด และกำจัดแถวที่มีค่าทุกคอลัมน์ซ้ำกันทิ้งไป",
+          code: "<span style='color: var(--syn-keyword);'>SELECT DISTINCT</span> City, PostalCode <span style='color: var(--syn-keyword);'>FROM</span> Customers"
+        },
+        {
+          num: 7,
+          name: "ORDER BY",
+          badge: "Step 7 of 8: เรียงลำดับข้อมูล",
+          desc: "ทำการจัดเรียงแถวข้อมูลผลลัพธ์ตามคอลัมน์ที่กำหนด (<code>ASC</code> หรือ <code>DESC</code>) ในขั้นตอนนี้สามารถใช้ชื่อ <strong>Column Alias</strong> ที่ตั้งใน SELECT ได้อย่างสมบูรณ์",
+          code: "<span style='color: var(--syn-keyword);'>ORDER BY</span> TotalSpend <span style='color: var(--syn-keyword);'>DESC</span>, c.CustomerName <span style='color: var(--syn-keyword);'>ASC</span>"
+        },
+        {
+          num: 8,
+          name: "OFFSET / LIMIT / TOP",
+          badge: "Step 8 of 8: ตัดแบ่งหน้า (Pagination)",
+          desc: "ขั้นตอนสุดท้าย! Engine จะทำการตัดเอาเฉพาะจำนวนแถวที่ต้องการส่งกลับ เช่น ดึงเฉพาะ 10 แถวแรกสำหรับทำ Pagination ใน Web API",
+          code: "<span style='color: var(--syn-keyword);'>OFFSET</span> 0 <span style='color: var(--syn-keyword);'>ROWS FETCH NEXT</span> 10 <span style='color: var(--syn-keyword);'>ROWS ONLY</span>; <span style='color: var(--text-muted);'>-- (หรือ TOP 10 / LIMIT 10)</span>"
+        }
+      ];
+
+      let currentStep = 1;
+      const stepNodes = document.querySelectorAll('.step-node');
+      const pipelineTitle = document.getElementById('pipeline-title');
+      const pipelineBadge = document.getElementById('pipeline-badge');
+      const pipelineDesc = document.getElementById('pipeline-desc');
+      const pipelineCode = document.getElementById('pipeline-code-preview');
+      const prevBtn = document.getElementById('prev-step-btn');
+      const nextBtn = document.getElementById('next-step-btn');
+
+      function updateStepView(stepNum) {
+        currentStep = stepNum;
+        stepNodes.forEach(node => {
+          const num = parseInt(node.getAttribute('data-step'));
+          node.classList.toggle('active', num === currentStep);
+        });
+
+        const data = stepsData[currentStep - 1];
+        pipelineTitle.innerHTML = `<span>📍 ขั้นตอนที่ ${data.num}: ${data.name}</span>`;
+        pipelineBadge.textContent = data.badge;
+        pipelineDesc.innerHTML = data.desc;
+        pipelineCode.innerHTML = data.code;
+      }
+
+      stepNodes.forEach(node => {
+        node.addEventListener('click', () => {
+          const num = parseInt(node.getAttribute('data-step'));
+          updateStepView(num);
+        });
+      });
+
+      if (prevBtn && nextBtn) {
+        prevBtn.addEventListener('click', () => {
+          let prev = currentStep - 1;
+          if (prev < 1) prev = stepsData.length;
+          updateStepView(prev);
+        });
+        nextBtn.addEventListener('click', () => {
+          let next = currentStep + 1;
+          if (next > stepsData.length) next = 1;
+          updateStepView(next);
+        });
+      }
+
+      // ─── 2. Interactive JOIN Sandbox Controller ───
+      const joinData = {
+        inner: {
+          title: "ผลลัพธ์ของ INNER JOIN (แสดงเฉพาะแถวที่ Key ตรงกันทั้งสองตาราง)",
+          badge: "3 Records Found",
+          query: `SELECT c.CustomerId, c.CustomerName, o.OrderId, o.Amount
+FROM Customers c
+INNER JOIN Orders o ON c.CustomerId = o.CustomerId;`,
+          rows: [
+            { cid: "1", name: "สมชาย (Somchai)", oid: "101", amount: "1,500 ฿", note: "ตรงกัน (สมชาย - ออเดอร์ 101)" },
+            { cid: "1", name: "สมชาย (Somchai)", oid: "102", amount: "4,200 ฿", note: "ตรงกัน (สมชาย - ออเดอร์ 102)" },
+            { cid: "2", name: "สมหญิง (Somying)", oid: "103", amount: "890 ฿", note: "ตรงกัน (สมหญิง - ออเดอร์ 103)" }
+          ],
+          explanation: "💡 <strong>INNER JOIN:</strong> ดึงเฉพาะลูกค้าที่ <em>เคยมีประวัติการสั่งซื้อ</em> (สมชาย 2 รายการ, สมหญิง 1 รายการ) ส่วนวิชัยและกานดา (ไม่เคยสั่งซื้อ) รวมถึงออเดอร์ 104 (ไม่มีลูกค้า) จะถูกตัดทิ้งทั้งหมด"
+        },
+        left: {
+          title: "ผลลัพธ์ของ LEFT JOIN (เอาตาราง Customers ซ้ายมาทั้งหมด 100%)",
+          badge: "5 Records Found",
+          query: `SELECT c.CustomerId, c.CustomerName, o.OrderId, o.Amount
+FROM Customers c
+LEFT JOIN Orders o ON c.CustomerId = o.CustomerId;`,
+          rows: [
+            { cid: "1", name: "สมชาย (Somchai)", oid: "101", amount: "1,500 ฿", note: "มีออเดอร์" },
+            { cid: "1", name: "สมชาย (Somchai)", oid: "102", amount: "4,200 ฿", note: "มีออเดอร์" },
+            { cid: "2", name: "สมหญิง (Somying)", oid: "103", amount: "890 ฿", note: "มีออเดอร์" },
+            { cid: "3", name: "วิชัย (Wichai)", oid: "<span class='null-val'>NULL</span>", amount: "<span class='null-val'>NULL</span>", note: "ไม่มีออเดอร์ (เติม NULL ทางขวา)" },
+            { cid: "4", name: "กานดา (Kanda)", oid: "<span class='null-val'>NULL</span>", amount: "<span class='null-val'>NULL</span>", note: "ไม่มีออเดอร์ (เติม NULL ทางขวา)" }
+          ],
+          explanation: "💡 <strong>LEFT JOIN:</strong> ดึงลูกค้าทุกคนออกมาครบถ้วน 100%! สำหรับลูกค้าที่ยังไม่เคยมีออเดอร์อย่างคุณวิชัยและคุณกานดา คอลัมน์ฝั่งขวาของตาราง Orders จะถูกเติมด้วยค่า <code>NULL</code> โดยอัตโนมัติ (ใช้บ่อยในการค้นหาลูกค้าที่ยังไม่เคยซื้อของ ด้วยเงื่อนไข <code>WHERE o.OrderId IS NULL</code>)"
+        },
+        right: {
+          title: "ผลลัพธ์ของ RIGHT JOIN (เอาตาราง Orders ขวามาทั้งหมด 100%)",
+          badge: "4 Records Found",
+          query: `SELECT c.CustomerId, c.CustomerName, o.OrderId, o.Amount
+FROM Customers c
+RIGHT JOIN Orders o ON c.CustomerId = o.CustomerId;`,
+          rows: [
+            { cid: "1", name: "สมชาย (Somchai)", oid: "101", amount: "1,500 ฿", note: "มีลูกค้าผูกโยง" },
+            { cid: "1", name: "สมชาย (Somchai)", oid: "102", amount: "4,200 ฿", note: "มีลูกค้าผูกโยง" },
+            { cid: "2", name: "สมหญิง (Somying)", oid: "103", amount: "890 ฿", note: "มีลูกค้าผูกโยง" },
+            { cid: "<span class='null-val'>NULL</span>", name: "<span class='null-val'>NULL</span>", oid: "104", amount: "3,100 ฿", note: "ออเดอร์ไม่มีลูกค้า (เติม NULL ทางซ้าย)" }
+          ],
+          explanation: "💡 <strong>RIGHT JOIN:</strong> ดึงออเดอร์ทั้งหมดออกมาครบ 4 ใบ โดยออเดอร์ 104 ที่ผูกกับ CustomerId 99 (ซึ่งไม่มีตัวตนในตารางลูกค้า) จะได้ค่าของตารางลูกค้าเป็น <code>NULL</code>"
+        },
+        full: {
+          title: "ผลลัพธ์ของ FULL OUTER JOIN (เอาข้อมูลทุกแถวจากทั้งซ้ายและขวา)",
+          badge: "6 Records Found",
+          query: `SELECT c.CustomerId, c.CustomerName, o.OrderId, o.Amount
+FROM Customers c
+FULL OUTER JOIN Orders o ON c.CustomerId = o.CustomerId;`,
+          rows: [
+            { cid: "1", name: "สมชาย (Somchai)", oid: "101", amount: "1,500 ฿", note: "ตรงกันทั้งสองฝั่ง" },
+            { cid: "1", name: "สมชาย (Somchai)", oid: "102", amount: "4,200 ฿", note: "ตรงกันทั้งสองฝั่ง" },
+            { cid: "2", name: "สมหญิง (Somying)", oid: "103", amount: "890 ฿", note: "ตรงกันทั้งสองฝั่ง" },
+            { cid: "3", name: "วิชัย (Wichai)", oid: "<span class='null-val'>NULL</span>", amount: "<span class='null-val'>NULL</span>", note: "ลูกค้าไม่มีออเดอร์" },
+            { cid: "4", name: "กานดา (Kanda)", oid: "<span class='null-val'>NULL</span>", amount: "<span class='null-val'>NULL</span>", note: "ลูกค้าไม่มีออเดอร์" },
+            { cid: "<span class='null-val'>NULL</span>", name: "<span class='null-val'>NULL</span>", oid: "104", amount: "3,100 ฿", note: "ออเดอร์ไม่มีลูกค้า" }
+          ],
+          explanation: "💡 <strong>FULL OUTER JOIN:</strong> เก็บทุกสิ่งทุกอย่างของทั้งสองตารางไว้แบบไม่มีการตัดทิ้ง แถวไหนจับคู่ได้ก็จับ แถวไหนไม่มีคู่ก็จะเติม <code>NULL</code> ให้ฝั่งที่ขาดหายไป"
+        }
+      };
+
+      const joinTabBtns = document.querySelectorAll('.join-tab-btn');
+      const joinTitle = document.getElementById('join-result-title');
+      const joinBadge = document.getElementById('join-result-badge');
+      const joinCode = document.getElementById('join-query-code');
+      const joinTbody = document.getElementById('join-result-tbody');
+      const joinExplanation = document.getElementById('join-explanation');
+
+      function renderJoin(type) {
+        const item = joinData[type];
+        if (!item) return;
+
+        joinTabBtns.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-join') === type));
+        joinTitle.textContent = item.title;
+        joinBadge.textContent = item.badge;
+        joinCode.textContent = item.query;
+        if (typeof Prism !== 'undefined') {
+          Prism.highlightElement(joinCode);
+        }
+
+        joinTbody.innerHTML = item.rows.map(r => `
+          <tr>
+            <td>${r.cid}</td>
+            <td>${r.name}</td>
+            <td>${r.oid}</td>
+            <td>${r.amount}</td>
+            <td style="color: var(--text-muted); font-size: 0.8rem;">${r.note}</td>
+          </tr>
+        `).join('');
+
+        joinExplanation.innerHTML = item.explanation;
+      }
+
+      joinTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const type = btn.getAttribute('data-join');
+          renderJoin(type);
+        });
+      });
+
+      // Initial render for Join Sandbox
+      renderJoin('inner');
+
+      // ─── 3. Quiz Engine Initialization ───
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ลำดับการประมวลผลจริงใน SQL Engine (Logical Execution Order) ข้อใดเรียงลำดับจากขั้นตอนแรกสุดไปยังขั้นตอนสุดท้ายได้ถูกต้อง 100%?',
+          options: [
+            'SELECT ➔ FROM ➔ WHERE ➔ GROUP BY ➔ ORDER BY',
+            'FROM & JOIN ➔ WHERE ➔ GROUP BY ➔ HAVING ➔ SELECT ➔ ORDER BY',
+            'WHERE ➔ FROM ➔ SELECT ➔ GROUP BY ➔ HAVING ➔ ORDER BY',
+            'FROM ➔ SELECT ➔ WHERE ➔ ORDER BY ➔ HAVING'
+          ],
+          answer: 1,
+          explanation: 'SQL Engine จะประมวลผลตามลำดับตรรกะ: 1. FROM & JOIN ➔ 2. WHERE ➔ 3. GROUP BY ➔ 4. HAVING ➔ 5. SELECT ➔ 6. DISTINCT ➔ 7. ORDER BY ➔ 8. OFFSET/LIMIT'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'เหตุผลใดที่เราจึงไม่สามารถนำ Column Alias ที่ประกาศใน SELECT (เช่น SELECT Price * 0.9 AS DiscountPrice) ไปใช้กรองในเงื่อนไข WHERE DiscountPrice < 500 ได้?',
+          options: [
+            'เพราะ WHERE ใช้งานได้เฉพาะกับข้อมูลประเภทตัวหนังสือ (String) เท่านั้น',
+            'เพราะ Clause WHERE ถูกประมวลผลในขั้นตอนที่ 2 ก่อนที่ SELECT (ขั้นตอนที่ 5) จะถูกรัน Alias จึงยังไม่มีตัวตนในหน่วยความจำ',
+            'เพราะคำว่า AS เป็นคีย์เวิร์ดสงวนสำหรับฟังก์ชัน Aggregate เท่านั้น',
+            'เพราะ SQL Server บังคับให้คำนวณตัวเลขใน C# Application แทนเสมอ'
+          ],
+          answer: 1,
+          explanation: 'ตาม SQL Order of Execution คำสั่ง WHERE รันใน Step 2 ก่อน SELECT ใน Step 5 ดังนั้นตอนที่ WHERE กำลังคัดกรองแถว ตัวแปรหรือชื่อ Alias ยังไม่ถูกสร้างขึ้นมา จึงเกิด Error ทันที'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'หากต้องการค้นหา "แผนก (Department) ที่มีเงินเดือนเฉลี่ยของพนักงานในแผนกมากกว่า 50,000 บาท" ควรเขียนเงื่อนไขกรองด้วย Clause ใด?',
+          options: [
+            'WHERE AVG(Salary) > 50000',
+            'HAVING AVG(Salary) > 50000',
+            'GROUP BY AVG(Salary) > 50000',
+            'ORDER BY AVG(Salary) > 50000'
+          ],
+          answer: 1,
+          explanation: 'การกรองผลลัพธ์ที่คำนวณมาจากฟังก์ชันสรุปยอด (Aggregate Function) เช่น AVG(), SUM(), COUNT() ต้องทำหลังจากแถวถูกจัดกลุ่มแล้ว จึงต้องใช้คำสั่ง HAVING เท่านั้น ห้ามใส่ใน WHERE เด็ดขาด'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'เมื่อใช้คำสั่ง LEFT JOIN ระหว่างตาราง Customers (ตารางซ้าย) กับ Orders (ตารางขวา) หากลูกค้าชื่อ "สมศักดิ์" ยังไม่เคยสร้างออเดอร์ใดๆ ในระบบเลย ผลลัพธ์ในคอลัมน์ OrderId ของแถวสมศักดิ์จะแสดงเป็นค่าใด?',
+          options: [
+            'แสดงเป็นตัวเลข 0',
+            'แสดงเป็นข้อความว่างเปล่า ("")',
+            'แสดงเป็นค่า NULL',
+            'แถวของสมศักดิ์จะถูกตัดทิ้งไม่แสดงผลออกมา'
+          ],
+          answer: 2,
+          explanation: 'LEFT JOIN จะรักษาทุกแถวของตารางฝั่งซ้ายไว้เสมอ หากตารางขวาไม่มีข้อมูลที่จับคู่กันได้ SQL Engine จะเติมค่า NULL ให้กับทุกคอลัมน์ของตารางขวาในแถวนั้น'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'แนวทางปฏิบัติที่ดีที่สุด (Best Practice) ในการรันคำสั่ง UPDATE หรือ DELETE ข้อมูลบนฐานข้อมูล Production เพื่อป้องกันข้อผิดพลาดร้ายแรงคือข้อใด?',
+          options: [
+            'ใส่เงื่อนไข WHERE 1=1 เสมอในทุกคำสั่ง',
+            'เขียน SELECT ตรวจสอบจำนวนแถวก่อนเสมอ และครอบคำสั่งด้วย BEGIN TRANSACTION เพื่อตรวจสอบผลก่อน COMMIT',
+            'ปิด Database Server ก่อนรันคำสั่งทุกครั้ง',
+            'ลบ Index และ Primary Key ออกก่อนรันคำสั่ง'
+          ],
+          answer: 1,
+          explanation: 'การเขียน SELECT ตรวจสอบเงื่อนไขแถวล่วงหน้า และการใช้ Transaction (BEGIN TRANSACTION; ... ถ้าถูกค่อย COMMIT; ถ้าผิดสั่ง ROLLBACK;) เป็นมาตรการความปลอดภัยสูงสุดในการทำงานกับฐานข้อมูล'
+        }
+      ];
+
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('sql-basics-quiz', quizQuestions, {
+          quizId: 'sql-basics',
+          showTimer: false,
+          showExplanation: true
+        });
+      }
+    });
+  </script>
+</body>
+</html>

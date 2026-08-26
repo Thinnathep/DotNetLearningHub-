@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blazor Components, Lifecycle & State — DotNet Learning Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">⚡</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน</a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP</a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections & LINQ</a>
+    <a href="./csharp-advanced.html" class="sidebar-link"><span class="link-icon">📕</span> C# ขั้นสูง</a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET</a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection</a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware</a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-link"><span class="link-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link"><span class="link-icon">🎮</span> SQL Playground</a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link active"><span class="link-icon">🧩</span> Blazor Components <span class="link-badge badge-mid">กลาง</span></a>
+    <a href="./xaml-basics.html" class="sidebar-link"><span class="link-icon">📐</span> XAML พื้นฐาน</a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML & JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps & Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git & CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link"><span class="link-icon">🛡️</span> Secure Coding</a>
+
+    <div class="sidebar-section-title">🟡 Web & คุณภาพ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link"><span class="link-icon">👀</span> Code Review</a>
+    <a href="./sdlc-agile.html" class="sidebar-link"><span class="link-icon">📋</span> SDLC & Agile</a>
+    <a href="./tech-docs.html" class="sidebar-link"><span class="link-icon">📝</span> Technical Docs</a>
+    <a href="./architecture.html" class="sidebar-link"><span class="link-icon">🏛️</span> Architecture</a>
+
+    <div class="sidebar-section-title">🎮 Games & Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> เตรียมสัมภาษณ์</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header reveal">
+            <div class="breadcrumb">
+                <a href="../index.html">🏠 หน้าแรก</a>
+                <span>/</span>
+                <span>Blazor Track</span>
+                <span>/</span>
+                <span>Blazor Components</span>
+            </div>
+            <div class="page-title">
+                <div class="title-icon" style="background: var(--cat-blazor); color: #fff;">🧩</div>
+                <h1>Blazor Components, Lifecycle & State Management</h1>
+            </div>
+            <p class="page-description">
+                สถาปัตยกรรม Component-based ใน Blazor, วงจรชีวิตของ Component (Lifecycle Methods), การส่งผ่านข้อมูลด้วย Parameters และ EventCallback, ฟอร์มและการตรวจสอบข้อมูล (EditForm)
+            </p>
+            <div class="page-meta">
+                <span class="meta-item">⭐ ระดับ: กลาง</span>
+                <span class="meta-item">⏱️ เวลา: ~50 นาที</span>
+                <span class="meta-item">⚡ รางวัล: +100 XP</span>
+                <span class="meta-item">🏷️ OnInitializedAsync / EventCallback</span>
+            </div>
+        </div>
+
+        <!-- Analogy Section -->
+        <div class="concept-card reveal">
+            <div class="concept-header">
+                <span class="concept-emoji">🧱</span>
+                <span class="concept-title">เปรียบเทียบให้เห็นภาพ: ตัวต่อเลโก้อัจฉริยะ (Smart LEGO Bricks)</span>
+            </div>
+            <div class="concept-body">
+                <div class="analogy-box">
+                    <div class="analogy-label">💡 Analogy</div>
+                    <p class="analogy-text">
+                        • <strong>Component:</strong> เหมือน <strong>บล็อกเลโก้ 1 ชิ้น</strong> ที่มีรูปทรงและการทำงานสมบูรณ์ในตัวเอง (HTML + C# Logic)<br>
+                        • <strong>[Parameter]:</strong> เหมือน <strong>ปุ่มตัวต่อด้านบน</strong> ที่รับคำสั่งหรือข้อมูลจากตัวต่อแม่ (Parent Component)<br>
+                        • <strong>EventCallback:</strong> เหมือน <strong>สัญญาณไฟแจ้งเตือน</strong> ที่ตัวต่อลูกส่งกลับไปบอกตัวต่อแม่ว่า "ผู้ใช้กดปุ่มแล้วนะ!"<br>
+                        • <strong>Lifecycle (OnInitializedAsync):</strong> เหมือน <strong>ช่วงเวลาเปิดสวิตช์เริ่มทำงานของเลโก้</strong> เพื่อไปโหลดถ่านหรือดึงข้อมูลจาก Server
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Component Lifecycle -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-blazor); color: #fff;">01</div>
+                <h2>วงจรชีวิตของ Blazor Component (Lifecycle Methods)</h2>
+            </div>
+            <p>เมื่อ Component ถูกแสดงผลบนหน้าจอ จะผ่านขั้นตอนการทำงานตามลำดับต่อไปนี้:</p>
+
+            <table class="comparison-table mb-lg">
+                <thead>
+                    <tr>
+                        <th>ลำดับ</th>
+                        <th>Lifecycle Method</th>
+                        <th>คำอธิบายและการใช้งาน</th>
+                        <th>ควรใช้ทำอะไร?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><code>SetParametersAsync()</code></td>
+                        <td>รับค่า Parameters ที่ถูกส่งเข้ามาจาก Parent Component</td>
+                        <td>ประมวลผลค่าเริ่มต้นก่อน Render</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><code>OnInitialized()</code> / <code>OnInitializedAsync()</code></td>
+                        <td>ทำงานเพียง <strong>ครั้งเดียว</strong> เมื่อ Component ถูกสร้างขึ้น</td>
+                        <td><strong>ดึงข้อมูลจาก API / Database (สำคัญที่สุด!)</strong></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td><code>OnParametersSetAsync()</code></td>
+                        <td>ทำงานเมื่อได้รับค่า Parameter ใหม่ หรือ URL Route เปลี่ยน</td>
+                        <td>อัปเดตข้อมูลเมื่อ ID ใน URL เปลี่ยนแปลง</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td><code>OnAfterRenderAsync(bool firstRender)</code></td>
+                        <td>ทำงาน <strong>หลัง</strong> จากที่ HTML เรนเดอร์บน Browser เสร็จแล้ว</td>
+                        <td>เรียกคำสั่ง JavaScript Interop (JSInterop)</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td><code>Dispose()</code> / <code>DisposeAsync()</code></td>
+                        <td>ทำงานเมื่อ Component ถูกปิดหรือเปลี่ยนหน้า</td>
+                        <td>Unsubscribe C# Events และคืนทรัพยากร Memory</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Section 2: Parent-Child Communication -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-blazor); color: #fff;">02</div>
+                <h2>การสื่อสารระหว่าง Components ([Parameter] & EventCallback)</h2>
+            </div>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> ProductCard.razor (Child Component)</div>
+                    <button class="copy-btn">📋 Copy</button>
+                </div>
+                <div class="code-block-body">
+<pre class="language-csharp"><code>&lt;div class="card"&gt;
+    &lt;h4&gt;@Title&lt;/h4&gt;
+    &lt;p&gt;ราคา: @Price.ToString("C")&lt;/p&gt;
+    &lt;button class="btn btn-primary" @onclick="HandleAddToCart"&gt;
+        🛒 เพิ่มลงตะกร้า
+    &lt;/button&gt;
+&lt;/div&gt;
+
+@code {
+    // 1. รับข้อมูลจาก Parent
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public decimal Price { get; set; }
+
+    // 2. ส่ง Event กลับไปหา Parent
+    [Parameter]
+    public EventCallback&lt;string&gt; OnAddToCart { get; set; }
+
+    private async Task HandleAddToCart()
+    {
+        // แจ้ง Parent ว่ามีการเพิ่มสินค้านี้
+        await OnAddToCart.InvokeAsync(Title);
+    }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: EditForm & Validation -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-blazor); color: #fff;">03</div>
+                <h2>การสร้างฟอร์มและการตรวจสอบข้อมูลด้วย EditForm</h2>
+            </div>
+            <p>Blazor มีระบบ <code>&lt;EditForm&gt;</code> ที่ผูกกับ Data Annotations ของ C# โดยตรง:</p>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> CreateUserForm.razor</div>
+                    <button class="copy-btn">📋 Copy</button>
+                </div>
+                <div class="code-block-body">
+<pre class="language-csharp"><code>@using System.ComponentModel.DataAnnotations
+
+&lt;EditForm Model="@userModel" OnValidSubmit="HandleSubmit"&gt;
+    &lt;!-- ตรวจสอบความถูกต้องตาม C# Data Annotations --&gt;
+    &lt;DataAnnotationsValidator /&gt;
+    &lt;ValidationSummary /&gt;
+
+    &lt;div class="form-group mb-md"&gt;
+        &lt;label&gt;ชื่อผู้ใช้:&lt;/label&gt;
+        &lt;InputText @bind-Value="userModel.Username" class="form-control" /&gt;
+        &lt;ValidationMessage For="@(() => userModel.Username)" /&gt;
+    &lt;/div&gt;
+
+    &lt;div class="form-group mb-md"&gt;
+        &lt;label&gt;อีเมล:&lt;/label&gt;
+        &lt;InputText @bind-Value="userModel.Email" class="form-control" /&gt;
+        &lt;ValidationMessage For="@(() => userModel.Email)" /&gt;
+    &lt;/div&gt;
+
+    &lt;button type="submit" class="btn btn-success"&gt;บันทึกข้อมูล&lt;/button&gt;
+&lt;/EditForm&gt;
+
+@code {
+    private UserModel userModel = new();
+
+    private void HandleSubmit()
+    {
+        // ทำงานเมื่อข้อมูลถูกต้องครบถ้วนเท่านั้น (Valid Submit)
+        Console.WriteLine($"สร้างผู้ใช้ {userModel.Username} สำเร็จ!");
+    }
+
+    public class UserModel
+    {
+        [Required(ErrorMessage = "กรุณากรอกชื่อผู้ใช้")]
+        [StringLength(20, MinimumLength = 3, ErrorMessage = "ชื่อต้องมีความยาว 3-20 ตัวอักษร")]
+        public string Username { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "กรุณากรอกอีเมล")]
+        [EmailAddress(ErrorMessage = "รูปแบบอีเมลไม่ถูกต้อง")]
+        public string Email { get; set; } = string.Empty;
+    }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Quiz -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-warning); color: #000;">🎯</div>
+                <h2>แบบทดสอบความเข้าใจ: Blazor Components</h2>
+            </div>
+            <div id="blazor-components-quiz"></div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/quiz-engine.js"></script>
+<script src="../js/code-visualizer.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'Lifecycle Method ใดใน Blazor ที่นิยมใช้มากที่สุดสำหรับการดึงข้อมูลจาก API เมื่อเปิดหน้าเว็บขึ้นมา?',
+                options: ['OnInitializedAsync()', 'SetParametersAsync()', 'Dispose()', 'OnAfterRender()'],
+                answer: 0,
+                explanation: 'OnInitializedAsync ทำงานครั้งเดียวเมื่อ Component เริ่มต้น เหมาะที่สุดสำหรับการเรียก HTTP Service ดึงข้อมูล',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Attribute ใดที่ต้องใส่หน้า Property เพื่อให้ Component สามารถรับค่าจาก Parent Component ได้?',
+                options: ['[Parameter]', '[Inject]', '[Binding]', '[Authorize]'],
+                answer: 0,
+                explanation: '[Parameter] ประกาศว่า Property นั้นเป็น Input Parameter ที่รับจากภายนอก',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'ชนิดข้อมูลใดที่ Blazor ใช้สำหรับส่ง Event หรือแจ้งเตือนจาก Child Component กลับไปยัง Parent Component?',
+                options: ['EventCallback<T>', 'Action<T>', 'Func<T>', 'delegate'],
+                answer: 0,
+                explanation: 'EventCallback<T> ถูกออกแบบมาสำหรับ Blazor โดยเฉพาะ เพราะจะสั่ง StateHasChanged() เพื่อรีเรนเดอร์ UI อัตโนมัติ',
+                difficulty: 'mid'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'หากต้องการรันคำสั่ง JavaScript Interop (JSInterop) ควรทำใน Lifecycle Method ใด?',
+                options: [
+                    'OnAfterRenderAsync(bool firstRender)',
+                    'OnInitializedAsync()',
+                    'SetParametersAsync()',
+                    'Constructor'
+                ],
+                answer: 0,
+                explanation: 'JavaScript Interop ต้องทำหลังจากที่ HTML DOM ถูกสร้างบน Browser เสร็จแล้วเท่านั้น จึงต้องทำใน OnAfterRender / OnAfterRenderAsync',
+                difficulty: 'mid'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Component ใดใน Blazor ใช้ครอบ Form เพื่อรองรับ C# DataAnnotationsValidator?',
+                options: ['<EditForm>', '<form>', '<DataForm>', '<InputForm>'],
+                answer: 0,
+                explanation: '<EditForm> เป็น Component หลักของ Blazor ที่มีระบบ ValidationContext และ OnValidSubmit/OnInvalidSubmit',
+                difficulty: 'basic'
+            }
+        ];
+
+        QuizEngine.start('blazor-components-quiz', questions, {
+            quizId: 'blazor-components',
+            onComplete: () => {
+                Progress.completeLesson('blazor-components');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

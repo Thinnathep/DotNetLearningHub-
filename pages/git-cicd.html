@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Version Control &amp; CI/CD Pipeline สำหรับ .NET — DotNet Learning Hub</title>
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+
+  <style>
+    /* ══════════════════════════════════════════════════════════
+       Custom Page Styles — Git & CI/CD Pipeline
+       ══════════════════════════════════════════════════════════ */
+
+    /* ─── Git Workflow 4-Zone Diagram ─── */
+    .git-zones-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    @media (max-width: 992px) {
+      .git-zones-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 576px) {
+      .git-zones-grid { grid-template-columns: 1fr; }
+    }
+
+    .git-zone-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      text-align: center;
+      position: relative;
+      transition: all var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .git-zone-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-glow);
+    }
+    .git-zone-card.zone-working { border-top: 4px solid var(--syn-keyword); }
+    .git-zone-card.zone-staging { border-top: 4px solid var(--syn-variable); }
+    .git-zone-card.zone-local { border-top: 4px solid var(--syn-type); }
+    .git-zone-card.zone-remote { border-top: 4px solid var(--syn-annotation); }
+
+    .zone-icon {
+      font-size: 2.2rem;
+      margin-bottom: var(--space-sm);
+    }
+    .zone-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 4px;
+    }
+    .zone-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.7rem;
+      font-family: var(--font-code);
+      margin-bottom: var(--space-sm);
+    }
+    .zone-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: var(--space-md);
+    }
+    .zone-cmd-tag {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      padding: 6px 8px;
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      color: var(--accent-primary);
+    }
+
+    /* ─── Git Branch Visualizer ─── */
+    .branch-tree-wrapper {
+      background: #0d1117;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+      font-family: var(--font-code);
+      overflow-x: auto;
+    }
+
+    .branch-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: var(--space-md);
+      gap: var(--space-md);
+      min-width: 600px;
+    }
+    .branch-tag {
+      width: 140px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .branch-main { background: rgba(248, 81, 73, 0.2); border: 1px solid #ff7b72; color: #ff7b72; }
+    .branch-develop { background: rgba(210, 168, 255, 0.2); border: 1px solid #d2a8ff; color: #d2a8ff; }
+    .branch-feature { background: rgba(121, 192, 255, 0.2); border: 1px solid #79c0ff; color: #79c0ff; }
+    .branch-hotfix { background: rgba(255, 166, 87, 0.2); border: 1px solid #ffa657; color: #ffa657; }
+
+    .branch-track {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .branch-line {
+      height: 3px;
+      width: 100%;
+      background: var(--border-default);
+      position: relative;
+    }
+    .commit-node {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--bg-tertiary);
+      border: 3px solid #79c0ff;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .commit-node:hover {
+      transform: translateY(-50%) scale(1.3);
+      box-shadow: 0 0 10px rgba(121, 192, 255, 0.8);
+      z-index: 10;
+    }
+
+    /* ─── CI/CD Interactive Simulator ─── */
+    .pipeline-simulator {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin: var(--space-xl) 0;
+    }
+    .pipeline-header {
+      padding: var(--space-md) var(--space-lg);
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+    .pipeline-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: var(--font-code);
+    }
+    .pipeline-status-idle { background: rgba(142, 150, 160, 0.15); color: var(--text-muted); border: 1px solid var(--border-default); }
+    .pipeline-status-running { background: rgba(210, 153, 34, 0.2); color: var(--accent-warning); border: 1px solid var(--accent-warning); }
+    .pipeline-status-passed { background: rgba(63, 185, 80, 0.2); color: var(--accent-success); border: 1px solid var(--accent-success); }
+
+    .pipeline-steps-container {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      padding: var(--space-xl);
+      background: #090d13;
+      position: relative;
+    }
+    @media (max-width: 992px) {
+      .pipeline-steps-container { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 576px) {
+      .pipeline-steps-container { grid-template-columns: 1fr; }
+    }
+
+    .pipeline-step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      text-align: center;
+      position: relative;
+      transition: all var(--transition-normal);
+    }
+    .pipeline-step-card.step-active {
+      border-color: var(--accent-warning);
+      box-shadow: 0 0 12px rgba(210, 153, 34, 0.3);
+      animation: pulseGlow 1.5s infinite;
+    }
+    .pipeline-step-card.step-passed {
+      border-color: var(--accent-success);
+      background: rgba(63, 185, 80, 0.05);
+    }
+    .pipeline-step-card.step-failed {
+      border-color: var(--accent-danger);
+      background: rgba(248, 81, 73, 0.05);
+    }
+
+    .step-icon-wrapper {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 8px auto;
+      font-size: 1.1rem;
+      transition: all var(--transition-fast);
+    }
+    .step-active .step-icon-wrapper { border-color: var(--accent-warning); background: rgba(210, 153, 34, 0.2); }
+    .step-passed .step-icon-wrapper { border-color: var(--accent-success); background: rgba(63, 185, 80, 0.2); color: #fff; }
+
+    .step-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+    .step-cmd {
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .step-duration {
+      font-family: var(--font-code);
+      font-size: 0.65rem;
+      color: var(--accent-primary);
+      margin-top: 6px;
+    }
+
+    .pipeline-console {
+      background: #04070b;
+      border-top: 1px solid var(--border-default);
+      padding: var(--space-md) var(--space-lg);
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      max-height: 180px;
+      overflow-y: auto;
+      color: #79c0ff;
+    }
+    .console-line { margin-bottom: 4px; line-height: 1.5; }
+    .console-success { color: var(--accent-success); }
+    .console-warning { color: var(--accent-warning); }
+    .console-info { color: var(--text-muted); }
+
+    /* ─── Docker Multi-Stage Visual Comparison ─── */
+    .docker-stage-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+    @media (max-width: 768px) {
+      .docker-stage-grid { grid-template-columns: 1fr; }
+    }
+
+    .docker-stage-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      position: relative;
+      overflow: hidden;
+    }
+    .stage-badge-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-md);
+      font-family: var(--font-code);
+    }
+    .badge-sdk { background: rgba(210, 168, 255, 0.15); color: #d2a8ff; border: 1px solid rgba(210, 168, 255, 0.4); }
+    .badge-runtime { background: rgba(126, 231, 135, 0.15); color: #7ee787; border: 1px solid rgba(126, 231, 135, 0.4); }
+
+    .stage-size-bar {
+      height: 24px;
+      background: var(--bg-primary);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-default);
+      margin: var(--space-sm) 0 var(--space-md) 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .stage-size-fill {
+      height: 100%;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      padding-left: 10px;
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .fill-sdk { width: 100%; background: linear-gradient(90deg, #8957e5, #bc8cff); }
+    .fill-runtime { width: 18%; background: linear-gradient(90deg, #238636, #3fb950); }
+
+    .docker-feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.85rem;
+    }
+    .docker-feature-list li {
+      margin-bottom: 6px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: var(--text-secondary);
+    }
+
+    /* ─── Azure Deployment Slots Diagram ─── */
+    .slot-swap-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: var(--space-lg);
+    }
+    .slot-box {
+      width: 220px;
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      text-align: center;
+      background: var(--bg-secondary);
+      border: 2px dashed var(--border-default);
+      position: relative;
+      transition: all var(--transition-normal);
+    }
+    .slot-box.production {
+      border-color: var(--accent-success);
+      border-style: solid;
+      background: rgba(63, 185, 80, 0.05);
+    }
+    .slot-box.staging {
+      border-color: var(--accent-primary);
+      border-style: solid;
+      background: rgba(88, 166, 255, 0.05);
+    }
+    .swap-action-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .swap-btn {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-info));
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 0 15px rgba(88, 166, 255, 0.4);
+      transition: all var(--transition-fast);
+    }
+    .swap-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 22px rgba(88, 166, 255, 0.7);
+    }
+
+    /* ─── Interactive Git Command Helper ─── */
+    .git-cmd-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: var(--space-md);
+    }
+    .git-cmd-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .git-cmd-btn:hover, .git-cmd-btn.active {
+      border-color: var(--accent-primary);
+      background: rgba(88, 166, 255, 0.12);
+      color: var(--accent-primary);
+    }
+    .git-cmd-display {
+      background: #090d13;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-md) var(--space-lg);
+      font-family: var(--font-code);
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 5px rgba(210, 153, 34, 0.2); }
+      50% { box-shadow: 0 0 15px rgba(210, 153, 34, 0.6); }
+      100% { box-shadow: 0 0 5px rgba(210, 153, 34, 0.2); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <a href="../index.html" class="site-logo">
+      <div class="logo-icon">🔄</div>
+      <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าหลัก (Dashboard)</span>
+      </a>
+    </div>
+
+    <!-- 🟣 Track C# Language -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="csharp-basics.html" class="sidebar-link">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="csharp-oop.html" class="sidebar-link">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="csharp-collections.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Collections &amp; Generics</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>LINQ &amp; Async/Await</span>
+        <span class="sidebar-badge badge-mid">Lv 4</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track .NET & Web API -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track .NET &amp; Web API</div>
+      <a href="dotnet-structure.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 Project Structure</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="dotnet-di.html" class="sidebar-link">
+        <span class="link-icon">💉</span>
+        <span>Dependency Injection</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="dotnet-middleware.html" class="sidebar-link">
+        <span class="link-icon">🛡️</span>
+        <span>Middleware Pipeline</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="rest-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>RESTful API Design</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="system-integration.html" class="sidebar-link">
+        <span class="link-icon">🔄</span>
+        <span>System Integration</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🔴 Track Database & ORM -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔴 Track Database &amp; ORM</div>
+      <a href="sql-basics.html" class="sidebar-link">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; CRUD</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="sql-advanced.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>SQL Advanced &amp; Index</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="sql-playground.html" class="sidebar-link">
+        <span class="link-icon">💻</span>
+        <span>SQL Playground Live</span>
+        <span class="sidebar-badge badge-new">Live</span>
+      </a>
+      <a href="ef-core.html" class="sidebar-link">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🟢 Track Blazor & Frontend -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟢 Track Blazor &amp; Markup</div>
+      <a href="blazor-intro.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Blazor Intro &amp; WASM</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="blazor-components.html" class="sidebar-link">
+        <span class="link-icon">🧩</span>
+        <span>Blazor Components</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="xaml-basics.html" class="sidebar-link">
+        <span class="link-icon">📐</span>
+        <span>XAML Basics (.NET MAUI)</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="xml-json.html" class="sidebar-link">
+        <span class="link-icon">📄</span>
+        <span>XML &amp; JSON Data Formats</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🟡 Track Web Basics -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟡 Track Web Basics</div>
+      <a href="html-css-js.html" class="sidebar-link">
+        <span class="link-icon">🌐</span>
+        <span>HTML, CSS &amp; JavaScript</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track DevOps & Security (Active Track) -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track DevOps &amp; Security</div>
+      <a href="git-cicd.html" class="sidebar-link active">
+        <span class="link-icon">🔄</span>
+        <span>Git &amp; CI/CD Pipelines</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="secure-coding.html" class="sidebar-link">
+        <span class="link-icon">🔒</span>
+        <span>Secure Coding &amp; OWASP</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🟢 Track Quality & Testing -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟢 Track Quality &amp; Process</div>
+      <a href="unit-testing.html" class="sidebar-link">
+        <span class="link-icon">🧪</span>
+        <span>Unit Testing &amp; xUnit</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="code-review.html" class="sidebar-link">
+        <span class="link-icon">👀</span>
+        <span>Code Review Best Practices</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="sdlc-agile.html" class="sidebar-link">
+        <span class="link-icon">🔄</span>
+        <span>SDLC &amp; Agile / Scrum</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="tech-docs.html" class="sidebar-link">
+        <span class="link-icon">📝</span>
+        <span>Technical Documentation</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🔴 Track Architecture -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔴 Track Architecture</div>
+      <a href="architecture.html" class="sidebar-link">
+        <span class="link-icon">🏛️</span>
+        <span>Clean Architecture &amp; CQRS</span>
+        <span class="sidebar-badge badge-new">Adv</span>
+      </a>
+    </div>
+
+    <!-- 🎮 Games & Arena -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🎮 Games &amp; Arena</div>
+      <a href="quiz-arena.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Quiz Arena</span>
+        <span class="sidebar-badge badge-new">Arena</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header animate-fade-in">
+        <div class="breadcrumb">
+          <a href="../index.html">หน้าหลัก</a>
+          <span>/</span>
+          <span>DevOps &amp; Security Track</span>
+          <span>/</span>
+          <span style="color: var(--cat-devops);">Git Version Control &amp; CI/CD</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(88, 166, 255, 0.15); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.4);">🔄</div>
+          <div>
+            <h1>Git Version Control &amp; CI/CD Pipeline สำหรับ .NET</h1>
+            <div class="page-description">เรียนรู้กระบวนการพัฒนาซอฟต์แวร์ระดับมืออาชีพ ตั้งแต่ Git Workflow, Branching Strategy, GitHub Actions Automation, Docker Multi-Stage ไปจนถึง Azure Zero-Downtime Deployment</div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="level-tag level-mid">⭐ พื้นฐาน &gt; กลาง</span></span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>เวลาเรียน: <strong>~45 นาที</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>รางวัล: <strong>+100 XP</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>🛠️</span>
+            <span>Git / GitHub Actions / Docker / Azure</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Analogy Section ─── -->
+      <section class="lesson-section reveal" id="analogy">
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">💡</span>
+            <span class="concept-title">เปรียบเทียบให้เห็นภาพ (Analogy) — ระบบ Time Machine &amp; สายการบินขนส่งสินค้าอัตโนมัติ</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🎮 Git คืออะไร? ทำไมโปรแกรมเมอร์ทุกคนต้องใช้?</div>
+              <p class="analogy-text">
+                ลองนึกถึงตอนที่คุณเล่นเกม RPG ขนาดใหญ่ — <strong>Git คือระบบบันทึกจุดเซฟ (Save Checkpoint) และไทม์แมชชีน (Time Machine)</strong>:
+                <br>• หากคุณเขียนโค้ดแล้วระบบพัง คุณสามารถกดย้อนเวลา (<code>git checkout</code> / <code>git revert</code>) กลับไปยังจุดเซฟที่โปรแกรมเคยทำงานสมบูรณ์ได้ทันที
+                <br>• หากต้องการทดลองฟีเจอร์ใหม่เสี่ยงๆ คุณสามารถแยกมิติไทม์ไลน์คู่ขนาน (<code>git branch</code>) ออกไปทดลองได้โดยไม่กระทบโลกหลัก และเมื่อทำสำเร็จก็รวมมิติกลับเข้ามา (<code>git merge</code>)
+              </p>
+            </div>
+
+            <div class="analogy-box" style="background: rgba(63, 185, 80, 0.08); border-color: rgba(63, 185, 80, 0.25); margin-bottom: 0;">
+              <div class="analogy-label" style="color: var(--accent-success);">🚀 CI/CD Pipeline คืออะไร?</div>
+              <p class="analogy-text">
+                <strong>CI/CD คือสายพานโรงงานและสายการบินขนส่งสินค้าอัตโนมัติ (Automated Assembly Line &amp; Freight Flight)</strong>:
+                <br>• ในอดีต เวลาจะปล่อยโปรแกรมขึ้นเซิร์ฟเวอร์ โปรแกรมเมอร์ต้องมานั่งคอมไพล์โค้ดในเครื่องตัวเอง แล้วใช้โปรแกรม FTP ลากไฟล์ขึ้นเซิร์ฟเวอร์สดๆ ซึ่งเสี่ยงต่อการที่ "โค้ดในเครื่องฉันรันได้ แต่บนเซิร์ฟเวอร์พัง" (It works on my machine!)
+                <br>• <strong>CI (Continuous Integration)</strong>: ทันทีที่คุณกดปุ่ม <code>git push</code> หุ่นยนต์ใน Cloud จะหยิบโค้ดไปประกอบร่าง (Build) และทำการตรวจสอบความปลอดภัย ทดสอบรัน Unit Tests นับร้อยข้อโดยอัตโนมัติ ภายในเวลาไม่กี่นาที
+                <br>• <strong>CD (Continuous Deployment)</strong>: เมื่อการทดสอบผ่านฉลุย 100% หุ่นยนต์จะแพ็กแอปใส่ตู้คอนเทนเนอร์ (Docker) และนำไปปล่อยขึ้น Cloud Server (Azure / AWS) ทันทีโดยที่ระบบไม่หยุดให้บริการแม้แต่วินาทีเดียว (Zero Downtime)
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 1: Git Workflow ในการทำงานจริง ─── -->
+      <section class="lesson-section reveal" id="git-workflow">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(88, 166, 255, 0.2); color: var(--accent-primary); border: 1px solid var(--accent-primary);">01</div>
+          <div>
+            <h2>Git Workflow ในการทำงานจริง (Real-World Git Workflow)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">เข้าใจ 4 พื้นที่จัดเก็บของ Git, วงจรชีวิตของโค้ด และกลยุทธ์การแตกกิ่ง (Branching Strategy)</p>
+          </div>
+        </div>
+
+        <p>
+          การใช้งาน Git ในระดับมืออาชีพไม่ได้มีแค่การโยนโค้ดขึ้นเว็บ แต่คือการจัดการสถานะของไฟล์ (File Lifecycle) และการประสานงานร่วมกันของนักพัฒนาหลายคนในทีมโดยไม่ให้โค้ดเกิดการขัดแย้ง (Conflict)
+        </p>
+
+        <!-- 4 Git Zones Visual Grid -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-xl); margin-bottom: var(--space-sm);">📦 แผนผัง 4 พื้นที่จัดเก็บข้อมูลของ Git (The 4 Stages of Git)</h3>
+        <div class="git-zones-grid">
+          <!-- Zone 1 -->
+          <div class="git-zone-card zone-working">
+            <div>
+              <div class="zone-icon">💻</div>
+              <div class="zone-title">1. Working Directory</div>
+              <span class="zone-badge" style="background: rgba(255, 123, 114, 0.15); color: #ff7b72;">พื้นที่ทำงานสด</span>
+              <p class="zone-desc">โฟลเดอร์ไฟล์บนเครื่องคุณที่กำลังเปิดเขียนโค้ดใน VS Code หรือ Visual Studio ไฟล์ที่แก้จะอยู่ในสถานะ Modified</p>
+            </div>
+            <div class="zone-cmd-tag">👉 เตรียมส่งด้วย <code>git add</code></div>
+          </div>
+
+          <!-- Zone 2 -->
+          <div class="git-zone-card zone-staging">
+            <div>
+              <div class="zone-icon">📋</div>
+              <div class="zone-title">2. Staging Area (Index)</div>
+              <span class="zone-badge" style="background: rgba(255, 166, 87, 0.15); color: #ffa657;">ลานเตรียมแพ็กเกจ</span>
+              <p class="zone-desc">จุดคัดเลือกไฟล์ที่พร้อมจะบันทึกเป็น Checkpoint ช่วยให้เราเลือก Commit เฉพาะส่วนที่เสร็จเรียบร้อยได้</p>
+            </div>
+            <div class="zone-cmd-tag">👉 บันทึกจุดเซฟด้วย <code>git commit</code></div>
+          </div>
+
+          <!-- Zone 3 -->
+          <div class="git-zone-card zone-local">
+            <div>
+              <div class="zone-icon">💾</div>
+              <div class="zone-title">3. Local Repository</div>
+              <span class="zone-badge" style="background: rgba(121, 192, 255, 0.15); color: #79c0ff;">ประวัติศาสตร์ในเครื่อง (.git)</span>
+              <p class="zone-desc">ฐานข้อมูล Git ที่ซ่อนอยู่ในโฟลเดอร์ <code>.git</code> ในเครื่อง เก็บประวัติ Commit ทั้งหมด แม้ไม่มีเน็ตก็ดูประวัติได้</p>
+            </div>
+            <div class="zone-cmd-tag">👉 อัปโหลดขึ้น Cloud ด้วย <code>git push</code></div>
+          </div>
+
+          <!-- Zone 4 -->
+          <div class="git-zone-card zone-remote">
+            <div>
+              <div class="zone-icon">☁️</div>
+              <div class="zone-title">4. Remote Repository</div>
+              <span class="zone-badge" style="background: rgba(126, 231, 135, 0.15); color: #7ee787;">คลังส่วนกลางบน Cloud</span>
+              <p class="zone-desc">GitHub / Azure DevOps / GitLab ที่ทีมงานทุกคนใช้แชร์โค้ดร่วมกันและใช้ทริกเกอร์ระบบ CI/CD</p>
+            </div>
+            <div class="zone-cmd-tag">👉 ดึงการอัปเดตด้วย <code>git pull</code></div>
+          </div>
+        </div>
+
+        <!-- Interactive Git Command Explorer -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-xl); margin-bottom: var(--space-sm);">⚡ Interactive Git Command Explorer (คลิกเพื่อดูคำอธิบายและตัวอย่างคำสั่ง)</h3>
+        <div class="card" style="background: var(--bg-card); margin-bottom: var(--space-lg);">
+          <div class="git-cmd-selector" id="cmd-selector">
+            <button class="git-cmd-btn active" data-cmd="init">git init &amp; clone</button>
+            <button class="git-cmd-btn" data-cmd="add-commit">git add &amp; commit</button>
+            <button class="git-cmd-btn" data-cmd="push-pull">git push &amp; pull</button>
+            <button class="git-cmd-btn" data-cmd="branch">git branch &amp; checkout</button>
+            <button class="git-cmd-btn" data-cmd="stash">git stash (สลับงานด่วน)</button>
+            <button class="git-cmd-btn" data-cmd="log">git log &amp; diff</button>
+          </div>
+          <div class="git-cmd-display" id="cmd-display-box">
+            <div style="color: var(--accent-primary); font-weight: 700; margin-bottom: 6px;"># 1. การสร้างและดึงโปรเจกต์</div>
+            <div style="color: var(--text-primary); margin-bottom: 8px;">
+              <code>git init</code> : สร้าง Git repository ใหม่ในโฟลเดอร์ปัจจุบัน<br>
+              <code>git clone https://github.com/company/dotnet-api.git</code> : โคลนโปรเจกต์จาก Remote ลงมาที่เครื่อง
+            </div>
+            <div class="text-muted" style="font-size: 0.8rem;">💡 คำแนะนำ: เมื่อเริ่มโปรเจกต์ .NET ใหม่ ให้พิมพ์ <code>dotnet new webapi</code> ตามด้วย <code>git init</code> เสมอ</div>
+          </div>
+        </div>
+
+        <!-- Branching Strategy -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-2xl); margin-bottom: var(--space-xs);">🌿 กลยุทธ์การแตกกิ่ง (Branching Strategy ในการทำงานจริง)</h3>
+        <p class="text-muted">
+          ในทีมระดับ Enterprise จะไม่มีใครแก้ไขโค้ดบนกิ่ง <code>main</code> โดยตรง แต่จะใช้ระบบ Branching เพื่อแยกงานและทำ Code Review อย่างเข้มงวด
+        </p>
+
+        <div class="branch-tree-wrapper">
+          <div class="branch-row">
+            <div class="branch-tag branch-main">main / prod</div>
+            <div class="branch-track">
+              <div class="branch-line"></div>
+              <div class="commit-node" style="left: 10%; border-color: #ff7b72;" title="v1.0.0 Release">v1</div>
+              <div class="commit-node" style="left: 85%; border-color: #ff7b72;" title="v1.1.0 Release">v1.1</div>
+            </div>
+            <span class="text-muted" style="font-size: 0.75rem; width: 140px;">🚀 โค้ดที่ขึ้น Production</span>
+          </div>
+
+          <div class="branch-row">
+            <div class="branch-tag branch-hotfix">hotfix/v1.0.1</div>
+            <div class="branch-track">
+              <div class="branch-line" style="background: rgba(255, 166, 87, 0.4);"></div>
+              <div class="commit-node" style="left: 45%; border-color: #ffa657;" title="Fix Critical Security Bug">fix</div>
+            </div>
+            <span class="text-muted" style="font-size: 0.75rem; width: 140px;">🔥 แก้บั๊กฉุกเฉินบน Prod</span>
+          </div>
+
+          <div class="branch-row">
+            <div class="branch-tag branch-develop">develop</div>
+            <div class="branch-track">
+              <div class="branch-line" style="background: rgba(210, 168, 255, 0.4);"></div>
+              <div class="commit-node" style="left: 20%; border-color: #d2a8ff;" title="Sprint 1 Start">c1</div>
+              <div class="commit-node" style="left: 55%; border-color: #d2a8ff;" title="Merge Auth Feature">c2</div>
+              <div class="commit-node" style="left: 75%; border-color: #d2a8ff;" title="Integration Ready">c3</div>
+            </div>
+            <span class="text-muted" style="font-size: 0.75rem; width: 140px;">🧪 ศูนย์รวมฟีเจอร์รอเทสต์</span>
+          </div>
+
+          <div class="branch-row">
+            <div class="branch-tag branch-feature">feature/auth-jwt</div>
+            <div class="branch-track">
+              <div class="branch-line" style="background: rgba(121, 192, 255, 0.4);"></div>
+              <div class="commit-node" style="left: 30%; border-color: #79c0ff;" title="Add JWT Token Service">f1</div>
+              <div class="commit-node" style="left: 42%; border-color: #79c0ff;" title="Add Login Endpoint">f2</div>
+            </div>
+            <span class="text-muted" style="font-size: 0.75rem; width: 140px;">✨ พัฒนาฟีเจอร์แยกเดี่ยว</span>
+          </div>
+        </div>
+
+        <div class="comparison-table-wrapper" style="overflow-x: auto; margin-top: var(--space-lg);">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>ชื่อกิ่ง (Branch Name)</th>
+                <th>วัตถุประสงค์ (Purpose)</th>
+                <th>แตกกิ่งมาจาก (Branch From)</th>
+                <th>รวมกลับไปที่ (Merge Back To)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code style="color: #ff7b72; font-weight: 700;">main</code> / <code style="color: #ff7b72;">master</code></td>
+                <td>โค้ดเวอร์ชันเสถียรที่สุดที่กำลังรันจริงบน Production เซิร์ฟเวอร์ <strong>(ห้าม Push ตรงเด็ดขาด)</strong></td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td><code style="color: #d2a8ff; font-weight: 700;">develop</code></td>
+                <td>กิ่งรวมฟีเจอร์ล่าสุดสำหรับทดสอบแบบรวมศูนย์ (Integration &amp; Staging Test)</td>
+                <td><code>main</code></td>
+                <td><code>main</code> (เมื่อพร้อมปล่อย Release)</td>
+              </tr>
+              <tr>
+                <td><code style="color: #79c0ff; font-weight: 700;">feature/*</code></td>
+                <td>พัฒนาฟีเจอร์ใหม่ เช่น <code>feature/stripe-payment</code> หรือ <code>feature/user-profile</code></td>
+                <td><code>develop</code></td>
+                <td><code>develop</code> (ผ่าน Pull Request)</td>
+              </tr>
+              <tr>
+                <td><code style="color: #ffa657; font-weight: 700;">bugfix/*</code> / <code style="color: #ffa657;">hotfix/*</code></td>
+                <td>แก้ไขข้อผิดพลาดเร่งด่วน โดยเฉพาะ <code>hotfix</code> ที่แก้ปัญหาบน Production ทันที</td>
+                <td><code>main</code> หรือ <code>develop</code></td>
+                <td>ทั้ง <code>main</code> และ <code>develop</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pull Request & Code Review Callout -->
+        <div class="callout callout-info mt-lg">
+          <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">🤝 ขั้นตอน Pull Request (PR) &amp; Code Review ในชีวิตจริง</div>
+          <p style="margin-bottom: 0;">
+            1. พัฒนาฟีเจอร์ในกิ่ง <code>feature/my-feature</code> จนเสร็จ พร้อมเขียน Unit Tests กำกับ<br>
+            2. Push โค้ดขึ้น GitHub แล้วกด <strong>"Open Pull Request"</strong> เพื่อขอรวมโค้ดเข้าสู่กิ่ง <code>develop</code> หรือ <code>main</code><br>
+            3. ระบบ CI Pipeline จะรัน Build และ Automated Tests ให้โดยอัตโนมัติทันที<br>
+            4. เพื่อนร่วมทีม (Peer Reviewer) เข้ามาตรวจเช็คความสะอาด ความถูกต้อง และประสิทธิภาพ (Code Review)<br>
+            5. เมื่อผ่านทั้ง CI และได้รับอนุมัติ (Approved) จาก Reviewer จึงจะสามารถกด <strong>Merge</strong> ได้อย่างปลอดภัย
+          </p>
+        </div>
+
+        <!-- .gitignore for .NET Section -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-2xl); margin-bottom: var(--space-sm);">🛡️ ข้อควรระวังในการเขียน <code>.gitignore</code> สำหรับโปรเจกต์ .NET</h3>
+        <p>
+          ไฟล์ <code>.gitignore</code> ทำหน้าที่บอก Git ว่า <em>"ไฟล์หรือโฟลเดอร์เหล่านี้ไม่ต้องนำเข้าสู่ระบบ Version Control"</em> หากตั้งค่าไม่ถูกต้อง อาจทำให้ไฟล์ขยะขนาดหลายร้อยเมกะไบต์ หรือแม้แต่ <strong>รหัสผ่านฐานข้อมูล (Secret Leaks) หลุดขึ้น Public GitHub</strong> จนระบบถูกแฮกได้!
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>.gitignore (ตัวอย่างไฟล์มาตรฐานสำหรับ .NET 8 / C#)</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-git"># ❌ 1. โฟลเดอร์ผลลัพธ์การ Build (ห้าม Commit เพราะสร้างใหม่ได้เสมอตอน build)
+bin/
+obj/
+publish/
+TestResults/
+
+# ❌ 2. ไฟล์การตั้งค่าส่วนบุคคลของ IDE และเครื่อง Dev
+.vs/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ❌ 3. ไฟล์เก็บความลับเฉพาะเครื่อง Dev (ป้องกัน Secret หลุด!)
+appsettings.Development.json
+secrets.json
+*.pfx
+*.key
+*.env
+
+# ❌ 4. OS Files
+.DS_Store
+Thumbs.db</code></pre>
+          </div>
+        </div>
+
+        <div class="callout callout-danger">
+          <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">🚨 ข้อควรระวังสูงสุดเรื่อง Connection Strings &amp; API Keys!</div>
+          <p style="margin-bottom: 0;">
+            <strong>ห้ามใส่ Production Database Password หรือ Payment Secret Keys ไว้ในไฟล์ <code>appsettings.json</code> ที่ถูก Push ขึ้น Git เด็ดขาด!</strong> เพราะบอทของแฮกเกอร์จะคอยสแกน Public GitHub ตลอด 24 ชม.
+            <br>✔️ บนเครื่อง Dev: ให้ใช้เครื่องมือ <code>dotnet user-secrets</code>
+            <br>✔️ บน Production Cloud: ให้ใส่ใน Azure Key Vault หรือ Environment Variables ของ Hosting
+          </p>
+        </div>
+      </section>
+
+      <!-- ─── Section 2: CI/CD Pipeline ─── -->
+      <section class="lesson-section reveal" id="cicd-pipeline">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(63, 185, 80, 0.2); color: var(--accent-success); border: 1px solid var(--accent-success);">02</div>
+          <div>
+            <h2>ระบบ CI/CD Pipeline ด้วย GitHub Actions</h2>
+            <p class="text-muted" style="margin-bottom: 0;">Continuous Integration (ตรวจเช็คและทดสอบอัตโนมัติ) และ Continuous Deployment (ส่งมอบสู่คลาวด์)</p>
+          </div>
+        </div>
+
+        <p>
+          ในยุค Modern Cloud Software การส่งมอบงานต้องรวดเร็วและมีเสถียรภาพสูงสุด <strong>CI/CD Pipeline</strong> จะเปลี่ยนขั้นตอนที่มนุษย์ต้องทำซ้ำๆ ให้กลายเป็นระบบอัตโนมัติ 100%
+        </p>
+
+        <!-- 3 Pillars of CI/CD -->
+        <div class="grid grid-3 gap-md my-lg">
+          <div class="card" style="border-top: 3px solid var(--accent-primary);">
+            <div style="font-size: 1.8rem; margin-bottom: 8px;">🔨</div>
+            <h4 style="margin-bottom: 6px; font-size: 1rem;">1. Build Automation</h4>
+            <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 0;">
+              คอมไพล์โค้ด .NET อัตโนมัติบน Virtual Machine ใน Cloud ทุกครั้งที่มีการเปิด PR เพื่อตรวจจับไวยากรณ์ผิดพลาดก่อนถึงเซิร์ฟเวอร์
+            </p>
+          </div>
+          <div class="card" style="border-top: 3px solid var(--accent-success);">
+            <div style="font-size: 1.8rem; margin-bottom: 8px;">🧪</div>
+            <h4 style="margin-bottom: 6px; font-size: 1rem;">2. Test Automation</h4>
+            <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 0;">
+              สั่งรัน Unit Tests และ Integration Tests (xUnit/NUnit) ทุกตัว หากมีแม้แต่ 1 Test ที่พัง ระบบจะไม่อนุญาตให้ Merge โค้ด
+            </p>
+          </div>
+          <div class="card" style="border-top: 3px solid var(--syn-annotation);">
+            <div style="font-size: 1.8rem; margin-bottom: 8px;">🚢</div>
+            <h4 style="margin-bottom: 6px; font-size: 1rem;">3. Zero-Downtime Deploy</h4>
+            <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 0;">
+              สร้าง Docker Container และส่งขึ้น Azure App Service หรือ Kubernetes โดยไม่มี Downtime ผู้ใช้งานไม่สะดุดแม้แต่วินาทีเดียว
+            </p>
+          </div>
+        </div>
+
+        <!-- Interactive CI/CD Simulator -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-2xl); margin-bottom: var(--space-xs);">⚡ Interactive CI/CD Pipeline Simulator (จำลองการทำงานของ GitHub Actions)</h3>
+        <p class="text-muted">คลิกปุ่ม <strong>"🚀 Trigger Pipeline (git push)"</strong> ด้านล่างเพื่อดูระบบรันขั้นตอนต่างๆ แบบ Real-time</p>
+
+        <div class="pipeline-simulator">
+          <div class="pipeline-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 1.2rem;">⚙️</span>
+              <strong style="font-family: var(--font-heading);">Workflow: .NET 8 Build, Test &amp; Deploy</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--space-md);">
+              <span class="pipeline-status-badge pipeline-status-idle" id="pipeline-status-badge">⚪ IDLE (พร้อมทำงาน)</span>
+              <button class="btn btn-primary btn-sm" id="btn-trigger-pipeline">
+                <span>🚀 Trigger Pipeline (git push)</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="pipeline-steps-container" id="pipeline-steps-box">
+            <!-- Step 1 -->
+            <div class="pipeline-step-card" id="step-1">
+              <div class="step-icon-wrapper">📥</div>
+              <div class="step-name">1. Checkout</div>
+              <div class="step-cmd">actions/checkout@v4</div>
+              <div class="step-duration" id="dur-1">-</div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="pipeline-step-card" id="step-2">
+              <div class="step-icon-wrapper">⚙️</div>
+              <div class="step-name">2. Setup .NET</div>
+              <div class="step-cmd">.NET 8.0.x SDK</div>
+              <div class="step-duration" id="dur-2">-</div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="pipeline-step-card" id="step-3">
+              <div class="step-icon-wrapper">📦</div>
+              <div class="step-name">3. Restore</div>
+              <div class="step-cmd">dotnet restore</div>
+              <div class="step-duration" id="dur-3">-</div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="pipeline-step-card" id="step-4">
+              <div class="step-icon-wrapper">🔨</div>
+              <div class="step-name">4. Build</div>
+              <div class="step-cmd">dotnet build -c Release</div>
+              <div class="step-duration" id="dur-4">-</div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="pipeline-step-card" id="step-5">
+              <div class="step-icon-wrapper">🧪</div>
+              <div class="step-name">5. xUnit Test</div>
+              <div class="step-cmd">dotnet test</div>
+              <div class="step-duration" id="dur-5">-</div>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="pipeline-step-card" id="step-6">
+              <div class="step-icon-wrapper">🚀</div>
+              <div class="step-name">6. Cloud Deploy</div>
+              <div class="step-cmd">Azure WebApp</div>
+              <div class="step-duration" id="dur-6">-</div>
+            </div>
+          </div>
+
+          <div class="pipeline-console" id="pipeline-console-log">
+            <div class="console-line console-info">$ Ready. Press "Trigger Pipeline" to simulate GitHub Actions run...</div>
+          </div>
+        </div>
+
+        <!-- GitHub Actions Workflow File Example -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-2xl); margin-bottom: var(--space-sm);">📄 ตัวอย่างไฟล์ GitHub Actions Workflow (<code>.github/workflows/dotnet.yml</code>)</h3>
+        <p>
+          GitHub Actions จะอ่านการตั้งค่าจากไฟล์ YAML ที่อยู่ในโฟลเดอร์ <code>.github/workflows/</code> เสมอ:
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>.github/workflows/dotnet.yml</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-yaml">name: .NET 8 Build, Test & Deploy Pipeline
+
+# 1. กำหนดเหตุการณ์ที่จะทริกเกอร์ให้ Pipeline ทำงาน (Event Triggers)
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    name: Build, Test and Package
+    runs-on: ubuntu-latest # รันบน Linux Container ชั่วคราวของ GitHub
+
+    steps:
+    # ─── Step 1: ดึงซอร์สโค้ดจาก Repository ───
+    - name: 📥 Check out repository code
+      uses: actions/checkout@v4
+
+    # ─── Step 2: ติดตั้ง .NET 8 SDK ───
+    - name: ⚙️ Setup .NET 8 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    # ─── Step 3: ดึง NuGet Packages ที่โปรเจกต์ต้องใช้ ───
+    - name: 📦 Restore dependencies
+      run: dotnet restore
+
+    # ─── Step 4: คอมไพล์โปรเจกต์ในโหมด Release ───
+    - name: 🔨 Build project
+      run: dotnet build --no-restore --configuration Release
+
+    # ─── Step 5: สั่งรัน Unit Tests ทั้งหมดในโซลูชัน ───
+    - name: 🧪 Run Unit Tests with xUnit
+      run: dotnet test --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage"
+
+    # ─── Step 6: รวมไฟล์ที่พร้อมส่งมอบ (Publish Artifact) ───
+    - name: 📦 Publish .NET Web App
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: dotnet publish -c Release -o ./publish
+
+    # ─── Step 7: Deploy ขึ้น Azure Web App ───
+    - name: 🚀 Deploy to Azure Web App
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'my-production-dotnet-api'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: ./publish</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 3: Docker Containerization ─── -->
+      <section class="lesson-section reveal" id="docker-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(121, 192, 255, 0.2); color: var(--accent-primary); border: 1px solid var(--accent-primary);">03</div>
+          <div>
+            <h2>Docker Containerization &amp; Multi-Stage Build สำหรับ .NET</h2>
+            <p class="text-muted" style="margin-bottom: 0;">แพ็กแอปพลิเคชัน .NET ลง Container ให้ขนาดเล็ก เบา ปลอดภัย และรันได้ทุกที่ในโลก</p>
+          </div>
+        </div>
+
+        <p>
+          <strong>Docker</strong> ช่วยแก้ปัญหาคลาสสิกของชาวเดฟที่ว่า <em>"บนเครื่องฉันรันได้ แต่บนเซิร์ฟเวอร์รันไม่ได้"</em> เพราะ Docker จะแพ็กทั้งโค้ด, .NET Runtime, ไลบรารี และระบบปฏิบัติการย่อยๆ รวมไว้ในก้อนเดียวที่เรียกว่า <strong>Container Image</strong>
+        </p>
+
+        <!-- Multi-Stage Comparison Box -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-xl); margin-bottom: var(--space-sm);">💡 ทำไมต้องใช้ Multi-Stage Dockerfile? (เทคนิคหัวใจสำคัญของ DevOps)</h3>
+        <p class="text-muted">
+          ในการพัฒนา .NET เราต้องการ <strong>.NET SDK</strong> (มีคอมไพเลอร์, Roslyn, CLI) ในการ Build โค้ด แต่เมื่อแอปคอมไพล์เสร็จแล้วตอนรันจริง เราต้องการแค่ <strong>ASP.NET Runtime</strong> เล็กๆ เท่านั้น!
+        </p>
+
+        <div class="docker-stage-grid">
+          <!-- Stage 1 Box: SDK -->
+          <div class="docker-stage-box">
+            <span class="stage-badge-top badge-sdk">🛠️ Stage 1: Build Stage (SDK Image)</span>
+            <h4 style="margin-bottom: 4px;">mcr.microsoft.com/dotnet/sdk:8.0</h4>
+            <div class="stage-size-bar">
+              <div class="stage-size-fill fill-sdk">ขนาด ~850 MB - 1 GB</div>
+            </div>
+            <ul class="docker-feature-list">
+              <li>✅ มี C# Compiler (csc), MSBuild, NuGet Package Manager</li>
+              <li>✅ มี .NET CLI ครบชุดสำหรับ <code>dotnet restore</code>, <code>dotnet build</code>, <code>dotnet publish</code></li>
+              <li>❌ <strong>ไม่ควรนำไปรันบน Production</strong> เพราะไฟล์ใหญ่ โหลดช้า และเสี่ยงต่อช่องโหว่ความปลอดภัย</li>
+            </ul>
+          </div>
+
+          <!-- Stage 2 Box: Runtime -->
+          <div class="docker-stage-box" style="border-color: rgba(63, 185, 80, 0.4);">
+            <span class="stage-badge-top badge-runtime">⚡ Stage 2: Final Runtime Stage (ASP.NET Image)</span>
+            <h4 style="margin-bottom: 4px; color: var(--accent-success);">mcr.microsoft.com/dotnet/aspnet:8.0</h4>
+            <div class="stage-size-bar">
+              <div class="stage-size-fill fill-runtime">~150 MB</div>
+            </div>
+            <ul class="docker-feature-list">
+              <li>✅ มีเฉพาะ Kestrel Web Server และ .NET CoreCLR สำหรับรัน DLL</li>
+              <li>✅ คัดลอกเฉพาะไฟล์ Binary ที่ Publish แล้วมาจาก Stage 1 (ไม่มี Source Code หลุด!)</li>
+              <li>✅ <strong>ขนาดเล็กลงกว่าเดิมถึง 80%!</strong> สตาร์ตแอปติดเร็ว ปลอดภัย และประหยัดค่าแบนด์วิดท์ Cloud</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Multi-Stage Dockerfile Code Example -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-xl); margin-bottom: var(--space-sm);">📄 โค้ด Multi-Stage Dockerfile มาตรฐานสำหรับ ASP.NET Core</h3>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">🐳</span>
+              <span>Dockerfile (Multi-Stage Build สำหรับ ASP.NET Core Web API)</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-docker"># ══════════════════════════════════════════════════════════
+# 1. Base Runtime Stage: เตรียมสภาพแวดล้อมสำหรับรันแอป
+# ══════════════════════════════════════════════════════════
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
+
+# ══════════════════════════════════════════════════════════
+# 2. Build Stage: ใช้ SDK ตัวใหญ่ในการคอมไพล์โค้ด
+# ══════════════════════════════════════════════════════════
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# คัดลอกเฉพาะไฟล์ .csproj เข้ามาก่อน เพื่อทำ Docker Layer Cache สำหรับ NuGet
+COPY ["MyWebApi.csproj", "./"]
+RUN dotnet restore "./MyWebApi.csproj"
+
+# คัดลอกซอร์สโค้ดทั้งหมดเข้ามาคอมไพล์
+COPY . .
+RUN dotnet build "MyWebApi.csproj" -c Release -o /app/build
+
+# ══════════════════════════════════════════════════════════
+# 3. Publish Stage: รวมไฟล์ DLL และ Static assets
+# ══════════════════════════════════════════════════════════
+FROM build AS publish
+RUN dotnet publish "MyWebApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# ══════════════════════════════════════════════════════════
+# 4. Final Production Stage: ดึงเฉพาะผลลัพธ์มาวางใน Runtime เล็ก
+# ══════════════════════════════════════════════════════════
+FROM base AS final
+WORKDIR /app
+# คัดลอกเฉพาะโฟลเดอร์ publish จาก Stage ที่ 3 เข้ามา
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "MyWebApi.dll"]</code></pre>
+          </div>
+        </div>
+
+        <!-- Docker CLI Cheat Sheet -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-xl); margin-bottom: var(--space-sm);">⌨️ คำสั่ง Docker CLI พื้นฐานที่ต้องรู้</h3>
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">💻</span>
+              <span>Terminal / Bash / PowerShell</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-bash"># 1. ประกอบร่าง Docker Image จาก Dockerfile ในโฟลเดอร์ปัจจุบัน
+docker build -t my-dotnet-api:1.0 .
+
+# 2. สั่งรัน Container โดย Map Port 8080 จากเครื่องเรา เข้าสู่ Port 8080 ใน Container
+docker run -d -p 8080:8080 --name my-api-container my-dotnet-api:1.0
+
+# 3. ตรวจสอบสถานะของ Container ที่กำลังทำงานอยู่
+docker ps
+
+# 4. ดูข้อความ Log สดๆ จากแอปพลิเคชันภายใน Container
+docker logs -f my-api-container
+
+# 5. สั่งหยุดและลบ Container
+docker stop my-api-container && docker rm my-api-container</code></pre>
+          </div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">⚠️ อย่าลืมสร้างไฟล์ <code>.dockerignore</code> ควบคู่ไปด้วยเสมอ!</div>
+          <p style="margin-bottom: 0;">
+            สร้างไฟล์ชื่อ <code>.dockerignore</code> ที่เดียวกับ Dockerfile และใส่ <code>bin/</code>, <code>obj/</code>, <code>.git</code> เข้าไป เพื่อไม่ให้ Docker เสียเวลา Copy ไฟล์ไบนารีขยะจากเครื่องเราเข้าไปใน Build Context ซึ่งจะทำให้ build ช้ามากโดยไม่จำเป็น
+          </p>
+        </div>
+      </section>
+
+      <!-- ─── Section 4: Cloud Deployment & Azure ─── -->
+      <section class="lesson-section reveal" id="cloud-deployment">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(210, 168, 255, 0.2); color: var(--syn-method); border: 1px solid var(--syn-method);">04</div>
+          <div>
+            <h2>Cloud Deployment &amp; Azure App Service เบื้องต้น</h2>
+            <p class="text-muted" style="margin-bottom: 0;">เข้าใจสถาปัตยกรรมคลาวด์, การทำ Blue-Green Deployment ด้วย Slots และการจัดการ Configuration</p>
+          </div>
+        </div>
+
+        <p>
+          เมื่อโปรเจกต์ .NET ผ่านขั้นตอน CI/CD และ Docker เรียบร้อย ขั้นตอนสุดท้ายคือการนำไปเปิดให้บริการบน Cloud Platform เช่น <strong>Microsoft Azure</strong> หรือ <strong>AWS</strong>
+        </p>
+
+        <!-- Cloud Models Grid -->
+        <div class="grid grid-3 gap-md my-lg">
+          <div class="card">
+            <span class="badge badge-primary mb-xs">PaaS (แนะนำสำหรับ Web/API)</span>
+            <h4 style="margin-top: 4px; margin-bottom: 6px;">Azure App Service</h4>
+            <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 0;">
+              โยนโค้ดหรือ Container ขึ้นไป ระบบ Cloud จัดการ OS Patching, SSL Certificate, Auto-scaling และ Load Balancer ให้เสร็จสรรพ
+            </p>
+          </div>
+
+          <div class="card">
+            <span class="badge badge-success mb-xs">Microservices &amp; Scale</span>
+            <h4 style="margin-top: 4px; margin-bottom: 6px;">Azure Container Apps / AKS</h4>
+            <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 0;">
+              ระบบจัดการ Container ระดับสูง (Kubernetes) เหมาะสำหรับสถาปัตยกรรม Microservices ที่ต้องการ Scale ต่ำสุดถึง 0 และรับโหลดสูงนับล้าน
+            </p>
+          </div>
+
+          <div class="card">
+            <span class="badge badge-warning mb-xs">IaaS (ควบคุมละเอียด)</span>
+            <h4 style="margin-top: 4px; margin-bottom: 6px;">Virtual Machines (VM)</h4>
+            <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 0;">
+              เช่าเซิร์ฟเวอร์เสมือน (Linux/Windows) ต้องติดตั้ง .NET SDK, Nginx/IIS และดูแลความปลอดภัยด้วยตนเองทั้งหมด
+            </p>
+          </div>
+        </div>
+
+        <!-- Azure Deployment Slots & Swap Visualization -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-2xl); margin-bottom: var(--space-xs);">🔄 เทคนิค Zero-Downtime ด้วย Deployment Slots (Blue-Green Deployment)</h3>
+        <p class="text-muted">
+          บน Azure App Service เราสามารถมี 2 สภาพแวดล้อมคู่ขนานกันได้: <strong>Staging (กรงทดลอง)</strong> และ <strong>Production (หน้างานจริง)</strong>
+        </p>
+
+        <div class="slot-swap-container">
+          <!-- Staging Slot -->
+          <div class="slot-box staging" id="box-staging">
+            <div style="font-size: 1.8rem; margin-bottom: 6px;">🧪</div>
+            <div style="font-weight: 700; color: var(--accent-primary); margin-bottom: 4px;">Staging Slot</div>
+            <div class="badge badge-primary mb-xs" id="staging-version-badge">Version 2.0 (New)</div>
+            <p class="text-muted" style="font-size: 0.75rem; margin-top: 6px; margin-bottom: 0;">
+              URL: <code>api-staging.azurewebsites.net</code><br>
+              ไว้ทำ Smoke Test และวอร์มอัปหน่วยความจำ
+            </p>
+          </div>
+
+          <!-- Swap Center Button -->
+          <div class="swap-action-center">
+            <button class="swap-btn" id="btn-swap-slots">
+              <span>⇄ SWAP SLOTS</span>
+            </button>
+            <span class="text-muted" style="font-size: 0.75rem; text-align: center;">⚡ สลับ Traffic ทันทีใน 0 วินาที<br>(Zero Downtime Swap)</span>
+          </div>
+
+          <!-- Production Slot -->
+          <div class="slot-box production" id="box-production">
+            <div style="font-size: 1.8rem; margin-bottom: 6px;">🟢</div>
+            <div style="font-weight: 700; color: var(--accent-success); margin-bottom: 4px;">Production Slot</div>
+            <div class="badge badge-success mb-xs" id="prod-version-badge">Version 1.0 (Live)</div>
+            <p class="text-muted" style="font-size: 0.75rem; margin-top: 6px; margin-bottom: 0;">
+              URL: <code>api.mycompany.com</code><br>
+              รับทราฟฟิกลูกค้าจริง 100%
+            </p>
+          </div>
+        </div>
+
+        <!-- Cloud Configuration & Secrets -->
+        <h3 style="font-size: 1.1rem; margin-top: var(--space-xl); margin-bottom: var(--space-sm);">🔑 การตั้งค่า Environment Variables และ Connection Strings บน Cloud</h3>
+        <p>
+          ใน ASP.NET Core เมื่อรันบน Cloud ตัวระบบ Configuration Provider จะอ่านค่าจาก Environment Variables โดยอัตโนมัติ โดยใช้เครื่องหมายขีดล่างคู่ (<code>__</code>) แทนเครื่องหมายโคลอน (<code>:</code>) ใน JSON:
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚙️</span>
+              <span>การแมป Environment Variable บน Cloud สู่ ASP.NET Core C#</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">// 1. ใน Azure App Service -> Configuration -> Application Settings ตั้งค่า:
+// Key: ConnectionStrings__DefaultConnection
+// Value: Server=tcp:sql-prod.database.windows.net;Database=SalesDb;User ID=appadmin;Password=Secret123!;
+
+// 2. ในโค้ด Program.cs ของ .NET 8 จะอ่านค่าได้โดยอัตโนมัติอย่างราบรื่น:
+var builder = WebApplication.CreateBuilder(args);
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext&lt;AppDbContext&gt;(options =&gt;
+    options.UseSqlServer(connectionString));</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 5: Quiz Section ─── -->
+      <section class="lesson-section reveal" id="quiz-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(247, 223, 30, 0.2); color: #f7df1e; border: 1px solid #f7df1e;">05</div>
+          <div>
+            <h2>แบบทดสอบความรู้: Git &amp; CI/CD Pipeline Arena</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ทดสอบความเข้าใจเกี่ยวกับ Git Workflow, GitHub Actions, Docker Multi-stage และ Cloud Deployment (5 ข้อ)</p>
+          </div>
+        </div>
+
+        <!-- Quiz Container for QuizEngine -->
+        <div id="git-cicd-quiz"></div>
+      </section>
+
+      <!-- ─── Next Lesson Navigation ─── -->
+      <div class="card mt-2xl reveal" style="border-color: var(--border-active); background: linear-gradient(135deg, rgba(88, 166, 255, 0.1) 0%, rgba(22, 27, 34, 0.8) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge badge-success mb-xs">🎉 ยอดเยี่ยม! ผ่านบทเรียน Git &amp; CI/CD Pipeline</span>
+            <h3 style="margin-top: 4px; margin-bottom: 4px;">พร้อมไปต่อกับบทเรียน Secure Coding &amp; OWASP แล้วหรือยัง?</h3>
+            <p class="text-muted" style="margin-bottom: 0;">เรียนรู้วิธีป้องกัน SQL Injection, XSS, CSRF, และการรักษาความปลอดภัยของระบบ .NET API</p>
+          </div>
+          <div>
+            <a href="./secure-coding.html" class="btn btn-primary btn-lg">
+              <span>ไปบทเรียนถัดไป: Secure Coding →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-git.min.js"></script>
+  
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Mark lesson completion & progress
+      if (typeof Progress !== 'undefined') {
+        Progress.completeLesson('git-cicd');
+        Progress.setModuleProgress('devops', 50);
+      }
+
+      // 2. Interactive Git Command Selector
+      const cmdData = {
+        'init': {
+          title: '# 1. การสร้างและดึงโปรเจกต์ (Init & Clone)',
+          content: '<code>git init</code> : สร้าง Git repository ใหม่ในโฟลเดอร์ปัจจุบัน<br><code>git clone &lt;url&gt;</code> : โคลนโปรเจกต์จาก Remote (GitHub/Azure) ลงมาที่เครื่อง',
+          tip: '💡 เมื่อเริ่มโปรเจกต์ .NET ใหม่ ให้สร้างโฟลเดอร์ รัน <code>dotnet new webapi</code> แล้วตามด้วย <code>git init</code>'
+        },
+        'add-commit': {
+          title: '# 2. การเตรียมไฟล์และบันทึก Checkpoint (Add & Commit)',
+          content: '<code>git add .</code> : นำไฟล์ที่มีการแก้ไขทั้งหมดเข้าสู่ Staging Area<br><code>git commit -m "feat: add customer login api"</code> : บันทึกจุดเซฟพร้อมข้อความอธิบายการเปลี่ยนแปลง (Commit Convention)',
+          tip: '💡 ใช้ Conventional Commits เช่น feat: (ฟีเจอร์ใหม่), fix: (แก้บั๊ก), refactor: (ปรับปรุงโค้ด)'
+        },
+        'push-pull': {
+          title: '# 3. การส่งและดึงโค้ดจาก Cloud (Push & Pull)',
+          content: '<code>git push -u origin feature/auth</code> : ส่งโค้ดและกิ่งขึ้น Remote Server<br><code>git pull origin main</code> : ดึงโค้ดล่าสุดจาก Server มารวมเข้ากับเครื่องเรา',
+          tip: '💡 ก่อนจะเริ่มเขียนโค้ดใหม่ทุกเช้า ควรพิมพ์ <code>git pull</code> เสมอ เพื่อให้ได้โค้ดล่าสุดจากเพื่อนร่วมทีม'
+        },
+        'branch': {
+          title: '# 4. การจัดการกิ่ง (Branch & Switch)',
+          content: '<code>git checkout -b feature/order-api</code> (หรือ <code>git switch -c feature/order-api</code>) : สร้างและสลับไปยังกิ่งใหม่ทันที<br><code>git branch -a</code> : แสดงรายชื่อกิ่งทั้งหมดทั้งในเครื่องและบน Remote',
+          tip: '💡 กฎเหล็ก: ห้ามแก้โค้ดบน main ให้สร้าง feature branch ทุกครั้ง!'
+        },
+        'stash': {
+          title: '# 5. การพักงานชั่วคราว (Git Stash)',
+          content: '<code>git stash</code> : เก็บโค้ดที่ยังเขียนไม่เสร็จซ่อนไว้ชั่วคราว เพื่อให้ Working Directory สะอาด<br><code>git stash pop</code> : ดึงโค้ดที่ซ่อนไว้กลับมาทำต่อเมื่อเสร็จงานด่วนแล้ว',
+          tip: '💡 มีประโยชน์มากเวลาเจองานด่วนแทรกเข้ามาแล้วยังไม่อยาก Commit โค้ดที่ยังไม่เสร็จ'
+        },
+        'log': {
+          title: '# 6. การตรวจสอบประวัติและการเปลี่ยนแปลง (Log & Diff)',
+          content: '<code>git log --oneline --graph --all</code> : ดูกราฟประวัติการแตกกิ่งและ Commit แบบกระชับ<br><code>git diff</code> : ดูความแตกต่างของโค้ดที่แก้ไขเปรียบเทียบกับ Commit ล่าสุด',
+          tip: '💡 แนะนำให้ลง Extension "Git Graph" ใน VS Code เพื่อดูภาพแผนผังต้นไม้อย่างสวยงาม'
+        }
+      };
+
+      const cmdButtons = document.querySelectorAll('#cmd-selector .git-cmd-btn');
+      const displayBox = document.getElementById('cmd-display-box');
+
+      cmdButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          cmdButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const key = btn.getAttribute('data-cmd');
+          const data = cmdData[key];
+          if (data && displayBox) {
+            displayBox.innerHTML = `
+              <div style="color: var(--accent-primary); font-weight: 700; margin-bottom: 6px;">${data.title}</div>
+              <div style="color: var(--text-primary); margin-bottom: 8px;">${data.content}</div>
+              <div class="text-muted" style="font-size: 0.8rem;">${data.tip}</div>
+            `;
+          }
+        });
+      });
+
+      // 3. Interactive CI/CD Simulator Logic
+      const btnTrigger = document.getElementById('btn-trigger-pipeline');
+      const statusBadge = document.getElementById('pipeline-status-badge');
+      const consoleLog = document.getElementById('pipeline-console-log');
+      let isRunningPipeline = false;
+
+      const pipelineSteps = [
+        { id: 'step-1', name: 'Checkout', durId: 'dur-1', duration: '1.2s', log: '✔ [Checkout] Fetching origin/main (SHA: 4f8b92c)... Done.' },
+        { id: 'step-2', name: 'Setup .NET', durId: 'dur-2', duration: '2.4s', log: '✔ [Setup .NET] Installed .NET SDK 8.0.204 (x64) on ubuntu-latest.' },
+        { id: 'step-3', name: 'Restore', durId: 'dur-3', duration: '3.1s', log: '✔ [Restore] Restored 42 NuGet packages in 3.1s (Using NuGet Cache).' },
+        { id: 'step-4', name: 'Build', durId: 'dur-4', duration: '4.5s', log: '✔ [Build] Compiled MyWebApi.csproj (Release) -> 0 Errors, 0 Warnings.' },
+        { id: 'step-5', name: 'xUnit Tests', durId: 'dur-5', duration: '5.8s', log: '✔ [Tests] Passed: 28 tests | Failed: 0 | Skipped: 0 (Coverage: 92.4%).' },
+        { id: 'step-6', name: 'Cloud Deploy', durId: 'dur-6', duration: '3.9s', log: '🚀 [Deploy] Successfully deployed to Azure Web App (https://api.mycompany.com) [Zero Downtime].' }
+      ];
+
+      if (btnTrigger) {
+        btnTrigger.addEventListener('click', () => {
+          if (isRunningPipeline) return;
+          isRunningPipeline = true;
+          btnTrigger.disabled = true;
+          btnTrigger.style.opacity = '0.6';
+
+          // Reset all steps
+          pipelineSteps.forEach(s => {
+            const el = document.getElementById(s.id);
+            const dur = document.getElementById(s.durId);
+            if (el) {
+              el.className = 'pipeline-step-card';
+            }
+            if (dur) dur.textContent = '-';
+          });
+
+          statusBadge.className = 'pipeline-status-badge pipeline-status-running';
+          statusBadge.textContent = '🟡 RUNNING (กำลังทำงาน...)';
+          consoleLog.innerHTML = '<div class="console-line console-warning">⚡ [Trigger] Event: push on refs/heads/main by developer... Starting Workflow!</div>';
+
+          let currentStepIdx = 0;
+
+          function runNextStep() {
+            if (currentStepIdx < pipelineSteps.length) {
+              const step = pipelineSteps[currentStepIdx];
+              const cardEl = document.getElementById(step.id);
+              const durEl = document.getElementById(step.durId);
+
+              // Set active
+              if (cardEl) cardEl.classList.add('step-active');
+              const activeLogLine = document.createElement('div');
+              activeLogLine.className = 'console-line console-info';
+              activeLogLine.textContent = `⏳ Running step: ${step.name}...`;
+              consoleLog.appendChild(activeLogLine);
+              consoleLog.scrollTop = consoleLog.scrollHeight;
+
+              setTimeout(() => {
+                if (cardEl) {
+                  cardEl.classList.remove('step-active');
+                  cardEl.classList.add('step-passed');
+                }
+                if (durEl) durEl.textContent = step.duration;
+
+                const passLogLine = document.createElement('div');
+                passLogLine.className = 'console-line console-success';
+                passLogLine.textContent = step.log;
+                consoleLog.appendChild(passLogLine);
+                consoleLog.scrollTop = consoleLog.scrollHeight;
+
+                currentStepIdx++;
+                runNextStep();
+              }, 1100);
+            } else {
+              // Completed
+              statusBadge.className = 'pipeline-status-badge pipeline-status-passed';
+              statusBadge.textContent = '🟢 ALL PASSED (เสร็จสมบูรณ์ 100%)';
+              
+              const finishLine = document.createElement('div');
+              finishLine.className = 'console-line console-success';
+              finishLine.style.fontWeight = 'bold';
+              finishLine.style.marginTop = '6px';
+              finishLine.textContent = '🎉 Workflow finished with status: SUCCESS! (Total time: 20.9s)';
+              consoleLog.appendChild(finishLine);
+              consoleLog.scrollTop = consoleLog.scrollHeight;
+
+              isRunningPipeline = false;
+              btnTrigger.disabled = false;
+              btnTrigger.style.opacity = '1';
+            }
+          }
+
+          runNextStep();
+        });
+      }
+
+      // 4. Interactive Azure Slot Swap Simulation
+      const btnSwap = document.getElementById('btn-swap-slots');
+      const stagingBadge = document.getElementById('staging-version-badge');
+      const prodBadge = document.getElementById('prod-version-badge');
+      let isStagingV2 = true;
+
+      if (btnSwap) {
+        btnSwap.addEventListener('click', () => {
+          btnSwap.disabled = true;
+          btnSwap.style.transform = 'scale(0.95)';
+          btnSwap.innerHTML = '<span>⏳ Swapping Traffic...</span>';
+
+          setTimeout(() => {
+            isStagingV2 = !isStagingV2;
+            if (isStagingV2) {
+              stagingBadge.textContent = 'Version 2.0 (New)';
+              stagingBadge.className = 'badge badge-primary mb-xs';
+              prodBadge.textContent = 'Version 1.0 (Live)';
+              prodBadge.className = 'badge badge-success mb-xs';
+            } else {
+              stagingBadge.textContent = 'Version 1.0 (Backup)';
+              stagingBadge.className = 'badge badge-warning mb-xs';
+              prodBadge.textContent = 'Version 2.0 (Live)';
+              prodBadge.className = 'badge badge-success mb-xs';
+            }
+            btnSwap.disabled = false;
+            btnSwap.style.transform = 'scale(1)';
+            btnSwap.innerHTML = '<span>⇄ SWAP SLOTS</span>';
+          }, 800);
+        });
+      }
+
+      // 5. Quiz Questions Definition
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ในการพัฒนาซอฟต์แวร์เป็นทีม ข้อใดอธิบายวัตถุประสงค์ของกิ่ง "main" หรือ "master" ได้ถูกต้องที่สุด?',
+          options: [
+            'เป็นกิ่งที่นักพัฒนาทุกคนใช้เขียนโค้ดทดลองเล่นตามใจชอบ',
+            'เป็นกิ่งที่เก็บโค้ดเวอร์ชันเสถียรที่สุดที่พร้อมรันบน Production เสมอ และต้องห้าม Push โค้ดตรงโดยไม่ผ่าน PR',
+            'เป็นกิ่งชั่วคราวที่จะถูกลบทิ้งอัตโนมัติทุกสิ้นวัน',
+            'เป็นกิ่งสำหรับเก็บไฟล์ขยะ bin/ และ obj/ ของโปรเจกต์'
+          ],
+          answer: 1,
+          explanation: 'กิ่ง main คือกิ่งสำคัญที่สุดของระบบ ต้องมีความเสถียร 100% เสมอ การนำโค้ดเข้าสู่ main ต้องทำผ่าน Pull Request และผ่านการทำ Code Review & Automated Tests เท่านั้น'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'เหตุใดในการเขียน Dockerfile สำหรับแอปพลิเคชัน .NET ยุคใหม่ จึงนิยมใช้เทคนิค "Multi-Stage Build"?',
+          options: [
+            'เพื่อใช้ .NET SDK ในการคอมไพล์ใน Stage แรก แล้วย้ายเฉพาะไฟล์ Publish ไปรันบน ASP.NET Runtime ขนาดเล็กใน Stage สุดท้าย ทำให้ Image เล็กและปลอดภัย',
+            'เพราะ Docker บังคับว่าถ้าไม่ทำ Multi-Stage จะไม่สามารถรันบนระบบปฏิบัติการ Linux ได้',
+            'เพื่อแปลงภาษา C# ให้กลายเป็นภาษา HTML อัตโนมัติ',
+            'เพื่อทำให้ Container รันได้โดยไม่ต้องต่ออินเทอร์เน็ตตลอดกาล'
+          ],
+          answer: 0,
+          explanation: 'Multi-Stage Build ช่วยแยกขั้นตอน Build ที่ต้องใช้ SDK ขนาดใหญ่ (~850MB) ออกจาก Runtime ขั้นสุดท้าย (~150MB) ทำให้ Docker Image มีขนาดเล็ก ปลอดภัย ไม่มีซอร์สโค้ดหลุด และสตาร์ตเร็วมาก'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ข้อใดคือไฟล์หรือโฟลเดอร์ในโปรเจกต์ .NET ที่ "ต้องระบุไว้ใน .gitignore" เสมอเพื่อป้องกันข้อผิดพลาดและความปลอดภัย?',
+          options: [
+            'Program.cs และ Controllers/',
+            'MyProject.csproj และ .sln',
+            'bin/, obj/, .vs/, และไฟล์ที่เก็บความลับเช่น appsettings.Development.json',
+            'Models/ และ Services/'
+          ],
+          answer: 2,
+          explanation: 'bin/ และ obj/ คือไฟล์ไบนารีที่สร้างใหม่ได้ตอน build, .vs/ คือไฟล์ config เฉพาะเครื่อง และไฟล์ settings ที่มีรหัสผ่านต้องห้าม Push ขึ้น Git เพื่อป้องกันความลับรั่วไหล'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'ในระบบ Continuous Integration (CI) ของ GitHub Actions คำสั่งใดที่ทำหน้าที่รัน Unit Tests ทั้งหมดเพื่อตรวจเช็คคุณภาพโค้ดก่อนทำการ Deploy?',
+          options: [
+            'dotnet new console',
+            'dotnet clean',
+            'dotnet test',
+            'dotnet watch'
+          ],
+          answer: 2,
+          explanation: 'คำสั่ง dotnet test จะทำการค้นหาและรันเทสต์เคสทั้งหมด (เช่น xUnit, NUnit, MSTest) ในโปรเจกต์ หากมีเทสต์ข้อใดไม่ผ่าน ระบบ CI จะหยุดการทำงานและแจ้งเตือนทันที'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'การใช้ฟีเจอร์ "Deployment Slots" (Staging & Production) บน Azure App Service ช่วยแก้ไขปัญหาใดได้ดีที่สุด?',
+          options: [
+            'ช่วยลดราคาค่าอินเทอร์เน็ตบ้านของโปรแกรมเมอร์',
+            'ช่วยให้สามารถอัปเดตเวอร์ชันใหม่ขึ้นเซิร์ฟเวอร์ได้โดยระบบไม่เกิด Downtime (Zero Downtime Deployment) และสามารถ Rollback สลับกลับได้ทันทีหากพบปัญหา',
+            'ช่วยลบฐานข้อมูลเก่าทิ้งทั้งหมดโดยอัตโนมัติ',
+            'ช่วยแก้ไวยากรณ์ภาษา C# ที่เขียนผิดให้ถูกต้อง'
+          ],
+          answer: 1,
+          explanation: 'Deployment Slots อนุญาตให้เรา Deploy โค้ดใหม่เข้า Staging เพื่อวอร์มอัปและทดสอบก่อน จากนั้นกด "Swap" เพื่อสลับการรับ Traffic กับ Production ทันที ทำให้ลูกค้าไม่สะดุด (Zero Downtime)'
+        }
+      ];
+
+      // 6. Initialize QuizEngine
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('git-cicd-quiz', quizQuestions, {
+          quizId: 'git-cicd-mastery',
+          showTimer: false,
+          showExplanation: true
+        });
+      }
+    });
+  </script>
+</body>
+</html>

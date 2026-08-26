@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entity Framework Core (EF Core 8/9) — ORM สำหรับ .NET | DotNet Learning Hub</title>
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <style>
+    /* Custom Styling for EF Core Page */
+    .orm-flow-container {
+      display: grid;
+      grid-template-columns: 1fr auto 1.2fr auto 1fr;
+      align-items: center;
+      gap: var(--space-md);
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+      position: relative;
+      overflow: hidden;
+    }
+    @media (max-width: 900px) {
+      .orm-flow-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: var(--space-lg);
+      }
+    }
+    .flow-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      text-align: center;
+      transition: all var(--transition-normal);
+    }
+    .flow-box:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+    .flow-box.efcore-box {
+      border: 2px solid var(--accent-info);
+      background: rgba(163, 113, 247, 0.08);
+      box-shadow: 0 0 20px rgba(163, 113, 247, 0.15);
+    }
+    .flow-arrow {
+      font-size: 1.5rem;
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    @media (max-width: 900px) {
+      .flow-arrow {
+        transform: rotate(90deg);
+      }
+    }
+
+    /* Terminal Simulator */
+    .terminal-box {
+      background: #0d1117;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin: var(--space-lg) 0;
+      font-family: var(--font-code);
+    }
+    .terminal-header {
+      background: #161b22;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .terminal-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .terminal-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+    .terminal-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .terminal-body {
+      padding: var(--space-lg);
+      color: #e6edf3;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+    .terminal-prompt {
+      color: var(--accent-success);
+      user-select: none;
+    }
+    .terminal-cmd {
+      color: var(--syn-type);
+      font-weight: 700;
+    }
+    .terminal-output {
+      color: var(--text-secondary);
+      margin: var(--space-xs) 0 var(--space-md) 0;
+    }
+    .terminal-highlight {
+      color: var(--syn-keyword);
+      font-weight: 600;
+    }
+
+    /* State Machine Grid */
+    .state-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    .state-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      position: relative;
+      transition: all var(--transition-normal);
+    }
+    .state-card:hover {
+      transform: translateY(-3px);
+    }
+    .state-badge {
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      margin-bottom: var(--space-xs);
+    }
+    .state-detached { background: rgba(139, 148, 158, 0.2); color: #8b949e; border: 1px solid #8b949e; }
+    .state-unchanged { background: rgba(88, 166, 255, 0.15); color: var(--accent-primary); border: 1px solid var(--accent-primary); }
+    .state-added { background: rgba(63, 185, 80, 0.15); color: var(--accent-success); border: 1px solid var(--accent-success); }
+    .state-modified { background: rgba(210, 153, 34, 0.15); color: var(--accent-warning); border: 1px solid var(--accent-warning); }
+    .state-deleted { background: rgba(248, 81, 73, 0.15); color: var(--accent-danger); border: 1px solid var(--accent-danger); }
+
+    /* Performance Comparison Cards */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    @media (max-width: 768px) {
+      .compare-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .compare-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      border: 1px solid var(--border-default);
+    }
+    .compare-bad {
+      border-color: rgba(248, 81, 73, 0.4);
+      background: rgba(248, 81, 73, 0.03);
+    }
+    .compare-good {
+      border-color: rgba(63, 185, 80, 0.4);
+      background: rgba(63, 185, 80, 0.03);
+    }
+
+    /* Architecture Visual Blocks */
+    .arch-block {
+      border: 1px solid var(--border-default);
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin-bottom: var(--space-sm);
+    }
+    .arch-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-xs);
+    }
+    .tag-dbcontext { background: rgba(163, 113, 247, 0.2); color: var(--syn-method); border: 1px solid rgba(163, 113, 247, 0.4); }
+    .tag-dbset { background: rgba(88, 166, 255, 0.2); color: var(--syn-type); border: 1px solid rgba(88, 166, 255, 0.4); }
+    .tag-entity { background: rgba(126, 231, 135, 0.2); color: var(--syn-annotation); border: 1px solid rgba(126, 231, 135, 0.4); }
+
+    /* Interactive query demo box */
+    .interactive-query-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <a href="../index.html" class="site-logo">
+      <div class="logo-icon">🟣</div>
+      <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าหลัก (Dashboard)</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="./csharp-basics.html" class="sidebar-link">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="./csharp-oop.html" class="sidebar-link">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="./csharp-linq.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>LINQ &amp; Collections (Level 3)</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="./csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>Async/Await &amp; Advanced (Lv 4)</span>
+        <span class="sidebar-badge badge-new">Lv 4</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🌐 Track .NET &amp; Web API</div>
+      <a href="./dotnet-overview.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 &amp; CLI Overview</span>
+      </a>
+      <a href="./aspnet-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>ASP.NET Core Web API</span>
+      </a>
+      <a href="./ef-core.html" class="sidebar-link active">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+        <span class="sidebar-badge badge-mid">ORM</span>
+      </a>
+      <a href="./blazor.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Blazor Web Apps</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🛠️ Track Database &amp; Quality</div>
+      <a href="./sql-basics.html" class="sidebar-link">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; T-SQL</span>
+      </a>
+      <a href="./architecture.html" class="sidebar-link">
+        <span class="link-icon">🏛️</span>
+        <span>Clean Architecture &amp; Patterns</span>
+      </a>
+      <a href="./testing.html" class="sidebar-link">
+        <span class="link-icon">🧪</span>
+        <span>Unit Testing &amp; xUnit</span>
+      </a>
+      <a href="./devops.html" class="sidebar-link">
+        <span class="link-icon">🐳</span>
+        <span>Docker &amp; CI/CD</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header animate-fade-in">
+        <div class="breadcrumb">
+          <a href="../index.html">หน้าหลัก</a>
+          <span>/</span>
+          <span>Database &amp; .NET Track</span>
+          <span>/</span>
+          <span class="text-primary">Entity Framework Core</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(163, 113, 247, 0.25); color: #d2a8ff; border: 1px solid rgba(163, 113, 247, 0.4);">🗄️</div>
+          <div>
+            <h1>Entity Framework Core (EF Core 8/9) — ORM สำหรับ .NET</h1>
+            <div class="page-description">เรียนรู้การเชื่อมต่อฐานข้อมูลระดับโปรด้วย Object-Relational Mapping (ORM) มาตรฐานของ .NET ตั้งแต่สถาปัตยกรรม DbContext, Code-First Migrations, CRUD จนถึง Performance Optimization และแก้ปัญหา N+1 Query</div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="level-tag level-mid">⭐⭐ กลาง (Intermediate)</span></span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>เวลาเรียน: <strong>~55 นาที</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>รางวัล: <strong>+100 XP</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>📦</span>
+            <span>รองรับ: <strong>.NET 8 / .NET 9 LTS</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Analogy Concept Box ─── -->
+      <section class="lesson-section reveal">
+        <div class="concept-card" style="border-left: 4px solid var(--accent-info);">
+          <div class="concept-header" style="background: rgba(163, 113, 247, 0.08);">
+            <span class="concept-emoji">💡</span>
+            <div>
+              <span class="concept-title">เปรียบเทียบให้เห็นภาพ: EF Core คือ "ล่ามแปลภาษาส่วนตัวระหว่าง C# กับ SQL"</span>
+              <div class="text-muted" style="font-size: 0.8rem;">ทำความเข้าใจหัวใจของ Object-Relational Mapper (ORM) ใน 1 นาที</div>
+            </div>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🍽️ เรื่องเล่าเปรียบเทียบ (Analogy)</div>
+              <p class="analogy-text">
+                สมมติว่าคุณเป็น<strong>ลูกค้าในภัตตาคารนานาชาติ</strong>ที่พูดได้เฉพาะ <strong>ภาษาไทย (C# / LINQ)</strong> เช่น <em>"ขอสเต็กเนื้อวัวที่ราคาเกิน 100 บาท จัดเรียงจากใหม่สุดมาเก่าสุด 5 จาน"</em><br><br>
+                แต่พ่อครัวในครัวพูดได้เฉพาะ <strong>ภาษา SQL (T-SQL, PostgreSQL, MySQL หรือ SQLite)</strong> เท่านั้น!<br>
+                หากไม่มีล่าม คุณจะต้องไปฝึกพูดภาษา SQL โบราณ ต้องจำคำสั่ง เปิดเตาเอง หยิบจานเอง เสี่ยงต่อความผิดพลาด (SQL Injection / Type Mismatch)...<br><br>
+                <strong>EF Core (Entity Framework Core)</strong> ทำหน้าที่เป็น <strong>"หัวหน้าบริกรและสุดยอดล่ามแปลภาษา"</strong>:
+              </p>
+              <ul style="margin: var(--space-sm) 0 0 var(--space-lg); color: var(--text-secondary); line-height: 1.7;">
+                <li>🗣️ <strong>แปลภาษาอัตโนมัติ:</strong> แปลคำสั่ง C# LINQ เช่น <code>.Where(p => p.Price > 100).Take(5)</code> ไปเป็นคำสั่ง <code>SELECT TOP(5) ... WHERE [Price] > 100</code> ที่ปลอดภัยและมีประสิทธิภาพ</li>
+                <li>🛡️ <strong>ป้องกันอันตราย (SQL Injection):</strong> ใช้ Parameterized Query เสมอโดยที่คุณไม่ต้องสั่ง</li>
+                <li>🍽️ <strong>เสิร์ฟใส่จานหรูหรา (Object Mapping):</strong> เมื่อครัวส่งข้อมูลดิบกลับมา ล่ามจะจัดใส่จานเป็น C# Object (Class Model) ให้คุณใช้งานได้ทันทีพร้อม IntelliSense</li>
+                <li>📝 <strong>จำสถานะ (Change Tracking):</strong> คอยจดจำว่าคุณหยิบช้อนอะไรไปแก้บ้าง พอคุณสั่ง <code>SaveChangesAsync()</code> ล่ามจะส่งบิลไปอัปเดตเฉพาะสิ่งที่เปลี่ยนให้อัตโนมัติ!</li>
+              </ul>
+            </div>
+
+            <!-- Visual Flow Diagram -->
+            <div class="orm-flow-container">
+              <div class="flow-box">
+                <div style="font-size: 1.8rem; margin-bottom: 6px;">💻</div>
+                <div style="font-weight: 700; color: var(--syn-type);">C# Code &amp; LINQ</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;"><code>context.Products.Where(...)</code></div>
+              </div>
+
+              <div class="flow-arrow">➔</div>
+
+              <div class="flow-box efcore-box">
+                <div style="font-size: 1.8rem; margin-bottom: 6px;">⚙️</div>
+                <div style="font-weight: 700; color: var(--accent-info);">EF Core (ORM Engine)</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">LINQ Provider + Change Tracker + Model Mapping</div>
+              </div>
+
+              <div class="flow-arrow">➔</div>
+
+              <div class="flow-box">
+                <div style="font-size: 1.8rem; margin-bottom: 6px;">🗄️</div>
+                <div style="font-weight: 700; color: var(--syn-annotation);">Database Engine</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">SQL Server / PostgreSQL / SQLite</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 1: Core Architecture & Building Blocks ─── -->
+      <section class="lesson-section reveal" id="architecture-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(163, 113, 247, 0.2); color: var(--accent-info); border: 1px solid var(--accent-info);">01</div>
+          <div>
+            <h2>โครงสร้างหลักของ EF Core (Core Architecture &amp; Building Blocks)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">เข้าใจ 4 องค์ประกอบสำคัญ: DbContext, DbSet&lt;T&gt;, Data Annotations และ Fluent API</p>
+          </div>
+        </div>
+
+        <p>ในการทำงานกับ EF Core โค้ดของเราจะประกอบไปด้วย 4 ส่วนหลักที่ทำงานประสานกันอย่างลงตัว:</p>
+
+        <!-- 4 Building Blocks Overview Grid -->
+        <div class="grid grid-2 gap-md my-lg">
+          <div class="arch-block">
+            <div class="arch-block-header">
+              <span class="badge tag-dbcontext">1. DbContext</span>
+              <span style="font-size: 1.2rem;">🏛️</span>
+            </div>
+            <h4 style="margin: 4px 0 6px 0; color: var(--text-primary);">ตัวแทนเซสชันและการเชื่อมต่อฐานข้อมูล</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0;">ทำหน้าที่เป็น <strong>Unit of Work</strong> และ <strong>Repository Pattern</strong> ในตัว จัดการ Connection, Transaction, และ Change Tracker ตรวจจับการเปลี่ยนแปลงของ Entity</p>
+          </div>
+
+          <div class="arch-block">
+            <div class="arch-block-header">
+              <span class="badge tag-dbset">2. DbSet&lt;TEntity&gt;</span>
+              <span style="font-size: 1.2rem;">📊</span>
+            </div>
+            <h4 style="margin: 4px 0 6px 0; color: var(--text-primary);">ตัวแทนตาราง (Table / Collection)</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0;">เปรียบเสมือนตารางใน DB แต่ละตาราง ที่เราสามารถรัน LINQ Query, สั่งเพิ่ม (Add), ค้นหา (Find), แก้ไข (Update) หรือลบ (Remove) ข้อมูลได้ในรูปแบบ C# Collection</p>
+          </div>
+
+          <div class="arch-block">
+            <div class="arch-block-header">
+              <span class="badge tag-entity">3. Entity Classes</span>
+              <span style="font-size: 1.2rem;">📦</span>
+            </div>
+            <h4 style="margin: 4px 0 6px 0; color: var(--text-primary);">โมเดลข้อมูลระดับคลาส (POCO)</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0;">Plain Old C# Object ที่แทนแถวข้อมูล (Row) 1 แถวในตาราง โดยมี Properties แทน Columns พร้อมกำหนดกฎความถูกต้องด้วย Data Annotations</p>
+          </div>
+
+          <div class="arch-block">
+            <div class="arch-block-header">
+              <span class="badge tag-dbcontext" style="background: rgba(210, 153, 34, 0.2); color: var(--accent-warning); border-color: var(--accent-warning);">4. Fluent API</span>
+              <span style="font-size: 1.2rem;">⚙️</span>
+            </div>
+            <h4 style="margin: 4px 0 6px 0; color: var(--text-primary);">การตั้งค่า Model ขั้นสูงใน OnModelCreating</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0;">การกำหนดความสัมพันธ์ซับซ้อน (1-to-1, 1-to-Many, Many-to-Many), Composite Key, Cascade Delete, Index, Table Name, และ Seed Data แยกออกจากตัว Entity ชัดเจน</p>
+          </div>
+        </div>
+
+        <!-- Code Block 1: Complete Entity Definition with Data Annotations -->
+        <h3 class="mt-xl">1.1 การสร้าง Entity Classes และ Data Annotations</h3>
+        <p>มาดูตัวอย่างการออกแบบ Entity สำหรับระบบ E-Commerce ร้านค้าออนไลน์ที่มี <code>Category</code> (หมวดหมู่สินค้า) และ <code>Product</code> (สินค้า):</p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>Models/Product.cs &amp; Models/Category.cs</span>
+            </div>
+            <button class="copy-btn">📋 คัดลอกโค้ด</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace DotNetShop.Models;
+
+// Entity 1: หมวดหมู่สินค้า
+[Table("Categories")] // กำหนดชื่อตารางใน Database
+public class Category
+{
+    [Key] // กำหนดให้เป็น Primary Key (ถ้าชื่อ Id หรือ CategoryId EF จะรู้เองอัตโนมัติ)
+    public int Id { get; set; }
+
+    [Required] // บังคับว่าต้องมีค่า (NOT NULL)
+    [MaxLength(100)] // กำหนดขนาด VARCHAR(100)
+    public string Name { get; set; } = string.Empty;
+
+    public string? Description { get; set; } // Nullable string => NVARCHAR(MAX) NULL
+
+    // Navigation Property: 1 หมวดหมู่ มีได้หลายสินค้า (1-to-Many)
+    public ICollection&lt;Product&gt; Products { get; set; } = new List&lt;Product&gt;();
+}
+
+// Entity 2: รายการสินค้า
+[Table("Products")]
+public class Product
+{
+    [Key]
+    public int Id { get; set; }
+
+    [Required]
+    [MaxLength(200)]
+    public string Name { get; set; } = string.Empty;
+
+    [MaxLength(50)]
+    public string Sku { get; set; } = string.Empty;
+
+    [Column(TypeName = "decimal(18,2)")] // กำหนด Data Type ใน SQL แม่นยำ
+    [Range(0.01, 1000000.00)]
+    public decimal Price { get; set; }
+
+    public int StockQuantity { get; set; }
+
+    public bool IsActive { get; set; } = true;
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    // Foreign Key สำหรับเชื่อมโยงกับ Category
+    public int CategoryId { get; set; }
+
+    // Navigation Property: สินค้า 1 ชิ้น อยู่ใน 1 หมวดหมู่
+    [ForeignKey(nameof(CategoryId))]
+    public Category Category { get; set; } = null!;
+}</code></pre>
+          </div>
+          <div class="color-legend">
+            <div class="legend-item"><span class="legend-dot" style="background: var(--syn-keyword);"></span> Keyword (class, public)</div>
+            <div class="legend-item"><span class="legend-dot" style="background: var(--syn-type);"></span> Type (int, string, decimal)</div>
+            <div class="legend-item"><span class="legend-dot" style="background: var(--syn-annotation);"></span> Annotation ([Key], [Required])</div>
+            <div class="legend-item"><span class="legend-dot" style="background: var(--syn-variable);"></span> Property (Name, Price)</div>
+          </div>
+        </div>
+
+        <!-- Code Block 2: Complete DbContext with Fluent API -->
+        <h3 class="mt-xl">1.2 การสร้าง <code>DbContext</code> และกำหนดค่าด้วย Fluent API</h3>
+        <p>คลาส <code>ApplicationDbContext</code> จะสืบทอดมาจาก <code>DbContext</code> และบรรจุ <code>DbSet&lt;T&gt;</code> ของทุกตาราง พร้อมกำหนด Fluent API ใน <code>OnModelCreating</code>:</p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>Data/ApplicationDbContext.cs</span>
+            </div>
+            <button class="copy-btn">📋 คัดลอกโค้ด</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">using Microsoft.EntityFrameworkCore;
+using DotNetShop.Models;
+
+namespace DotNetShop.Data;
+
+public class ApplicationDbContext : DbContext
+{
+    // Constructor รับ DbContextOptions เพื่อส่ง Connection String เข้ามาจาก Program.cs
+    public ApplicationDbContext(DbContextOptions&lt;ApplicationDbContext&gt; options)
+        : base(options)
+    {
+    }
+
+    // DbSet เป็นตัวแทนตาราง Categories และ Products ในฐานข้อมูล
+    public DbSet&lt;Category&gt; Categories =&gt; Set&lt;Category&gt;();
+    public DbSet&lt;Product&gt; Products =&gt; Set&lt;Product&gt;();
+
+    // เมธอดสำหรับกำหนด Schema ขั้นสูงด้วย Fluent API
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // 1. กำหนดความสัมพันธ์ 1-to-Many ระหว่าง Category และ Product
+        modelBuilder.Entity&lt;Product&gt;(entity =&gt;
+        {
+            entity.HasOne(p =&gt; p.Category)
+                  .WithMany(c =&gt; c.Products)
+                  .HasForeignKey(p =&gt; p.CategoryId)
+                  .OnDelete(DeleteBehavior.Restrict); // ป้องกันไม่ให้ลบหมวดหมู่ถ้ายังมีสินค้าอยู่
+
+            // 2. สร้าง Unique Index บน SKU ป้องกันรหัสสินค้าซ้ำ
+            entity.HasIndex(p =&gt; p.Sku)
+                  .IsUnique();
+
+            // 3. กำหนดค่าเริ่มต้นให้กับคอลัมน์ CreatedAt โดยใช้ฟังก์ชันของ SQL Server
+            entity.Property(p =&gt; p.CreatedAt)
+                  .HasDefaultValueSql("GETUTCDATE()");
+        });
+
+        // 4. Seeding Data (ข้อมูลตั้งต้น) ลงฐานข้อมูลอัตโนมัติ
+        modelBuilder.Entity&lt;Category&gt;().HasData(
+            new Category { Id = 1, Name = "Gadgets &amp; Electronics", Description = "อุปกรณ์อิเล็กทรอนิกส์และแกดเจ็ต" },
+            new Category { Id = 2, Name = "Books &amp; Media", Description = "หนังสือและสื่อการเรียนรู้" }
+        );
+
+        modelBuilder.Entity&lt;Product&gt;().HasData(
+            new Product 
+            { 
+                Id = 1, 
+                Name = "Mechanical Keyboard RGB", 
+                Sku = "KB-RGB-001", 
+                Price = 2490.00m, 
+                StockQuantity = 50, 
+                CategoryId = 1,
+                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            },
+            new Product 
+            { 
+                Id = 2, 
+                Name = "C# in Depth 5th Edition", 
+                Sku = "BK-CSHARP-002", 
+                Price = 1250.00m, 
+                StockQuantity = 30, 
+                CategoryId = 2,
+                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            }
+        );
+    }
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- Registration in Program.cs -->
+        <h3 class="mt-xl">1.3 การลงทะเบียน DbContext ใน <code>Program.cs</code> (Dependency Injection)</h3>
+        <p>ในแอปพลิเคชัน ASP.NET Core เราจะลงทะเบียน DbContext ผ่าน IoC Container เพื่อให้ Controller หรือ Service เรียกใช้งานผ่าน Dependency Injection ได้แบบ Scoped Lifetime (1 Connection ต่อ 1 HTTP Request):</p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚙️</span>
+              <span>Program.cs &amp; appsettings.json</span>
+            </div>
+            <button class="copy-btn">📋 คัดลอกโค้ด</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">// === appsettings.json ===
+/*
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Database=DotNetShopDb;Trusted_Connection=True;TrustServerCertificate=True;"
+  }
+}
+*/
+
+// === Program.cs ===
+using Microsoft.EntityFrameworkCore;
+using DotNetShop.Data;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// 1. ดึง Connection String จาก appsettings.json
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+// 2. ลงทะเบียน ApplicationDbContext ให้ใช้ SQL Server
+builder.Services.AddDbContext&lt;ApplicationDbContext&gt;(options =&gt;
+    options.UseSqlServer(connectionString, sqlOptions =&gt;
+    {
+        // เปิดใช้งาน Connection Resiliency (พยายาม Reconnect อัตโนมัติเมื่อหลุด)
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null);
+    }));
+
+builder.Services.AddControllers();
+var app = builder.Build();
+app.MapControllers();
+app.Run();</code></pre>
+          </div>
+        </div>
+
+        <div class="callout callout-info my-md">
+          <span class="callout-icon">💡</span>
+          <div class="callout-content">
+            <div class="callout-title">Data Annotations vs Fluent API เลือกใช้อย่างไร?</div>
+            <p style="margin-bottom: 0;"><strong>Data Annotations</strong> เหมาะกับกฎพื้นฐาน เช่น <code>[Required]</code> หรือ <code>[MaxLength]</code> เพราะเข้าใจง่ายและแชร์การ Validate ไปยัง UI/API ได้ทันที<br>
+            ส่วน <strong>Fluent API</strong> มีพลังสูงสุด รองรับทุกฟีเจอร์ของ DB (เช่น Composite Keys, Complex Index, Shadow Properties, Value Converters, Seed Data) และช่วยให้ Entity Model สะอาด ไม่ผูกติดกับ Database Framework (Separation of Concerns)</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 2: Code-First Migrations Workflow ─── -->
+      <section class="lesson-section reveal" id="migrations-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(63, 185, 80, 0.2); color: var(--accent-success); border: 1px solid var(--accent-success);">02</div>
+          <div>
+            <h2>Code-First Migrations Workflow (วงจรจัดการฐานข้อมูลแบบมือโปร)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">จัดการการเปลี่ยนแปลง Schema ของ Database อย่างเป็นระบบด้วยคำสั่ง dotnet ef</p>
+          </div>
+        </div>
+
+        <p><strong>Code-First Migrations</strong> คือกลไกที่ใช้คลาส C# เป็น <em>Single Source of Truth</em> เมื่อเราแก้ไข C# Model ระบบ EF Core จะเปรียบเทียบความแตกต่าง (Diff) และสร้างไฟล์ Migration ที่ระบุคำสั่ง SQL ในการแก้ไข Database ให้ตรงกับ Model โดยที่ข้อมูลเดิมไม่สูญหาย</p>
+
+        <!-- Terminal Interactive Simulator -->
+        <div class="terminal-box">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <div class="terminal-dot dot-red"></div>
+              <div class="terminal-dot dot-yellow"></div>
+              <div class="terminal-dot dot-green"></div>
+            </div>
+            <div class="terminal-title">PowerShell / Command Prompt — dotnet ef CLI</div>
+            <div></div>
+          </div>
+          <div class="terminal-body">
+            <div><span class="terminal-prompt">PS D:\Projects\DotNetShop&gt;</span> <span class="terminal-cmd">dotnet tool install --global dotnet-ef</span></div>
+            <div class="terminal-output">Tool 'dotnet-ef' (version '8.0.x') was successfully installed.</div>
+
+            <div><span class="terminal-prompt">PS D:\Projects\DotNetShop&gt;</span> <span class="terminal-cmd">dotnet ef migrations add InitialCreate</span></div>
+            <div class="terminal-output">
+              Build started...<br>
+              Build succeeded.<br>
+              <span class="terminal-highlight">Done.</span> To undo this action, use 'dotnet ef migrations remove'<br>
+              📁 Created file: <em>Migrations/20260827_InitialCreate.cs</em>
+            </div>
+
+            <div><span class="terminal-prompt">PS D:\Projects\DotNetShop&gt;</span> <span class="terminal-cmd">dotnet ef database update</span></div>
+            <div class="terminal-output">
+              Build started...<br>
+              Build succeeded.<br>
+              Applying migration '20260827_InitialCreate'.<br>
+              <span style="color: var(--accent-success);">✓ Done.</span> Database schema is up to date!
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Essential Migration Commands Table -->
+        <h3 class="mt-lg">4 คำสั่ง Migrations ที่นักพัฒนา .NET ต้องใช้ทุกวัน</h3>
+        <div class="table-container my-md">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width: 30%;">คำสั่ง CLI</th>
+                <th style="width: 35%;">หน้าที่การทำงาน</th>
+                <th style="width: 35%;">คำแนะนำ / ข้อควรระวัง</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>dotnet ef migrations add &lt;Name&gt;</code></td>
+                <td>สร้างไฟล์ Migration ใหม่โดยเปรียบเทียบ Model C# กับ Snapshot ล่าสุด</td>
+                <td>ตั้งชื่อแบบ PascalCase ชัดเจน เช่น <code>AddProductRating</code> หรือ <code>CreateOrdersTable</code></td>
+              </tr>
+              <tr>
+                <td><code>dotnet ef database update</code></td>
+                <td>รัน Migration ที่ยังไม่ได้ Apply ไปยัง Database จริงทันที</td>
+                <td>ใช้ในขั้นตอน Local Development เพื่อทดสอบความถูกต้องของ Schema</td>
+              </tr>
+              <tr>
+                <td><code>dotnet ef migrations remove</code></td>
+                <td>ยกเลิกและลบไฟล์ Migration ล่าสุดออก (เฉพาะที่ยังไม่รันลง DB)</td>
+                <td>หากรัน <code>database update</code> ไปแล้ว ต้อง rollback ด้วย <code>update &lt;PreviousMigration&gt;</code> ก่อนเสมอ</td>
+              </tr>
+              <tr>
+                <td><code>dotnet ef migrations script -i -o deploy.sql</code></td>
+                <td>สร้างไฟล์ Raw SQL Script (Idempotent) สำหรับนำไป Deploy ขึ้น Production</td>
+                <td><strong>Best Practice สูงสุด:</strong> ใช้ตัวเลือก <code>--idempotent</code> เพื่อให้ script ตรวจสอบตาราง history ก่อนรันเสมอ</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Internal Working: __EFMigrationsHistory -->
+        <div class="card my-lg" style="background: rgba(22, 27, 34, 0.7); border-color: var(--border-default);">
+          <div class="card-header">
+            <div class="card-icon" style="background: rgba(88, 166, 255, 0.15); color: var(--syn-type);">🔍</div>
+            <div>
+              <div class="card-title">EF Core รู้ได้อย่างไรว่า Migration ไหนรันไปแล้ว?</div>
+              <div class="card-body" style="padding: 0; font-size: 0.82rem;">กลไกเบื้องหลังของตาราง <code>__EFMigrationsHistory</code></div>
+            </div>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">
+            เมื่อเรารันคำสั่ง <code>dotnet ef database update</code> ตัว EF Core จะเข้าไปสร้างและตรวจสอบตารางพิเศษชื่อ <code>__EFMigrationsHistory</code> ภายใน Database ของเราโดยอัตโนมัติ ซึ่งประกอบด้วย 2 คอลัมน์หลัก:
+          </p>
+          <div class="code-block-wrapper" style="margin: var(--space-sm) 0;">
+            <div class="code-block-body">
+              <pre><code class="language-sql">-- โครงสร้างและข้อมูลในตาราง __EFMigrationsHistory
+SELECT MigrationId, ProductVersion FROM [__EFMigrationsHistory];
+
+/* ผลลัพธ์ตัวอย่าง:
+MigrationId                         | ProductVersion
+------------------------------------+----------------
+20260827010000_InitialCreate         | 8.0.4
+20260827023015_AddProductSkuIndex   | 8.0.4
+*/</code></pre>
+            </div>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0;">
+            EF Core จะนำรายชื่อไฟล์ Migration ทั้งหมดในโปรเจกต์มาเทียบกับรายชื่อในตารางนี้ หากพบไฟล์ใดที่ยังไม่มีชื่อบันทึกอยู่ EF Core จะทยอยรันเฉพาะ Migration ที่ขาดอยู่ตามลำดับเวลา (Timestamp) จนครบ!
+          </p>
+        </div>
+
+        <!-- Production Deployment Warning Callout -->
+        <div class="callout callout-danger my-md">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-content">
+            <div class="callout-title">คำเตือนระดับ Production: ห้ามใช้ <code>context.Database.Migrate()</code> ตอนเปิดแอปเด็ดขาด!</div>
+            <p style="margin-bottom: 0;">
+              หลายคนมักใส่ <code>context.Database.Migrate()</code> ไว้ใน <code>Program.cs</code> เพื่อให้แอปอัปเดต DB อัตโนมัติเวลาสตาร์ท... แต่วิธีนี้อันตรายมากใน Production เพราะ:
+              <br>1. <strong>Race Condition:</strong> เมื่อคุณ deploy แบบ Multi-instance (Kubernetes / App Service หลาย Node) ทุกตัวจะพยายาม Migrate แย่งกัน ทำให้ DB ล็อคหรือพัง
+              <br>2. <strong>Permissions:</strong> User ของ Web App ไม่ควรมีสิทธิ์ DDL (CREATE/ALTER TABLE) ใน Production เพื่อความปลอดภัย
+              <br><strong>แนวทางที่ถูกต้อง:</strong> ให้สร้าง SQL Script ด้วย <code>dotnet ef migrations script --idempotent</code> แล้วรันผ่าน CI/CD Pipeline หรือใช้ <strong>Migration Bundles</strong> (<code>dotnet ef migrations bundle</code>) รันก่อน Deploy แอป
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 3: CRUD Operations with EF Core ─── -->
+      <section class="lesson-section reveal" id="crud-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(210, 168, 255, 0.2); color: var(--syn-method); border: 1px solid var(--syn-method);">03</div>
+          <div>
+            <h2>การทำ CRUD Operations ด้วย EF Core</h2>
+            <p class="text-muted" style="margin-bottom: 0;">Create, Read, Update, Delete ตั้งแต่วิธีมาตรฐานจนถึง High-Performance Bulk Operations ใน EF Core 8/9</p>
+          </div>
+        </div>
+
+        <!-- Entity Lifecycle & Change Tracker State Machine -->
+        <h3 class="mt-md">3.1 เข้าใจวงจรชีวิตของ Entity (Entity State Machine)</h3>
+        <p>ทุก Entity ที่อยู่ใน <code>DbContext</code> จะถูก <strong>Change Tracker</strong> ตรวจสอบสถานะเสมอ เมื่อเราเรียก <code>await context.SaveChangesAsync()</code> ตัว EF Core จะดูว่าแต่ละ Object อยู่ในสถานะใด แล้วสร้างคำสั่ง SQL INSERT/UPDATE/DELETE ให้ตรงกัน:</p>
+
+        <div class="state-grid">
+          <div class="state-card">
+            <span class="state-badge state-detached">Detached</span>
+            <h5 style="margin: 4px 0;">ไม่อยู่ในการติดตาม</h5>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0;">เพิ่งสร้างด้วยคำสั่ง <code>new</code> หรือ query มาด้วย <code>AsNoTracking()</code></p>
+          </div>
+
+          <div class="state-card">
+            <span class="state-badge state-unchanged">Unchanged</span>
+            <h5 style="margin: 4px 0;">ไม่มีการเปลี่ยนแปลง</h5>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0;">โหลดมาจาก Database แล้วข้อมูลยังเหมือนเดิมทุกประการ ไม่สร้างคำสั่ง SQL</p>
+          </div>
+
+          <div class="state-card">
+            <span class="state-badge state-added">Added</span>
+            <h5 style="margin: 4px 0;">เพิ่มใหม่</h5>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0;">ผ่านคำสั่ง <code>AddAsync()</code> รอแปลงเป็น <code>INSERT INTO ...</code></p>
+          </div>
+
+          <div class="state-card">
+            <span class="state-badge state-modified">Modified</span>
+            <h5 style="margin: 4px 0;">มีการแก้ไข</h5>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0;">Property บางตัวถูกเปลี่ยนค่า รอแปลงเป็น <code>UPDATE ... SET</code> เฉพาะคอลัมน์นั้น</p>
+          </div>
+
+          <div class="state-card">
+            <span class="state-badge state-deleted">Deleted</span>
+            <h5 style="margin: 4px 0;">ถูกทำเครื่องหมายให้ลบ</h5>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0;">ผ่านคำสั่ง <code>Remove()</code> รอแปลงเป็น <code>DELETE FROM ...</code></p>
+          </div>
+        </div>
+
+        <!-- Code Tabs: All CRUD Operations -->
+        <h3 class="mt-xl">3.2 ตัวอย่างโค้ด CRUD ฉบับสมบูรณ์ (Async/Await Best Practices)</h3>
+        <p>ตัวอย่างการนำ EF Core ไปใช้งานใน Service หรือ Controller ของ ASP.NET Core Web API:</p>
+
+        <div class="tabs" style="margin-bottom: var(--space-md);">
+          <button class="tab-btn active" data-tab="create">➕ 1. Create (สร้างข้อมูล)</button>
+          <button class="tab-btn" data-tab="read">🔍 2. Read (ค้นหา/คิวรี)</button>
+          <button class="tab-btn" data-tab="update">✏️ 3. Update (แก้ไขข้อมูล)</button>
+          <button class="tab-btn" data-tab="delete">🗑️ 4. Delete (ลบข้อมูล)</button>
+          <button class="tab-btn" data-tab="bulk">⚡ 5. Bulk Execute (EF 7/8/9)</button>
+        </div>
+
+        <!-- Tab 1: Create -->
+        <div class="tab-content active" data-tab-content="create">
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <div class="file-info"><span class="file-icon">📄</span><span>Create Operations</span></div>
+              <button class="copy-btn">📋 คัดลอกโค้ด</button>
+            </div>
+            <div class="code-block-body">
+              <pre><code class="language-csharp">// 1. เพิ่ม Entity เดี่ยว (Single Item)
+var newProduct = new Product
+{
+    Name = "Wireless Gaming Mouse",
+    Sku = "MS-WIR-009",
+    Price = 1890.00m,
+    StockQuantity = 25,
+    CategoryId = 1 // อ้างอิง Category ID ที่มีอยู่จริง
+};
+
+// นำเข้าสู่ Change Tracker ในสถานะ EntityState.Added
+await context.Products.AddAsync(newProduct);
+
+// บันทึกการเปลี่ยนแปลงลงฐานข้อมูล (รันคำสั่ง SQL INSERT)
+await context.SaveChangesAsync();
+
+// หลัง SaveChangesAsync() สำเร็จ EF Core จะดึง Generated ID จาก Database มาใส่ในตัวแปรทันที!
+Console.WriteLine($"สร้างสินค้าสำเร็จ! รหัสสินค้าใหม่คือ ID: {newProduct.Id}");
+
+// ----------------------------------------------------
+// 2. เพิ่มข้อมูลเป็นชุด (Batch Insert)
+var bulkItems = new List&lt;Product&gt;
+{
+    new() { Name = "Mouse Pad XXL", Sku = "PAD-XXL-01", Price = 490m, CategoryId = 1 },
+    new() { Name = "USB-C Hub 7-in-1", Sku = "HUB-7IN1-02", Price = 990m, CategoryId = 1 }
+};
+
+await context.Products.AddRangeAsync(bulkItems);
+await context.SaveChangesAsync();</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Read -->
+        <div class="tab-content" data-tab-content="read">
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <div class="file-info"><span class="file-icon">📄</span><span>Read &amp; LINQ Query Operations</span></div>
+              <button class="copy-btn">📋 คัดลอกโค้ด</button>
+            </div>
+            <div class="code-block-body">
+              <pre><code class="language-csharp">// 1. ค้นหาด้วย Primary Key โดยตรงด้วย FindAsync
+// (ข้อดี: FindAsync จะเช็คในหน่วยความจำของ DbContext ก่อน ถ้ายืมมาแล้วจะไม่ยิง DB ซ้ำ)
+Product? product = await context.Products.FindAsync(1);
+
+// 2. ค้นหาข้อมูลตัวแรกตามเงื่อนไข (FirstOrDefaultAsync)
+Product? activeItem = await context.Products
+    .FirstOrDefaultAsync(p =&gt; p.Sku == "KB-RGB-001");
+
+// 3. กรองข้อมูล (Filter) + จัดเรียง (Sort) + ดึงเป็น List
+List&lt;Product&gt; expensiveItems = await context.Products
+    .Where(p =&gt; p.IsActive &amp;&amp; p.Price &gt;= 1000m)
+    .OrderByDescending(p =&gt; p.Price)
+    .ToListAsync();
+
+// 4. การนับจำนวนและตรวจสอบการมีอยู่ (รันคำสั่ง COUNT และ EXISTS บน DB โดยตรง ไม่โหลด data)
+int totalActiveCount = await context.Products.CountAsync(p =&gt; p.IsActive);
+bool hasOutOfStock = await context.Products.AnyAsync(p =&gt; p.StockQuantity == 0);
+
+// 5. การแบ่งหน้า (Pagination) ด้วย Skip &amp; Take
+int pageNumber = 1;
+int pageSize = 10;
+var pagedProducts = await context.Products
+    .OrderBy(p =&gt; p.Id)
+    .Skip((pageNumber - 1) * pageSize)
+    .Take(pageSize)
+    .ToListAsync();</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Update -->
+        <div class="tab-content" data-tab-content="update">
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <div class="file-info"><span class="file-icon">📄</span><span>Update Operations</span></div>
+              <button class="copy-btn">📋 คัดลอกโค้ด</button>
+            </div>
+            <div class="code-block-body">
+              <pre><code class="language-csharp">// วิธีที่ 1: Connected Update (แนะนำที่สุดสำหรับ Business Logic)
+// ดึงข้อมูลมาก่อน -> แก้ไข Property -> สั่ง SaveChangesAsync
+var product = await context.Products.FindAsync(1);
+if (product != null)
+{
+    product.Price = 2190.00m;       // ปรับลดราคา
+    product.StockQuantity -= 1;      // หักสต็อก
+    
+    // Change Tracker จะตรวจจับอัตโนมัติว่าฟิลด์ Price กับ StockQuantity เปลี่ยนไป
+    // และสร้าง SQL: UPDATE Products SET Price = 2190, StockQuantity = 49 WHERE Id = 1
+    await context.SaveChangesAsync();
+}
+
+// ----------------------------------------------------
+// วิธีที่ 2: Disconnected Update (เช่น ได้รับ DTO มาจาก Web API โดยไม่ได้โหลดจาก DB ก่อน)
+var updatedProduct = new Product
+{
+    Id = 1,
+    Name = "Mechanical Keyboard Pro RGB",
+    Sku = "KB-RGB-001",
+    Price = 2290m,
+    StockQuantity = 45,
+    CategoryId = 1
+};
+
+// แจ้งให้ Context ทราบว่า Entity นี้มีอยู่แล้ว และต้องการบันทึกทุก Property ทับลงไป
+context.Products.Update(updatedProduct);
+await context.SaveChangesAsync();</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Delete -->
+        <div class="tab-content" data-tab-content="delete">
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <div class="file-info"><span class="file-icon">📄</span><span>Delete &amp; Soft Delete Pattern</span></div>
+              <button class="copy-btn">📋 คัดลอกโค้ด</button>
+            </div>
+            <div class="code-block-body">
+              <pre><code class="language-csharp">// 1. การลบข้อมูลจริง (Hard Delete)
+var productToDelete = await context.Products.FindAsync(2);
+if (productToDelete != null)
+{
+    // เปลี่ยนสถานะ Entity เป็น EntityState.Deleted
+    context.Products.Remove(productToDelete);
+    await context.SaveChangesAsync(); // รันคำสั่ง DELETE FROM Products WHERE Id = 2
+}
+
+// ----------------------------------------------------
+// 2. Soft Delete Pattern (วิธีมาตรฐานในองค์กร: ซ่อนข้อมูลโดยไม่ลบจริง)
+// คลาสมี Property: public bool IsDeleted { get; set; }
+
+var item = await context.Products.FindAsync(1);
+if (item != null)
+{
+    item.IsDeleted = true; // ทำเครื่องหมายว่าถูกลบ
+    await context.SaveChangesAsync();
+}
+
+// 💡 TIP: สามารถตั้งค่า Global Query Filter ใน DbContext ให้กรองข้อมูลที่ถูกลบออกอัตโนมัติ:
+// modelBuilder.Entity&lt;Product&gt;().HasQueryFilter(p =&gt; !p.IsDeleted);</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 5: Bulk -->
+        <div class="tab-content" data-tab-content="bulk">
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <div class="file-info"><span class="file-icon">⚡</span><span>ExecuteUpdateAsync &amp; ExecuteDeleteAsync (EF Core 7/8/9)</span></div>
+              <button class="copy-btn">📋 คัดลอกโค้ด</button>
+            </div>
+            <div class="code-block-body">
+              <pre><code class="language-csharp">// ⚡ ฟีเจอร์ใหม่ความเร็วแสง: สั่งรันคำสั่งตรงบน Database ทันที 1 Query
+// โดย "ไม่ต้องโหลด Entity ลงหน่วยความจำ" และ "ไม่ต้องผ่าน Change Tracker"!
+
+// 1. Bulk Update: ปรับลดราคาสินค้า 10% ทุกรายการในหมวดหมู่ Gadgets (CategoryId = 1)
+int affectedRows = await context.Products
+    .Where(p =&gt; p.CategoryId == 1 &amp;&amp; p.IsActive)
+    .ExecuteUpdateAsync(setters =&gt; setters
+        .SetProperty(p =&gt; p.Price, p =&gt; p.Price * 0.90m)
+        .SetProperty(p =&gt; p.StockQuantity, p =&gt; p.StockQuantity + 5)
+    );
+
+Console.WriteLine($"อัปเดตราคาสำเร็จทั้งหมด {affectedRows} รายการ!");
+// สร้าง SQL ทันที: UPDATE [p] SET [p].[Price] = [p].[Price] * 0.9, [p].[StockQuantity] = [p].[StockQuantity] + 5 FROM [Products] AS [p] WHERE ...
+
+// 2. Bulk Delete: ลบสินค้าที่ยกเลิกการขายและหมดสต็อกทั้งหมดใน 1 คำสั่ง
+int deletedRows = await context.Products
+    .Where(p =&gt; !p.IsActive &amp;&amp; p.StockQuantity == 0)
+    .ExecuteDeleteAsync();
+
+Console.WriteLine($"ลบสินค้าเก่าสำเร็จ {deletedRows} รายการ!");
+// สร้าง SQL ทันที: DELETE FROM [Products] WHERE [IsActive] = 0 AND [StockQuantity] = 0</code></pre>
+            </div>
+          </div>
+          <div class="callout callout-success mt-sm">
+            <span class="callout-icon">🚀</span>
+            <div class="callout-content">
+              <div class="callout-title">ประสิทธิภาพที่เหนือกว่าแบบเดิมถึง 100 เท่า!</div>
+              <p style="margin-bottom: 0;">วิธีแบบเดิมหากต้องการอัปเดต 10,000 แถว คุณต้องโหลดข้อมูล 10,000 Object ลง RAM แล้วยิง UPDATE 10,000 ครั้ง แต่ด้วย <code>ExecuteUpdateAsync</code> จะยิงคำสั่ง SQL เพียงครั้งเดียว ใช้เวลาไม่กี่มิลลิวินาทีและประหยัด RAM แทบจะเป็น 0!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 4: Performance Best Practices ─── -->
+      <section class="lesson-section reveal" id="performance-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(248, 81, 73, 0.2); color: var(--accent-danger); border: 1px solid var(--accent-danger);">04</div>
+          <div>
+            <h2>Performance Best Practices ที่ Junior .NET ต้องรู้</h2>
+            <p class="text-muted" style="margin-bottom: 0;">เทคนิคระดับ Senior ในการรีดความเร็ว EF Core, กำจัดคอขวด, และแก้ปัญหา N+1 Query Problem</p>
+          </div>
+        </div>
+
+        <!-- 1. AsNoTracking -->
+        <h3 class="mt-md">4.1 <code>AsNoTracking()</code> สำหรับ Read-Only Queries</h3>
+        <p>ตามปกติเมื่อเรา Query ข้อมูลจาก EF Core ตัว <strong>Change Tracker</strong> จะทำการจดจำ Snapshot ของ Entity ทุกตัวไว้ในหน่วยความจำ RAM เพื่อรอตรวจจับว่ามีการแก้ไขค่าหรือไม่<br>
+        หากเราต้องการอ่านข้อมูลมาแสดงผลเท่านั้น (เช่น ทำ API ส่ง JSON กลับไปให้ Frontend) ให้ใส่ <code>.AsNoTracking()</code> เสมอ:</p>
+
+        <div class="compare-grid">
+          <div class="compare-card compare-bad">
+            <div style="color: var(--accent-danger); font-weight: 700; margin-bottom: 6px;">❌ แบบช้าและเปลือง RAM (Tracking ทำงาน)</div>
+            <pre style="background: transparent; padding: 0; margin: 0;"><code class="language-csharp">// Change Tracker จะโคลน Object เก็บไว้ใน Snapshot Memory
+var products = await context.Products
+    .Where(p => p.Price > 500)
+    .ToListAsync();
+// เหมาะสำหรับตอนที่ "ต้องการแก้ค่าแล้วสั่ง SaveChangesAsync" เท่านั้น</code></pre>
+          </div>
+
+          <div class="compare-card compare-good">
+            <div style="color: var(--accent-success); font-weight: 700; margin-bottom: 6px;">✅ เร็วกว่า 2-4 เท่า และประหยัด RAM มหาศาล</div>
+            <pre style="background: transparent; padding: 0; margin: 0;"><code class="language-csharp">// ปิด Change Tracker ทำให้ประหยัด RAM และ Query เร็วขึ้นสูงสุด
+var products = await context.Products
+    .AsNoTracking()
+    .Where(p => p.Price > 500)
+    .ToListAsync();
+// แนะนำเป็นค่า Default สำหรับ GET Endpoint ทั้งหมดใน Web API!</code></pre>
+          </div>
+        </div>
+
+        <!-- 2. N+1 Query Problem & Loading Strategies -->
+        <h3 class="mt-xl">4.2 หายนะ N+1 Query Problem และการแก้ด้วย Eager Loading</h3>
+        <p><strong>N+1 Problem</strong> คือข้อผิดพลาดคลาสสิกที่ทำให้ Database Server ล่มได้ง่ายที่สุด เกิดจากการโหลดข้อมูลหลัก 1 ครั้ง (1 Query) แล้วเขียนลูปไปดึงข้อมูลตารางลูกอีก N ครั้ง (N Queries):</p>
+
+        <div class="card my-md" style="background: rgba(248, 81, 73, 0.05); border-color: rgba(248, 81, 73, 0.3);">
+          <h4 style="color: var(--accent-danger); margin-top: 0;">💥 ตัวอย่างโค้ดที่ทำให้เกิด N+1 Query (อย่าหาทำ!):</h4>
+          <div class="code-block-wrapper" style="margin: var(--space-sm) 0;">
+            <div class="code-block-body">
+              <pre><code class="language-csharp">// 1. ยิง Query แรกเพื่อดึง Category 100 รายการ (1 Query)
+var categories = await context.Categories.ToListAsync();
+
+foreach (var cat in categories)
+{
+    // 2. เผลอยิง Query ย่อยใน Loop เพื่อดึงสินค้าของแต่ละหมวดหมู่อีก 100 ครั้ง! (N Queries)
+    var products = await context.Products.Where(p =&gt; p.CategoryId == cat.Id).ToListAsync();
+    Console.WriteLine($"{cat.Name}: มีสินค้า {products.Count} ชิ้น");
+}
+// ผลลัพธ์: ยิง SQL ทั้งหมด 1 + 100 = 101 ครั้งลง Database พร้อมกัน! ระบบค้างแน่นอน!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="mt-lg">วิธีแก้ด้วย 3 กลยุทธ์การโหลดข้อมูล (Loading Strategies):</h4>
+
+        <div class="tabs" style="margin-bottom: var(--space-md);">
+          <button class="tab-btn active" data-tab="eager">⚡ Eager Loading (แนะนำ)</button>
+          <button class="tab-btn" data-tab="explicit">🎯 Explicit Loading</button>
+          <button class="tab-btn" data-tab="lazy">⚠️ Lazy Loading (ระวัง)</button>
+        </div>
+
+        <!-- Eager Loading -->
+        <div class="tab-content active" data-tab-content="eager">
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">ใช้คำสั่ง <code>.Include()</code> และ <code>.ThenInclude()</code> เพื่อสั่งให้ EF Core เขียนคำสั่ง SQL <code>LEFT JOIN</code> นำข้อมูลตารางที่เกี่ยวข้องกันทั้งหมดขึ้นมาตั้งแต่คำสั่งแรกเพียง Query เดียว:</p>
+          <div class="code-block-wrapper">
+            <div class="code-block-body">
+              <pre><code class="language-csharp">// Eager Loading: ยิง SQL JOIN ครั้งเดียวจบ ไม่เกิด N+1!
+var categoriesWithProducts = await context.Categories
+    .AsNoTracking()
+    .Include(c =&gt; c.Products) // โหลดตารางลูก Products
+    .ToListAsync();
+
+// หากมีความสัมพันธ์หลายชั้น เช่น Category -> Products -> Reviews
+var fullDetails = await context.Categories
+    .AsNoTracking()
+    .Include(c =&gt; c.Products)
+        .ThenInclude(p =&gt; p.Reviews) // โหลดตารางหลานต่อจาก Products
+    .ToListAsync();</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explicit Loading -->
+        <div class="tab-content" data-tab-content="explicit">
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">โหลดข้อมูล Entity หลักมาก่อน แล้วค่อยเลือกโหลดข้อมูลตารางลูกเฉพาะบางเรคคอร์ดที่ตรงตามเงื่อนไขในภายหลังผ่าน <code>Entry()</code>:</p>
+          <div class="code-block-wrapper">
+            <div class="code-block-body">
+              <pre><code class="language-csharp">var category = await context.Categories.FindAsync(1);
+
+if (category != null &amp;&amp; needProducts)
+{
+    // โหลด Products เฉพาะเมื่อต้องการใช้จริง และสามารถกรองเงื่อนไขต่อได้
+    await context.Entry(category)
+        .Collection(c =&gt; c.Products)
+        .Query()
+        .Where(p =&gt; p.IsActive &amp;&amp; p.Price &gt; 500)
+        .LoadAsync();
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lazy Loading -->
+        <div class="tab-content" data-tab-content="lazy">
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">โหลดข้อมูลตารางลูกอัตโนมัติเมื่อมีการเรียกใช้ Property (ต้องเปิด Proxies และใช้ <code>virtual</code>):</p>
+          <div class="code-block-wrapper">
+            <div class="code-block-body">
+              <pre><code class="language-csharp">// ต้องลง NuGet: Microsoft.EntityFrameworkCore.Proxies
+// และเปิด options.UseLazyLoadingProxies() ใน Program.cs
+public class Category
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public virtual ICollection&lt;Product&gt; Products { get; set; } = new List&lt;Product&gt;();
+}
+
+// ⚠️ อันตรายมากใน Web API! เพราะเมื่อ JSON Serializer ทำงาน มันจะพยายาม serialize
+// navigation property ทุกตัว ทำให้เกิดการยิง Query อัตโนมัตินับพันครั้งและเกิด Circular Reference!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Split Queries -->
+        <h3 class="mt-xl">4.3 การแก้ Cartesian Explosion ด้วย Split Queries (<code>.AsSplitQuery()</code>)</h3>
+        <p>เมื่อเราใช้ <code>.Include()</code> ตารางลูกหลายๆ ตารางพร้อมกัน (เช่น Order มีหลาย OrderItems และหลาย OrderLogs) การทำ SQL Single Query ด้วย <code>LEFT JOIN</code> หลายตารางจะทำให้ข้อมูลผลลัพธ์คูณทวีคูณ (Cartesian Explosion) เช่น ได้ข้อมูลซ้ำซ้อน 10,000 แถวกลับมา ทั้งที่มี Order แค่ 10 ใบ!<br>
+        ใน EF Core เราสามารถสั่ง <code>.AsSplitQuery()</code> เพื่อให้ระบบแยกคำสั่ง SQL ยิงทีละตารางอย่างมีประสิทธิภาพ:</p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info"><span class="file-icon">⚡</span><span>Split Query Optimization</span></div>
+            <button class="copy-btn">📋 คัดลอกโค้ด</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">// แยกเป็น 2-3 คำสั่ง SQL ย่อย แทนที่จะ JOIN เป็นก้อนยักษ์
+var categories = await context.Categories
+    .AsNoTracking()
+    .Include(c =&gt; c.Products)
+    .Include(c =&gt; c.Promotions)
+    .AsSplitQuery() // 👈 แบ่งคำสั่ง SQL แยกกันเพื่อป้องกันข้อมูลซ้ำซ้อน
+    .ToListAsync();
+
+// หรือกำหนดให้ทุก Query เป็น Split Query เป็นค่า Default ใน Program.cs:
+// options.UseSqlServer(connectionString, o =&gt; o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));</code></pre>
+          </div>
+        </div>
+
+        <!-- 4. DTO Projection -->
+        <h3 class="mt-xl">4.4 Projection ด้วย <code>.Select()</code> (ดึงเฉพาะฟิลด์ที่ต้องใช้)</h3>
+        <p>แทนที่จะดึง Entity มาทั้งตาราง (ซึ่งมีคอลัมน์รูปภาพ, Description ยาวๆ, วันที่สร้าง) ให้ดึงเฉพาะฟิลด์ที่จำเป็นเข้าสู่ DTO (Data Transfer Object) ซึ่ง EF Core จะแปลงเป็น <code>SELECT Name, Price FROM ...</code> แทน <code>SELECT *</code> ช่วยประหยัด Network I/O และ RAM ได้ดีที่สุด:</p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info"><span class="file-icon">🚀</span><span>DTO Projection Pattern</span></div>
+            <button class="copy-btn">📋 คัดลอกโค้ด</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">// DTO Class สำหรับส่งข้อมูลให้ Mobile App / Web Frontend
+public record ProductSummaryDto(int Id, string Name, decimal Price, string CategoryName);
+
+// การ Query ด้วย Projection (ไม่จำเป็นต้องใส่ AsNoTracking() เพราะ Projection ไม่ถูก track อยู่แล้ว)
+List&lt;ProductSummaryDto&gt; dtos = await context.Products
+    .Where(p =&gt; p.IsActive)
+    .Select(p =&gt; new ProductSummaryDto(
+        p.Id,
+        p.Name,
+        p.Price,
+        p.Category.Name // EF Core จะเขียน JOIN ดึงชื่อหมวดหมู่อัตโนมัติใน SELECT เดียว!
+    ))
+    .ToListAsync();</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 5: Inline Quiz ─── -->
+      <section class="lesson-section reveal" id="quiz-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(163, 113, 247, 0.2); color: var(--syn-method); border: 1px solid var(--syn-method);">05</div>
+          <div>
+            <h2>แบบทดสอบวัดความเข้าใจ (EF Core Knowledge Quiz)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ทดสอบความรู้ความเข้าใจเรื่อง DbContext, Migrations, AsNoTracking, และ Eager Loading จำนวน 5 ข้อ</p>
+          </div>
+        </div>
+
+        <!-- Quiz Container rendered by QuizEngine -->
+        <div id="ef-core-quiz"></div>
+      </section>
+
+      <!-- ─── Next Lesson Navigation ─── -->
+      <div class="card mt-2xl reveal" style="border-color: var(--border-active); background: linear-gradient(135deg, rgba(163, 113, 247, 0.15) 0%, rgba(22, 27, 34, 0.8) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge badge-success mb-xs">🎉 ยอดเยี่ยม! จบหลักสูตร Entity Framework Core</span>
+            <h3 style="margin-top: 4px; margin-bottom: 4px;">พร้อมนำความรู้ ORM ไปสร้าง Web API ระดับโปรหรือยัง?</h3>
+            <p class="text-muted" style="margin-bottom: 0;">เรียนรู้การต่อยอดเชื่อมต่อฐานข้อมูลเข้ากับ Controller, Minimal API และ DTOs ใน ASP.NET Core</p>
+          </div>
+          <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+            <a href="./aspnet-api.html" class="btn btn-primary btn-lg">
+              <span>ไปบทเรียน ASP.NET Core Web API →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize main application
+      if (typeof App !== 'undefined') {
+        App.init();
+      }
+
+      // Mark this lesson in Progress tracker
+      if (typeof Progress !== 'undefined') {
+        Progress.completeLesson('ef-core');
+        Progress.setModuleProgress('dotnet', 60);
+      }
+
+      // Quiz Questions Definition (5 Comprehensive EF Core Questions)
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ใน Entity Framework Core หน้าที่หลักของ "DbContext" และ "DbSet<T>" คือข้อใดตามลำดับ?',
+          options: [
+            'DbContext คือตารางในฐานข้อมูล ส่วน DbSet คือแถวข้อมูล 1 แถว',
+            'DbContext คือตัวแทนการเชื่อมต่อและเซสชันการทำงานกับ Database (Unit of Work) ส่วน DbSet<T> คือตัวแทนของตารางที่สามารถ Query และจัดการ Entity Type นั้นๆ ได้',
+            'DbContext ใช้เฉพาะตอนทำ Migration ส่วน DbSet ใช้เฉพาะตอนรันคำสั่ง SELECT',
+            'DbContext และ DbSet คือสิ่งเดียวกัน สามารถใช้แทนกันได้เสมอ'
+          ],
+          answer: 1,
+          explanation: 'DbContext เปรียบเสมือนสะพานเชื่อมต่อและตัวประสานงาน (Unit of Work + Session) ที่คอยดูแล Transaction และ Change Tracker ส่วน DbSet<T> คือตัวแทนของตารางแต่ละตารางที่เราสามารถใช้เขียน LINQ query และทำ CRUD ได้'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'เหตุใดเราจึงควรใส่ .AsNoTracking() ต่อท้าย LINQ Query สำหรับการอ่านข้อมูล (Read-Only) ใน Web API?',
+          options: [
+            'เพื่อบังคับให้ Database ลบข้อมูลทิ้งหลังส่งผลลัพธ์',
+            'เพื่อปิดการทำงานของ Change Tracker ทำให้ไม่เสีย Memory ในการเก็บ Snapshot ช่วยให้ Query เร็วขึ้น 2-4 เท่า และประหยัด RAM มหาศาล',
+            'เพื่อให้ผลลัพธ์ส่งออกมาเป็นไฟล์ XML แทน JSON',
+            'เพื่อป้องกันไม่ให้ผู้ใช้งานส่งคำสั่ง HTTP POST เข้ามาได้'
+          ],
+          answer: 1,
+          explanation: 'AsNoTracking() สั่งให้ EF Core ไม่ต้องนำ Object เข้าสู่ Change Tracker ซึ่งช่วยลด overhead ในการสร้าง snapshot ใน RAM จึงช่วยเพิ่มความเร็วในการ query อย่างมาก และเหมาะกับ Read-Only scenarios เช่น GET APIs'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'ปัญหา "N+1 Query Problem" ใน ORM เกิดจากอะไร และแก้ไขได้อย่างถูกต้องที่สุดด้วยวิธีใด?',
+          options: [
+            'เกิดจากตารางมีขนาดเกิน 1 ล้านแถว แก้ด้วยการลบข้อมูลทิ้ง',
+            'เกิดจากการโหลดข้อมูลหลัก 1 ครั้ง แล้วเขียนลูปยิง Query ดึงข้อมูลตารางลูกอีก N ครั้ง แก้ไขโดยใช้ Eager Loading ผ่านคำสั่ง .Include() และ .ThenInclude() เพื่อยิง SQL JOIN เพียงครั้งเดียว',
+            'เกิดจากการตั้งชื่อ Primary Key ผิด แก้ไขโดยใช้ [Key] annotation',
+            'เกิดจากการใช้ async/await แก้ไขโดยเปลี่ยนกลับเป็น sync function'
+          ],
+          answer: 1,
+          explanation: 'N+1 Problem เกิดจากการยิง query แรกได้ N เรคคอร์ด แล้วเผลอเขียนลูปยิง query ย่อยอีก N ครั้ง ทำให้ยิง SQL รวม N+1 ครั้ง ส่งผลให้ฐานข้อมูลทำงานหนักมาก สามารถแก้ได้ด้วย Eager Loading (.Include()) เพื่อให้ EF Core เขียนคำสั่ง JOIN ดึงข้อมูลมาพร้อมกันตั้งแต่ต้น'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'สำหรับการ Deploy ขึ้นสภาพแวดล้อม Production ข้อใดคือ Best Practice ในการอัปเดต Database Schema ด้วย Migrations?',
+          options: [
+            'ใส่ context.Database.Migrate() ไว้ใน Program.cs เพื่อให้อัปเดตตอนสตาร์ทแอป',
+            'ลบ Database ใน Production ทิ้งแล้วสร้างใหม่ทุกครั้งที่ Deploy',
+            'สร้าง Idempotent SQL Script ด้วยคำสั่ง "dotnet ef migrations script --idempotent" แล้วนำไปรันผ่าน CI/CD Pipeline หรือ Migration Bundle',
+            'พิมพ์คำสั่ง CREATE TABLE บนหน้าจอ Production ด้วยตนเองโดยไม่ใช้ Migrations'
+          ],
+          answer: 2,
+          explanation: 'การใช้ dotnet ef migrations script --idempotent จะสร้าง SQL script ที่ปลอดภัย มีการเช็คตาราง __EFMigrationsHistory ก่อนรัน ทำให้สามารถนำไปรันใน CI/CD Pipeline ได้อย่างปลอดภัย ไม่เกิด Race Condition เมื่อ deploy หลาย instance'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'mid',
+          question: 'ฟีเจอร์ "ExecuteUpdateAsync" และ "ExecuteDeleteAsync" ที่เพิ่มเข้ามาใน EF Core 7/8/9 มีข้อดีที่โดดเด่นกว่าการแก้ไขข้อมูลแบบเดิมอย่างไร?',
+          options: [
+            'สามารถทำงานได้โดยไม่ต้องมี Database Server',
+            'ยิงคำสั่ง UPDATE/DELETE ตรงไปยัง Database ทันทีใน 1 Query โดยไม่ต้องโหลด Entity ลงหน่วยความจำ RAM และไม่ต้องผ่าน Change Tracker',
+            'บังคับให้คำสั่งทำงานช้าลงเพื่อความปลอดภัย',
+            'ใช้ได้เฉพาะกับฐานข้อมูล SQLite เท่านั้น'
+          ],
+          answer: 1,
+          explanation: 'Bulk Operations (ExecuteUpdateAsync / ExecuteDeleteAsync) ส่งคำสั่ง SQL ไปประมวลผลที่ฐานข้อมูลโดยตรงทันที ไม่ต้องเสียเวลาดึง Entity นับพันตัวลง RAM และไม่ต้องตรวจจับผ่าน Change Tracker ทำให้ทำงานเร็วกว่าวิธีเดิมนับร้อยเท่า'
+        }
+      ];
+
+      // Initialize Quiz Engine
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('ef-core-quiz', quizQuestions, {
+          quizId: 'ef-core',
+          showTimer: false,
+          showExplanation: true
+        });
+      }
+    });
+  </script>
+</body>
+</html>

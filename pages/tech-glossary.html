@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>พจนานุกรมศัพท์เทคนิค & คำอ่านภาษาอังกฤษ — DotNet Learning Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        .glossary-search-box {
+            position: relative;
+            max-width: 650px;
+            margin: 0 auto var(--space-2xl) auto;
+        }
+        .glossary-search-input {
+            width: 100%;
+            padding: 16px 24px 16px 54px;
+            background: var(--bg-card);
+            border: 2px solid var(--border-default);
+            border-radius: var(--radius-full);
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-family: var(--font-heading);
+            outline: none;
+            transition: all var(--transition-normal);
+            box-shadow: var(--shadow-md);
+        }
+        .glossary-search-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.25);
+            background: var(--bg-secondary);
+        }
+        .glossary-search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+        .category-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+            justify-content: center;
+            margin-bottom: var(--space-2xl);
+        }
+        .filter-chip {
+            padding: 8px 18px;
+            border-radius: var(--radius-full);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-default);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .filter-chip:hover, .filter-chip.active {
+            background: rgba(88, 166, 255, 0.15);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+        .glossary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        .glossary-card:hover {
+            border-color: var(--border-active);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-glow);
+        }
+        .glossary-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+        }
+        .pronounce-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(163, 113, 247, 0.12);
+            border: 1px solid rgba(163, 113, 247, 0.3);
+            color: var(--accent-info);
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-family: var(--font-body);
+            font-weight: 600;
+            margin: 6px 0 12px 0;
+        }
+        .term-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            font-family: var(--font-heading);
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+        .term-meaning {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: var(--space-md);
+        }
+        .term-usecase {
+            background: rgba(13, 17, 23, 0.6);
+            border-left: 3px solid var(--accent-success);
+            padding: 10px 14px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+        .term-category-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-family: var(--font-code);
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">📖</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+    <a href="./tech-glossary.html" class="sidebar-link active"><span class="link-icon">📖</span> ศัพท์เทคนิค & คำอ่าน <span class="link-badge badge-new">ใหม่</span></a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน</a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP</a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections & LINQ</a>
+    <a href="./csharp-advanced.html" class="sidebar-link"><span class="link-icon">📕</span> C# ขั้นสูง</a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET</a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection</a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware</a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-link"><span class="link-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link"><span class="link-icon">🎮</span> SQL Playground</a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link"><span class="link-icon">🧩</span> Blazor Components</a>
+    <a href="./xaml-basics.html" class="sidebar-link"><span class="link-icon">📐</span> XAML พื้นฐาน</a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML & JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps & Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git & CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link"><span class="link-icon">🛡️</span> Secure Coding</a>
+
+    <div class="sidebar-section-title">🟡 Web & คุณภาพ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link"><span class="link-icon">👀</span> Code Review</a>
+    <a href="./sdlc-agile.html" class="sidebar-link"><span class="link-icon">📋</span> SDLC & Agile</a>
+    <a href="./tech-docs.html" class="sidebar-link"><span class="link-icon">📝</span> Technical Docs</a>
+    <a href="./architecture.html" class="sidebar-link"><span class="link-icon">🏛️</span> Architecture</a>
+
+    <div class="sidebar-section-title">🎮 Games & Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> เตรียมสัมภาษณ์</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header reveal text-center">
+            <div class="breadcrumb" style="justify-content: center;">
+                <a href="../index.html">🏠 หน้าแรก</a>
+                <span>/</span>
+                <span>พจนานุกรมศัพท์เทคนิค & คำอ่าน</span>
+            </div>
+            <div class="page-title" style="justify-content: center;">
+                <div class="title-icon" style="background: var(--gradient-primary); color: #fff;">📖</div>
+                <h1>พจนานุกรมศัพท์เทคนิค & คำอ่านภาษาอังกฤษ (.NET & C#)</h1>
+            </div>
+            <p class="page-description" style="margin: 0 auto;">
+                รวมคำศัพท์ภาษาอังกฤษทางเทคนิคที่ใช้จริงในการทำงานและการสัมภาษณ์งาน พร้อมคำอ่านไทยออกเสียงง่าย ความหมายชัดเจน และลิงก์ไปยังบทเรียนที่เกี่ยวข้อง
+            </p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="glossary-search-box reveal">
+            <span class="glossary-search-icon">🔍</span>
+            <input type="text" id="glossary-search" class="glossary-search-input" placeholder="พิมพ์ค้นหาคำศัพท์, คำอ่านภาษาไทย หรือความหมาย..." autocomplete="off">
+        </div>
+
+        <!-- Category Filters -->
+        <div class="category-filter-bar reveal">
+            <button class="filter-chip active" data-cat="all">🌟 ทั้งหมด (<span id="count-all">0</span>)</button>
+            <button class="filter-chip" data-cat="csharp">🟣 C# & OOP</button>
+            <button class="filter-chip" data-cat="dotnet">🔵 ASP.NET Core</button>
+            <button class="filter-chip" data-cat="api">🟠 REST API</button>
+            <button class="filter-chip" data-cat="database">🔴 Database & SQL</button>
+            <button class="filter-chip" data-cat="blazor">🟢 Blazor & Markup</button>
+            <button class="filter-chip" data-cat="devops">🔵 DevOps & Security</button>
+            <button class="filter-chip" data-cat="testing">✅ Testing & Process</button>
+            <button class="filter-chip" data-cat="arch">🏛️ Architecture</button>
+        </div>
+
+        <!-- Glossary Grid -->
+        <div class="grid grid-2" id="glossary-grid">
+            <!-- Rendered by JS -->
+        </div>
+
+        <!-- No Results Message -->
+        <div id="no-results" class="card text-center hidden" style="padding: 40px;">
+            <h3>🔍 ไม่พบคำศัพท์ที่ค้นหา</h3>
+            <p class="text-muted">ลองค้นหาด้วยคำอื่น หรือกดเลือกดูทุกหมวดหมู่ได้เลยค่ะ</p>
+        </div>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+<script>
+const GLOSSARY_TERMS = [
+    // 🟣 C# & OOP
+    {
+        term: "Encapsulation",
+        pronounce: "เอ็น-แคป-ซู-เล-ชัน",
+        category: "csharp",
+        catName: "C# & OOP",
+        color: "var(--cat-csharp)",
+        meaning: "การห่อหุ้มข้อมูลและซ่อนรายละเอียดภายในของคลาส โดยเปิดให้เข้าถึงผ่านทาง Properties หรือ Methods ที่กำหนดเท่านั้นเพื่อความปลอดภัย",
+        useCase: "ใช้กำหนด private field แล้วเปิด public property ที่มีเงื่อนไขตรวจสอบ (Validation) ป้องกันข้อมูลผิดพลาด",
+        link: "./csharp-oop.html",
+        linkText: "เรียนรู้ใน C# OOP →"
+    },
+    {
+        term: "Inheritance",
+        pronounce: "อิน-เฮอ-ริ-แทนซ์",
+        category: "csharp",
+        catName: "C# & OOP",
+        color: "var(--cat-csharp)",
+        meaning: "การสืบทอดคุณสมบัติและพฤติกรรมจากคลาสแม่ (Base Class) ไปสู่คลาสลูก (Derived Class) เพื่อนำโค้ดเดิมกลับมาใช้ซ้ำ",
+        useCase: "สร้างคลาส Animal เป็นแม่ แล้วให้ Dog และ Cat สืบทอดต่อเพื่อลดการเขียนโค้ดซ้ำ",
+        link: "./csharp-oop.html",
+        linkText: "เรียนรู้ใน C# OOP →"
+    },
+    {
+        term: "Polymorphism",
+        pronounce: "โพลี-มอร์-ฟิซึม",
+        category: "csharp",
+        catName: "C# & OOP",
+        color: "var(--cat-csharp)",
+        meaning: "การมีหลายรูปแบบ หรือคลาสลูกสามารถปรับแต่งพฤติกรรม (Override) ของเมธอดชื่อเดียวกันให้ทำงานต่างกันได้",
+        useCase: "สั่ง `animal.MakeSound()` แต่ Dog จะเห่า 'โฮ่ง' ขณะที่ Cat จะร้อง 'เหมียว'",
+        link: "./csharp-oop.html",
+        linkText: "เรียนรู้ใน C# OOP →"
+    },
+    {
+        term: "Abstraction",
+        pronounce: "แอ็บ-สแตรก-ชัน",
+        category: "csharp",
+        catName: "C# & OOP",
+        color: "var(--cat-csharp)",
+        meaning: "การซ่อนรายละเอียดความซับซ้อนของการทำงาน และนำเสนอเฉพาะส่วนติดต่อ (Interface/Contract) ที่ผู้ใช้จำเป็นต้องรู้",
+        useCase: "การใช้ Interface เช่น `IPaymentService` โดยคนเรียกไม่ต้องรู้ว่าข้างในเขียนเชื่อมธนาคารอย่างไร",
+        link: "./csharp-oop.html",
+        linkText: "เรียนรู้ใน C# OOP →"
+    },
+    {
+        term: "Asynchronous (async / await)",
+        pronounce: "อะ-ซิง-โคร-นัส (อะ-ซิงค์ / อะ-เวท)",
+        category: "csharp",
+        catName: "C# & OOP",
+        color: "var(--cat-csharp)",
+        meaning: "การเขียนโปรแกรมแบบไม่บล็อกการทำงาน (Non-blocking I/O) ทำให้ Thread สามารถไปทำงานอื่นระหว่างรอ Database หรือ Network ตอบกลับ",
+        useCase: "ใช้กับ `await _db.SaveChangesAsync()` เพื่อให้ Web Server รองรับผู้ใช้พร้อมกันได้จำนวนมหาศาล",
+        link: "./csharp-advanced.html",
+        linkText: "เรียนรู้ใน C# ขั้นสูง →"
+    },
+    {
+        term: "Generics",
+        pronounce: "เจ-เน-ริกส์",
+        category: "csharp",
+        catName: "C# & OOP",
+        color: "var(--cat-csharp)",
+        meaning: "การสร้างคลาสหรือฟังก์ชันที่สามารถรองรับชนิดข้อมูลใดๆ ก็ได้ (`<T>`) โดยคงความปลอดภัยของ Type (Type-safe) และไม่ต้องแปลง Object",
+        useCase: "ใช้กับ `List<T>`, `Repository<T>`, `Task<T>` เพื่อความยืดหยุ่นและประสิทธิภาพสูง",
+        link: "./csharp-advanced.html",
+        linkText: "เรียนรู้ใน C# ขั้นสูง →"
+    },
+    {
+        term: "LINQ (Language Integrated Query)",
+        pronounce: "ลิงค์",
+        category: "csharp",
+        catName: "C# & OOP",
+        color: "var(--cat-csharp)",
+        meaning: "ชุดคำสั่งไวยากรณ์สำหรับกรอง แปลง และค้นหาข้อมูลใน Collections หรือ Database ให้อยู่ในรูปแบบ C# ที่อ่านง่ายและกระชับ",
+        useCase: "ใช้คำสั่ง `products.Where(p => p.Price > 100).OrderBy(p => p.Name).ToList()`",
+        link: "./csharp-collections.html",
+        linkText: "เรียนรู้ใน Collections & LINQ →"
+    },
+
+    // 🔵 ASP.NET Core
+    {
+        term: "Dependency Injection (DI)",
+        pronounce: "ดี-เพน-เดน-ซี อิน-เจก-ชัน",
+        category: "dotnet",
+        catName: "ASP.NET Core",
+        color: "var(--cat-dotnet)",
+        meaning: "รูปแบบการส่งคลาสเครื่องมือ (Dependency) เข้าไปให้คลาสเป้าหมายผ่านทาง Constructor เพื่อลดการผูกมัด (Loose Coupling) และช่วยให้เขียน Unit Test ได้ง่าย",
+        useCase: "ฉีด `IProductRepository` เข้าไปใน `ProductsController` แทนการใช้คำสั่ง `new` เองตรงๆ",
+        link: "./dotnet-di.html",
+        linkText: "เรียนรู้ใน Dependency Injection →"
+    },
+    {
+        term: "Transient Lifetime",
+        pronounce: "แทรน-เชียนท์ ไลฟ์-ไทม์",
+        category: "dotnet",
+        catName: "ASP.NET Core",
+        color: "var(--cat-dotnet)",
+        meaning: "วงจรอายุของ Service ใน DI Container ที่ถูกสร้าง Instance ใหม่ขึ้นมาทุกครั้งที่มีการร้องขอ (เปรียบเหมือนกระดาษทิชชู่)",
+        useCase: "เหมาะสำหรับคลาส Helper ขนาดเล็ก หรือบริการคำนวณที่ไม่มี State ค้างในตัว",
+        link: "./dotnet-di.html",
+        linkText: "เรียนรู้ใน Dependency Injection →"
+    },
+    {
+        term: "Scoped Lifetime",
+        pronounce: "สโคปต์ ไลฟ์-ไทม์",
+        category: "dotnet",
+        catName: "ASP.NET Core",
+        color: "var(--cat-dotnet)",
+        meaning: "วงจรอายุของ Service ที่สร้างเพียง 1 Instance ต่อ 1 HTTP Request และแชร์ร่วมกันใน Request นั้น (เปรียบเหมือนถาดอาหารประจำมื้อ)",
+        useCase: "ใช้กับ `DbContext`, Repositories และ Business Services เกือบทั้งหมดใน ASP.NET Core",
+        link: "./dotnet-di.html",
+        linkText: "เรียนรู้ใน Dependency Injection →"
+    },
+    {
+        term: "Singleton Lifetime",
+        pronounce: "ซิงเกิล-ตัน ไลฟ์-ไทม์",
+        category: "dotnet",
+        catName: "ASP.NET Core",
+        color: "var(--cat-dotnet)",
+        meaning: "วงจรอายุของ Service ที่ถูกสร้างเพียงครั้งเดียวตลอดอายุการทำงานของระบบ (เปรียบเหมือนตู้กดน้ำสาธารณะ)",
+        useCase: "ใช้กับ In-Memory Cache, Logger, Configuration, หรือ Memory State Store",
+        link: "./dotnet-di.html",
+        linkText: "เรียนรู้ใน Dependency Injection →"
+    },
+    {
+        term: "Captive Dependency",
+        pronounce: "แคป-ทีฟ ดี-เพน-เดน-ซี",
+        category: "dotnet",
+        catName: "ASP.NET Core",
+        color: "var(--cat-dotnet)",
+        meaning: "ข้อผิดพลาดร้ายแรงเมื่อ Service ที่มีอายุยาว (เช่น Singleton) ไปฉีด Service ที่มีอายุสั้นกว่า (เช่น Scoped / DbContext) จนทำให้ Scoped ถูกกักขังและไม่ถูก Dispose",
+        useCase: "ต้องป้องกันด้วยการใช้ `IServiceScopeFactory` สร้าง Scope ชั่วคราวใน Singleton",
+        link: "./dotnet-di.html",
+        linkText: "เรียนรู้ใน Dependency Injection →"
+    },
+    {
+        term: "Middleware",
+        pronounce: "มิด-เดิล-แวร์",
+        category: "dotnet",
+        catName: "ASP.NET Core",
+        color: "var(--cat-dotnet)",
+        meaning: "ซอฟต์แวร์ชิ้นย่อยที่ประกอบกันเป็นสายพานลำเลียงคำขอ (Request Pipeline) คอยดักตรวจจับ แก้ไข หรือส่งต่อ Request/Response ก่อนถึง Endpoint",
+        useCase: "ใช้ทำ Authentication, Logging, CORS, Error Handling, และ HTTPS Redirection",
+        link: "./dotnet-middleware.html",
+        linkText: "เรียนรู้ใน Middleware Pipeline →"
+    },
+    {
+        term: "Minimal APIs",
+        pronounce: "มินิ-มอล เอ-พี-ไอ",
+        category: "dotnet",
+        catName: "ASP.NET Core",
+        color: "var(--cat-dotnet)",
+        meaning: "แนวทางการเขียน HTTP Endpoints ใน .NET 8/9 แบบกะทัดรัดในไฟล์ Program.cs โดยไม่ต้องสร้าง Controller คลาส ช่วยให้ทำงานได้รวดเร็วและประหยัด Overhead",
+        useCase: "เหมาะสำหรับสร้าง Microservices, Cloud Function, หรือ API ขนาดเล็กที่ต้องการ Performance สูง",
+        link: "./dotnet-structure.html",
+        linkText: "เรียนรู้ใน โครงสร้าง ASP.NET →"
+    },
+
+    // 🟠 REST API
+    {
+        term: "REST (Representational State Transfer)",
+        pronounce: "เรสต์",
+        category: "api",
+        catName: "REST API",
+        color: "var(--cat-api)",
+        meaning: "สถาปัตยกรรมการออกแบบ Web Service มาตรฐานสากลที่สื่อสารผ่าน HTTP Protocol โดยใช้คำนามแทน Resource และใช้ HTTP Verbs แทนการกระทำ",
+        useCase: "ออกแบบ API เช่น `GET /api/v1/orders`, `POST /api/v1/orders`",
+        link: "./rest-api.html",
+        linkText: "เรียนรู้ใน RESTful API →"
+    },
+    {
+        term: "Idempotent",
+        pronounce: "ไอ-เดม-โพ-เทนต์",
+        category: "api",
+        catName: "REST API",
+        color: "var(--cat-api)",
+        meaning: "คุณสมบัติของการส่งคำขอ HTTP ที่แม้จะยิงซ้ำหลายครั้ง ผลลัพธ์ของสถานะข้อมูลบนเซิร์ฟเวอร์จะยังคงเหมือนเดิมเสมอ (เช่น GET, PUT, DELETE)",
+        useCase: "คำสั่ง `DELETE /api/orders/5` ยิงครั้งเดียวหรือ 10 ครั้ง ข้อมูลก็ถูกลบเหมือนกัน",
+        link: "./rest-api.html",
+        linkText: "เรียนรู้ใน RESTful API →"
+    },
+    {
+        term: "DTO (Data Transfer Object)",
+        pronounce: "ดี-ที-โอ",
+        category: "api",
+        catName: "REST API",
+        color: "var(--cat-api)",
+        meaning: "วัตถุหรือคลาสที่สร้างขึ้นเฉพาะเพื่อใช้ส่งผ่านข้อมูลระหว่าง Client กับ Server เพื่อซ่อนโครงสร้างจริงของ Database Entity และป้องกันการรั่วไหลของข้อมูลลับ",
+        useCase: "ใช้ `CreateUserRequestDto` และ `UserResponseDto` แทนการส่ง Entity `User` ที่มี PasswordHash ออกไป",
+        link: "./rest-api.html",
+        linkText: "เรียนรู้ใน RESTful API →"
+    },
+    {
+        term: "Socket Exhaustion",
+        pronounce: "ซ็อกเก็ต เอ็ก-ซอส-ชัน",
+        category: "api",
+        catName: "System Integration",
+        color: "var(--cat-api)",
+        meaning: "ภาวะที่ระบบปฏิบัติการหมด Socket Port ว่าง เนื่องจากมีการ `new HttpClient()` ซ้ำๆ แล้วปิด ทำให้ Port ค้างอยู่ในสถานะ TIME_WAIT",
+        useCase: "แก้ไขด้วยการลงทะเบียนผ่าน `IHttpClientFactory` เพื่อหมุนเวียน Socket Pool",
+        link: "./system-integration.html",
+        linkText: "เรียนรู้ใน System Integration →"
+    },
+    {
+        term: "Webhook",
+        pronounce: "เว็บ-ฮุก",
+        category: "api",
+        catName: "System Integration",
+        color: "var(--cat-api)",
+        meaning: "กลไกการส่งข้อมูลแบบ Real-time จากระบบหนึ่งไปยังอีกระบบหนึ่งอัตโนมัติเมื่อเกิดเหตุการณ์ (Event) ขึ้น โดยที่เราไม่ต้องคอยยิงถามซ้ำๆ (Polling)",
+        useCase: "ระบบชำระเงินยิง HTTP POST มาบอกเราว่าลูกค้าจ่ายเงินสำเร็จแล้ว",
+        link: "./system-integration.html",
+        linkText: "เรียนรู้ใน System Integration →"
+    },
+
+    // 🔴 Database & SQL
+    {
+        term: "ORM (Object-Relational Mapping)",
+        pronounce: "โอ-อาร์-เอ็ม",
+        category: "database",
+        catName: "Database & SQL",
+        color: "var(--cat-sql)",
+        meaning: "เทคนิคที่ช่วยแปลงตารางในฐานข้อมูลเชิงสัมพันธ์ (SQL) ให้กลายเป็น C# Objects อัตโนมัติ เพื่อให้เขียนโค้ดจัดการข้อมูลได้สะดวกโดยไม่ต้องเขียน SQL ดิบเองทั้งหมด",
+        useCase: "Entity Framework Core (EF Core) และ Dapper",
+        link: "./ef-core.html",
+        linkText: "เรียนรู้ใน EF Core →"
+    },
+    {
+        term: "DbContext",
+        pronounce: "ดีบี-คอนเท็กซ์",
+        category: "database",
+        catName: "Database & SQL",
+        color: "var(--cat-sql)",
+        meaning: "คลาสหลักใน Entity Framework Core ที่ทำหน้าที่เป็นสะพานเชื่อมต่อ จัดการ Transaction และติดตามสถานะการเปลี่ยนแปลงของข้อมูล (Change Tracking)",
+        useCase: "เรียก `await _context.SaveChangesAsync()` เพื่อ Commit การเปลี่ยนแปลงลงฐานข้อมูล",
+        link: "./ef-core.html",
+        linkText: "เรียนรู้ใน EF Core →"
+    },
+    {
+        term: "N+1 Query Problem",
+        pronounce: "เอ็น พลัส วัน คิวรี พร็อบเลม",
+        category: "database",
+        catName: "Database & SQL",
+        color: "var(--cat-sql)",
+        meaning: "ปัญหาประสิทธิภาพร้ายแรงเมื่อระบบยิงคำขอดึงข้อมูลหลัก 1 ครั้ง แล้ววนลูปส่ง Query ย่อยไปดึงข้อมูลลูกอีก N ครั้ง ทำให้ Database โดนยิงรัว",
+        useCase: "แก้ไขด้วยการทำ Eager Loading ด้วยคำสั่ง `.Include(o => o.OrderItems)`",
+        link: "./ef-core.html",
+        linkText: "เรียนรู้ใน EF Core →"
+    },
+    {
+        term: "AsNoTracking",
+        pronounce: "แอส โน แทร็กกิ้ง",
+        category: "database",
+        catName: "Database & SQL",
+        color: "var(--cat-sql)",
+        meaning: "คำสั่งใน EF Core สำหรับปิดระบบ Change Tracker เพื่อเพิ่มความเร็วในการ Query แบบ Read-Only และประหยัดหน่วยความจำมหาศาล",
+        useCase: "ใส่ `_context.Products.AsNoTracking().ToListAsync()` เมื่อดึงข้อมูลมาแสดงผลโดยไม่มีการ Update",
+        link: "./ef-core.html",
+        linkText: "เรียนรู้ใน EF Core →"
+    },
+    {
+        term: "Clustered Index",
+        pronounce: "คลัสเตอร์ด อินเด็กซ์",
+        category: "database",
+        catName: "Database & SQL",
+        color: "var(--cat-sql)",
+        meaning: "ดัชนีที่กำหนดลำดับการจัดเก็บบนดิสก์ทางกายภาพจริงของแถวข้อมูล (เปรียบเหมือนพจนานุกรม) หนึ่งตารางมีได้เพียง 1 ตัว",
+        useCase: "มักถูกสร้างอัตโนมัติบน Primary Key เพื่อความเร็วสูงสุดในการค้นหาและจัดเรียง",
+        link: "./sql-advanced.html",
+        linkText: "เรียนรู้ใน SQL ขั้นกลาง-สูง →"
+    },
+    {
+        term: "ACID Properties",
+        pronounce: "เอ-ซิด พร็อพเพอร์ตี้ส์",
+        category: "database",
+        catName: "Database & SQL",
+        color: "var(--cat-sql)",
+        meaning: "4 คุณสมบัติมาตรฐานความน่าเชื่อถือของ Transaction ในฐานข้อมูล: Atomicity (ทั้งหมดหรือไม่เลย), Consistency (ถูกต้องตามกฎ), Isolation (แยกเดี่ยว), Durability (คงทนถาวร)",
+        useCase: "ใช้ในระบบการเงิน การโอนเงิน หรือการตัดยอดสต็อกสินค้า",
+        link: "./sql-advanced.html",
+        linkText: "เรียนรู้ใน SQL ขั้นกลาง-สูง →"
+    },
+
+    // 🟢 Blazor & Markup
+    {
+        term: "WebAssembly (WASM)",
+        pronounce: "เว็บ แอส-เซม-บลี (วาสซึม)",
+        category: "blazor",
+        catName: "Blazor & Markup",
+        color: "var(--cat-blazor)",
+        meaning: "รูปแบบโค้ด Binary ประสิทธิภาพสูงที่สามารถรันได้โดยตรงบนเว็บเบราว์เซอร์ ทำให้สามารถนำภาษา C# มารันฝั่ง Client ได้โดยไม่ต้องใช้ JavaScript",
+        useCase: "Blazor WebAssembly สำหรับสร้างเว็บแอปพลิเคชันที่ทำงานแบบ Offline PWA ได้",
+        link: "./blazor-intro.html",
+        linkText: "เรียนรู้ใน Blazor พื้นฐาน →"
+    },
+    {
+        term: "XAML (Extensible Application Markup Language)",
+        pronounce: "แซม-เมิล",
+        category: "blazor",
+        catName: "Blazor & Markup",
+        color: "var(--cat-blazor)",
+        meaning: "ภาษา Markup บนโครงสร้าง XML ที่ Microsoft ออกแบบมาสำหรับสร้างหน้าตา UI บน .NET MAUI และ WPF",
+        useCase: "เขียนปุ่ม หน้าจอ และจัด Grid Layout บนแอปพลิเคชันมือถือ iOS/Android และ Windows",
+        link: "./xaml-basics.html",
+        linkText: "เรียนรู้ใน XAML พื้นฐาน →"
+    },
+    {
+        term: "MVVM (Model - View - ViewModel)",
+        pronounce: "เอ็ม-วี-วี-เอ็ม",
+        category: "blazor",
+        catName: "Blazor & Markup",
+        color: "var(--cat-blazor)",
+        meaning: "รูปแบบสถาปัตยกรรมที่แยกส่วนแสดงผล UI (View) ออกจาก Business Logic (ViewModel) ผ่านกลไก Data Binding",
+        useCase: "พัฒนา .NET MAUI แอปพลิเคชันด้วย CommunityToolkit.Mvvm",
+        link: "./xaml-basics.html",
+        linkText: "เรียนรู้ใน XAML พื้นฐาน →"
+    },
+
+    // 🔵 DevOps & Security
+    {
+        term: "CI/CD (Continuous Integration / Continuous Deployment)",
+        pronounce: "ซี-ไอ / ซี-ดี",
+        category: "devops",
+        catName: "DevOps & Security",
+        color: "var(--cat-devops)",
+        meaning: "กระบวนการสร้าง (Build), ทดสอบ (Automated Test) และส่งมอบแอปพลิเคชันขึ้นเซิร์ฟเวอร์แบบอัตโนมัติทุกครั้งที่มีการ Push โค้ด",
+        useCase: "ตั้งค่า GitHub Actions เพื่อรัน `dotnet test` และ Deploy ขึ้น Azure อัตโนมัติ",
+        link: "./git-cicd.html",
+        linkText: "เรียนรู้ใน Git & CI/CD →"
+    },
+    {
+        term: "IDOR (Insecure Direct Object Reference)",
+        pronounce: "ไอ-ดอร์",
+        category: "devops",
+        catName: "DevOps & Security",
+        color: "var(--accent-danger)",
+        meaning: "ช่องโหว่ความปลอดภัยที่ผู้ใช้สามารถเปลี่ยนรหัส ID ใน URL/Parameter เพื่อแอบดูหรือแก้ไขข้อมูลของผู้อื่นโดยไม่มีการตรวจสอบสิทธิ์ความเป็นเจ้าของ",
+        useCase: "ต้องดึง `currentUserId` จาก JWT Claims เสมอเพื่อตรวจสอบสิทธิ์ก่อนอนุญาตให้เข้าถึงข้อมูล",
+        link: "./secure-coding.html",
+        linkText: "เรียนรู้ใน Secure Coding →"
+    },
+    {
+        term: "Row-Level Security (RLS)",
+        pronounce: "โรว-เลเวล ซีเคียวริตี้",
+        category: "devops",
+        catName: "DevOps & Security",
+        color: "var(--accent-danger)",
+        meaning: "ระบบรักษาความปลอดภัยระดับแถวข้อมูลในฐานข้อมูล ที่อนุญาตให้ผู้ใช้เห็นเฉพาะข้อมูลแถวที่ตัวเองมีสิทธิ์เท่านั้นตามกฎ Database-First",
+        useCase: "ป้องกันข้อมูลรั่วไหลแม้ว่าโค้ด Application จะมีข้อผิดพลาด",
+        link: "./secure-coding.html",
+        linkText: "เรียนรู้ใน Secure Coding →"
+    },
+
+    // ✅ Testing & Process
+    {
+        term: "AAA Pattern (Arrange - Act - Assert)",
+        pronounce: "ทริปเปิล เอ แพทเทิร์น",
+        category: "testing",
+        catName: "Testing & Process",
+        color: "var(--cat-testing)",
+        meaning: "มาตรฐานการจัดโครงสร้าง Unit Test สากล: Arrange (เตรียมข้อมูล), Act (เรียกฟังก์ชันจริง), Assert (ตรวจสอบผลลัพธ์)",
+        useCase: "เขียนโค้ดทดสอบด้วย xUnit",
+        link: "./unit-testing.html",
+        linkText: "เรียนรู้ใน Unit Testing →"
+    },
+    {
+        term: "Mocking",
+        pronounce: "ม็อค-กิ้ง",
+        category: "testing",
+        catName: "Testing & Process",
+        color: "var(--cat-testing)",
+        meaning: "การสร้างวัตถุจำลอง (Fake Object) เพื่อแทนที่การทำงานจริงของฐานข้อมูลหรือ Third-Party API ในระหว่างรัน Unit Test เพื่อความรวดเร็วและไม่สร้างผลกระทบต่อระบบจริง",
+        useCase: "ใช้ไลบรารี Moq สร้าง `new Mock<IProductRepository>()`",
+        link: "./unit-testing.html",
+        linkText: "เรียนรู้ใน Unit Testing →"
+    },
+    {
+        term: "SOLID Principles",
+        pronounce: "โซ-ลิด พริน-ซิ-เพิลส์",
+        category: "testing",
+        catName: "Testing & Process",
+        color: "var(--cat-testing)",
+        meaning: "5 กฎเหล็กในการออกแบบ Object-Oriented Software ให้ยืดหยุ่น ดูแลรักษาง่าย และพร้อมรองรับการขยายตัว (SRP, OCP, LSP, ISP, DIP)",
+        useCase: "ใช้เป็นมาตรฐานในการเขียนโค้ดและทำ Code Review ในทีม",
+        link: "./code-review.html",
+        linkText: "เรียนรู้ใน Code Review & SOLID →"
+    },
+
+    // 🏛️ Architecture
+    {
+        term: "Clean Architecture",
+        pronounce: "คลีน อาร์คิเทกเจอร์",
+        category: "arch",
+        catName: "Architecture",
+        color: "var(--cat-arch)",
+        meaning: "สถาปัตยกรรมซอฟต์แวร์ที่แบ่งระบบออกเป็น 4 เลเยอร์ (Domain, Application, Infrastructure, Presentation) โดยกำหนดให้ Dependencies ชี้เข้าสู่แก่นกลางทางธุรกิจเสมอ",
+        useCase: "ใช้ในการสร้าง Enterprise Web API ขนาดใหญ่ให้เป็นอิสระจาก Framework และ Database",
+        link: "./architecture.html",
+        linkText: "เรียนรู้ใน Clean Architecture →"
+    },
+    {
+        term: "CQRS (Command Query Responsibility Segregation)",
+        pronounce: "ซี-คิว-อาร์-เอส",
+        category: "arch",
+        catName: "Architecture",
+        color: "var(--cat-arch)",
+        meaning: "รูปแบบการแยกการประมวลผลคำสั่งเปลี่ยนแปลงข้อมูล (Command) ออกจากการสืบค้นข้อมูล (Query) เพื่อความสะอาดและประสิทธิภาพในการ Scale",
+        useCase: "ใช้งานร่วมกับ MediatR ใน Application Layer ของ Clean Architecture",
+        link: "./architecture.html",
+        linkText: "เรียนรู้ใน Clean Architecture →"
+    }
+];
+
+// Initialize and Render
+document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('glossary-grid');
+    const searchInput = document.getElementById('glossary-search');
+    const noResults = document.getElementById('no-results');
+    const filterButtons = document.querySelectorAll('.filter-chip');
+    const countAll = document.getElementById('count-all');
+
+    countAll.textContent = GLOSSARY_TERMS.length;
+
+    let currentCat = 'all';
+    let currentQuery = '';
+
+    function renderTerms() {
+        const filtered = GLOSSARY_TERMS.filter(item => {
+            const matchCat = (currentCat === 'all' || item.category === currentCat);
+            const q = currentQuery.toLowerCase().trim();
+            const matchQuery = !q || 
+                item.term.toLowerCase().includes(q) ||
+                item.pronounce.toLowerCase().includes(q) ||
+                item.meaning.toLowerCase().includes(q) ||
+                item.useCase.toLowerCase().includes(q);
+            return matchCat && matchQuery;
+        });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '';
+            noResults.classList.remove('hidden');
+            return;
+        }
+
+        noResults.classList.add('hidden');
+        grid.innerHTML = filtered.map(item => `
+            <div class="glossary-card animate-fade-in" style="border-top: 3px solid ${item.color};">
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                        <span class="term-title">${item.term}</span>
+                        <span class="term-category-tag" style="background: rgba(88,166,255,0.1); color:${item.color}; border:1px solid ${item.color};">${item.catName}</span>
+                    </div>
+                    <div class="pronounce-badge">
+                        <span>🗣️ คำอ่าน:</span>
+                        <span>${item.pronounce}</span>
+                    </div>
+                    <p class="term-meaning">${item.meaning}</p>
+                    <div class="term-usecase">
+                        <strong>💡 ใช้ทำอะไรในงานจริง:</strong><br>
+                        ${item.useCase}
+                    </div>
+                </div>
+                <div style="margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--border-muted); display:flex; justify-content:flex-end;">
+                    <a href="${item.link}" class="btn btn-outline btn-sm" style="border-color:${item.color}; color:var(--text-primary);">
+                        ${item.linkText}
+                    </a>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Search event
+    searchInput.addEventListener('input', (e) => {
+        currentQuery = e.target.value;
+        renderTerms();
+    });
+
+    // Category filter click
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentCat = btn.dataset.cat;
+            renderTerms();
+        });
+    });
+
+    // Initial render
+    renderTerms();
+});
+</script>
+
+</body>
+</html>

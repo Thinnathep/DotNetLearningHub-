@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C# ขั้นสูง (Async/Await, Generics, Nullable) — DotNet Learning Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">🟣</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน</a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP</a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections & LINQ</a>
+    <a href="./csharp-advanced.html" class="sidebar-link active"><span class="link-icon">📕</span> C# ขั้นสูง <span class="link-badge badge-mid">กลาง</span></a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET</a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection</a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware</a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-link"><span class="link-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link"><span class="link-icon">🎮</span> SQL Playground</a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link"><span class="link-icon">🧩</span> Blazor Components</a>
+    <a href="./xaml-basics.html" class="sidebar-link"><span class="link-icon">📐</span> XAML พื้นฐาน</a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML & JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps & Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git & CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link"><span class="link-icon">🛡️</span> Secure Coding</a>
+
+    <div class="sidebar-section-title">🟡 Web & คุณภาพ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link"><span class="link-icon">👀</span> Code Review</a>
+    <a href="./sdlc-agile.html" class="sidebar-link"><span class="link-icon">📋</span> SDLC & Agile</a>
+    <a href="./tech-docs.html" class="sidebar-link"><span class="link-icon">📝</span> Technical Docs</a>
+    <a href="./architecture.html" class="sidebar-link"><span class="link-icon">🏛️</span> Architecture</a>
+
+    <div class="sidebar-section-title">🎮 Games & Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> เตรียมสัมภาษณ์</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header reveal">
+            <div class="breadcrumb">
+                <a href="../index.html">🏠 หน้าแรก</a>
+                <span>/</span>
+                <span>C# Track</span>
+                <span>/</span>
+                <span>C# ขั้นสูง — Level 4</span>
+            </div>
+            <div class="page-title">
+                <div class="title-icon" style="background: var(--gradient-csharp); color: #fff;">📕</div>
+                <h1>C# ขั้นกลาง-สูง: Async/Await, Generics & Null Safety</h1>
+            </div>
+            <p class="page-description">
+                เจาะลึกฟีเจอร์สำคัญที่ใช้จริงในงาน Backend ระดับโปรดักชัน: Asynchronous Programming (Task, async/await), Generics & Constraints, Nullable Reference Types และ Delegates/Events
+            </p>
+            <div class="page-meta">
+                <span class="meta-item">⭐ ระดับ: กลาง</span>
+                <span class="meta-item">⏱️ เวลา: ~60 นาที</span>
+                <span class="meta-item">⚡ รางวัล: +100 XP</span>
+                <span class="meta-item">🏷️ Task&lt;T&gt; / Generics / C# 12</span>
+            </div>
+        </div>
+
+        <!-- Analogy Section -->
+        <div class="concept-card reveal">
+            <div class="concept-header">
+                <span class="concept-emoji">👨‍🍳</span>
+                <span class="concept-title">เปรียบเทียบให้เห็นภาพ: เชฟทำอาหารในครัวยุคใหม่</span>
+            </div>
+            <div class="concept-body">
+                <div class="analogy-box">
+                    <div class="analogy-label">💡 Analogy</div>
+                    <p class="analogy-text">
+                        • <strong>Synchronous (แบบเดิม):</strong> เชฟต้มน้ำซุปแล้ว <strong>ยืนรอเฉยๆ 15 นาทีจนน้ำเดือด</strong> ไม่ยอมทำอะไรต่อเลย ทำให้ครัวหยุดชะงัก (Blocking Thread)<br>
+                        • <strong>Asynchronous (async/await):</strong> เชฟตั้งหม้อน้ำซุปทิ้งไว้ (<code>await BoilWaterAsync()</code>) แล้ว <strong>ปล่อยมือไปหั่นผักและเตรียมเนื้อทันที</strong> เมื่อน้ำซุปเดือดสัญญาณเตือนดัง เชฟก็กลับมาทำต่อได้ โดยไม่ต้องใช้เชฟหลายคน (Non-blocking Thread Pool)<br>
+                        • <strong>Generics:</strong> เหมือน <strong>แม่พิมพ์ซิลิโคนอเนกประสงค์</strong> ที่จะเทช็อกโกแลต เจลลี่ หรือน้ำแข็งลงไปก็ได้รูปทรงเดิมโดยไม่ต้องซื้อพิมพ์ใหม่แยกประเภท
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Async / Await -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-csharp); color: #fff;">01</div>
+                <h2>Asynchronous Programming ด้วย async, await และ Task</h2>
+            </div>
+            <p>ในงาน Backend API กว่า 90% เป็นงานประเภท <strong>I/O Bound</strong> (รอ Database ตอบกลับ, รออ่านไฟล์, รอดึงข้อมูลจาก Third-Party API) การใช้ Async/Await จะช่วยให้เซิร์ฟเวอร์รองรับ Concurrent Users ได้เพิ่มขึ้นเป็น 10 เท่า!</p>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> AsyncExample.cs</div>
+                    <button class="copy-btn">📋 Copy</button>
+                </div>
+                <div class="code-block-body">
+<pre class="language-csharp"><code>public class OrderService
+{
+    private readonly ApplicationDbContext _db;
+    private readonly IPaymentClient _payment;
+
+    public OrderService(ApplicationDbContext db, IPaymentClient payment)
+    {
+        _db = db;
+        _payment = payment;
+    }
+
+    // ✅ เมธอด async ต้องคืนค่าเป็น Task หรือ Task<T>
+    public async Task&lt;OrderResult&gt; ProcessOrderAsync(int orderId, CancellationToken cancellationToken = default)
+    {
+        // 1. ดึงข้อมูลจากฐานข้อมูลแบบ Asynchronous (ไม่บล็อก Thread)
+        var order = await _db.Orders
+            .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
+
+        if (order == null) throw new NotFoundException("Order not found");
+
+        // 2. เรียกตัดเงินผ่าน API ภายนอกแบบ Async
+        var paymentResult = await _payment.ChargeAsync(order.TotalAmount, cancellationToken);
+
+        order.Status = paymentResult.Success ? "Paid" : "Failed";
+
+        // 3. บันทึกผลลัพธ์ลง Database
+        await _db.SaveChangesAsync(cancellationToken);
+
+        return new OrderResult { Success = paymentResult.Success };
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="grid grid-2 mb-md">
+                <div class="card" style="border-left: 3px solid var(--accent-danger);">
+                    <h4 style="color: var(--accent-danger); margin-bottom: 6px;">❌ ข้อห้ามเด็ดขาด (Async Anti-patterns)</h4>
+                    <ul class="text-xs" style="line-height: 1.8;">
+                        <li><strong>ห้ามใช้ <code>.Result</code> หรือ <code>.Wait()</code>:</strong> เสี่ยงเกิด <strong>Thread Pool Deadlock</strong> ทันที!</li>
+                        <li><strong>หลีกเลี่ยง <code>async void</code>:</strong> ใช้ <code>async Task</code> เสมอ เพราะ <code>async void</code> ดักจับ Exception ไม่ได้ ยกเว้น UI Event Handlers</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-left: 3px solid var(--accent-success);">
+                    <h4 style="color: var(--accent-success); margin-bottom: 6px;">✅ Task.WhenAll (รันคู่ขนาน)</h4>
+                    <p class="text-xs">ถ้ารายการงานไม่ขึ้นต่อกัน สามารถยิงพร้อมกันด้วย <code>Task.WhenAll()</code> เพื่อความเร็วสูงสุด:</p>
+                    <pre class="language-csharp" style="font-size: 0.75rem; padding: 8px;"><code>var userTask = _userService.GetAsync(id);
+var ordersTask = _orderService.GetByUserIdAsync(id);
+
+// รอให้ทั้งสองคำขอเสร็จพร้อมกัน
+await Task.WhenAll(userTask, ordersTask);</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Generics & Constraints -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-csharp); color: #fff;">02</div>
+                <h2>Generics & Type Constraints (ความยืดหยุ่นและ Type Safety)</h2>
+            </div>
+            <p>Generics ช่วยให้เราเขียน Class หรือ Method ที่ทำงานได้กับทุก Data Type โดยไม่ต้องทำ Boxing/Unboxing:</p>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> GenericRepository.cs</div>
+                    <button class="copy-btn">📋 Copy</button>
+                </div>
+                <div class="code-block-body">
+<pre class="language-csharp"><code>// Generic Interface พร้อมกำหนด Constraint: T ต้องเป็น Class และเป็น EntityBase
+public interface IRepository&lt;T&gt; where T : EntityBase, new()
+{
+    Task&lt;T?&gt; GetByIdAsync(int id);
+    Task&lt;IEnumerable&lt;T&gt;&gt; GetAllAsync();
+    Task AddAsync(T entity);
+}
+
+// Generic Implementation
+public class Repository&lt;T&gt; : IRepository&lt;T&gt; where T : EntityBase, new()
+{
+    protected readonly ApplicationDbContext _context;
+    protected readonly DbSet&lt;T&gt; _dbSet;
+
+    public Repository(ApplicationDbContext context)
+    {
+        _context = context;
+        _dbSet = _context.Set&lt;T&gt;();
+    }
+
+    public async Task&lt;T?&gt; GetByIdAsync(int id)
+    {
+        return await _dbSet.FindAsync(id);
+    }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Modern Null Safety -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-csharp); color: #fff;">03</div>
+                <h2>Modern Null Safety ใน C# (ป้องกัน NullReferenceException)</h2>
+            </div>
+
+            <table class="comparison-table mb-lg">
+                <thead>
+                    <tr>
+                        <th>สัญลักษณ์ / Operator</th>
+                        <th>ชื่อเรียก</th>
+                        <th>ตัวอย่างโค้ด</th>
+                        <th>ผลลัพธ์ / การทำงาน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>T?</code></td>
+                        <td>Nullable Reference Type</td>
+                        <td><code>string? nickname = null;</code></td>
+                        <td>บอก Compiler อย่างชัดเจนว่าตัวแปรนี้ "ยอมรับค่า null ได้"</td>
+                    </tr>
+                    <tr>
+                        <td><code>?.</code></td>
+                        <td>Null-Conditional Operator</td>
+                        <td><code>int? length = user?.Address?.City?.Length;</code></td>
+                        <td>ถ้าตัวใดตัวหนึ่งเป็น null จะคืนค่า null ทันทีโดยไม่ Crash</td>
+                    </tr>
+                    <tr>
+                        <td><code>??</code></td>
+                        <td>Null-Coalescing Operator</td>
+                        <td><code>string display = user.Nickname ?? "สมาชิกทั่วไป";</code></td>
+                        <td>ถ้าฝั่งซ้ายเป็น null ให้ใช้ค่าฝั่งขวาแทน</td>
+                    </tr>
+                    <tr>
+                        <td><code>??=</code></td>
+                        <td>Null-Coalescing Assignment</td>
+                        <td><code>_cache ??= new Dictionary&lt;string, string&gt;();</code></td>
+                        <td>ถ้าตัวแปรเป็น null ให้กำหนดค่าใหม่ทันที</td>
+                    </tr>
+                    <tr>
+                        <td><code>!</code></td>
+                        <td>Null-Forgiving Operator</td>
+                        <td><code>var name = user.Name!;</code></td>
+                        <td>บอก Compiler ว่า "ฉันมั่นใจว่าไม่ใช่ null ไม่ต้องขึ้น Warning"</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Section 4: Quiz -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-warning); color: #000;">🎯</div>
+                <h2>แบบทดสอบความเข้าใจ: C# ขั้นสูง</h2>
+            </div>
+            <div id="csharp-advanced-quiz"></div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/quiz-engine.js"></script>
+<script src="../js/code-visualizer.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'เหตุใดการใช้คำสั่ง Task.Result หรือ Task.Wait() ใน ASP.NET Core จึงถือเป็น Anti-pattern ที่อันตราย?',
+                options: [
+                    'เพราะเสี่ยงทำให้เกิดปัญหา Thread Pool Deadlock บล็อก Thread ของเซิร์ฟเวอร์จนระบบหยุดทำงาน',
+                    'เพราะจะทำให้ข้อมูลในฐานข้อมูลถูกลบ',
+                    'เพราะไฟล์ C# จะใหญ่เกินไป',
+                    'เพราะทำให้โปรแกรมรันเร็วเกินไป'
+                ],
+                answer: 0,
+                explanation: 'การใช้ .Result หรือ .Wait() บล็อก Sync-over-Async อาจทำให้ Thread Pool ขาดแคลนและเกิด Deadlock ทันที',
+                difficulty: 'mid'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'หากมี 2 เมธอด async ที่ทำงานอิสระต่อกันและต้องการรันพร้อมกันให้เสร็จเร็วที่สุด ควรใช้คำสั่งใด?',
+                options: ['Task.WhenAll(task1, task2)', 'await task1; await task2;', 'Thread.Sleep()', 'Task.Yield()'],
+                answer: 0,
+                explanation: 'Task.WhenAll รันทั้งสอง Task แบบคู่ขนาน และรอจนกว่าทั้งสองจะเสร็จสิ้น',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Null-Coalescing Operator (??) ทำหน้าที่อะไรใน C#?',
+                options: [
+                    'ถ้าค่าฝั่งซ้ายเป็น null จะคืนค่าฝั่งขวาแทน',
+                    'บวกเลขสองจำนวน',
+                    'ตรวจสอบว่าตัวแปรเท่ากันหรือไม่',
+                    'ลบค่าออกจาก Memory'
+                ],
+                answer: 0,
+                explanation: 'x ?? y หมายถึง ถ้า x ไม่เป็น null ให้ใช้ x แต่ถ้า x เป็น null ให้ใช้ y แทน',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'ใน C# Generic Constraint คำสั่ง where T : class หมายถึงข้อใด?',
+                options: [
+                    'T ต้องเป็น Reference Type เท่านั้น',
+                    'T ต้องเป็น Value Type เช่น int, bool',
+                    'T ต้องมี Constructor ว่างๆ',
+                    'T ต้องเป็น Interface'
+                ],
+                answer: 0,
+                explanation: 'where T : class ระบุว่า Type Parameter T ต้องเป็น Reference Type (Class, Interface, Delegate หรือ Array)',
+                difficulty: 'mid'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'การส่งผ่าน CancellationToken เข้าสู่ Async Method มีประโยชน์อย่างไร?',
+                options: [
+                    'ช่วยให้สามารถยกเลิกการทำงานของ Database/API ได้ทันทีเมื่อ Client กดยกเลิกหรือปิดหน้าเว็บไปแล้ว',
+                    'เพื่อเพิ่มความเร็วในการคำนวณ',
+                    'เพื่อป้องกัน SQL Injection',
+                    'เพื่อบังคับให้ Method ทำงานแบบ Synchronous'
+                ],
+                answer: 0,
+                explanation: 'CancellationToken ช่วยให้ Application ไม่เสียทรัพยากรประมวลผลงานที่ Client ไม่ต้องการแล้ว',
+                difficulty: 'mid'
+            }
+        ];
+
+        QuizEngine.start('csharp-advanced-quiz', questions, {
+            quizId: 'csharp-advanced',
+            onComplete: () => {
+                Progress.completeLesson('csharp-advanced');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

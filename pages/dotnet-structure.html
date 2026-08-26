@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โครงสร้าง ASP.NET Core & Minimal APIs — DotNet Learning Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">🔵</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน <span class="link-badge badge-basic">พื้นฐาน</span></a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP <span class="link-badge badge-basic">พื้นฐาน</span></a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections & LINQ <span class="link-badge badge-mid">กลาง</span></a>
+    <a href="./csharp-advanced.html" class="sidebar-link"><span class="link-icon">📕</span> C# ขั้นสูง <span class="link-badge badge-mid">กลาง</span></a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link active"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET <span class="link-badge badge-basic">พื้นฐาน</span></a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection <span class="link-badge badge-mid">กลาง</span></a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware <span class="link-badge badge-mid">กลาง</span></a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-link"><span class="link-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link"><span class="link-icon">🎮</span> SQL Playground</a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link"><span class="link-icon">🧩</span> Blazor Components</a>
+    <a href="./xaml-basics.html" class="sidebar-link"><span class="link-icon">📐</span> XAML พื้นฐาน</a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML & JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps & Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git & CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link"><span class="link-icon">🛡️</span> Secure Coding</a>
+
+    <div class="sidebar-section-title">🟡 Web & คุณภาพ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link"><span class="link-icon">👀</span> Code Review</a>
+    <a href="./sdlc-agile.html" class="sidebar-link"><span class="link-icon">📋</span> SDLC & Agile</a>
+    <a href="./tech-docs.html" class="sidebar-link"><span class="link-icon">📝</span> Technical Docs</a>
+    <a href="./architecture.html" class="sidebar-link"><span class="link-icon">🏛️</span> Architecture</a>
+
+    <div class="sidebar-section-title">🎮 Games & Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> เตรียมสัมภาษณ์</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header reveal">
+            <div class="breadcrumb">
+                <a href="../index.html">🏠 หน้าแรก</a>
+                <span>/</span>
+                <span>ASP.NET Core Track</span>
+                <span>/</span>
+                <span>โครงสร้าง ASP.NET Core</span>
+            </div>
+            <div class="page-title">
+                <div class="title-icon" style="background: var(--cat-dotnet); color: #fff;">🏗️</div>
+                <h1>โครงสร้าง ASP.NET Core & Minimal APIs</h1>
+            </div>
+            <p class="page-description">
+                เจาะลึกสถาปัตยกรรมของโปรเจกต์ .NET 8/9 ตั้งแต่ไฟล์ Program.cs, Service Container, Configuration ไปจนถึง Folder Structure สำหรับงานจริง
+            </p>
+            <div class="page-meta">
+                <span class="meta-item">⭐ ระดับ: พื้นฐาน > กลาง</span>
+                <span class="meta-item">⏱️ เวลา: ~45 นาที</span>
+                <span class="meta-item">⚡ รางวัล: +100 XP</span>
+                <span class="meta-item">🏷️ .NET 8 / .NET 9</span>
+            </div>
+        </div>
+
+        <!-- Analogy Section -->
+        <div class="concept-card reveal">
+            <div class="concept-header">
+                <span class="concept-emoji">🏭</span>
+                <span class="concept-title">เปรียบเทียบให้เห็นภาพ: โรงงานผลิตสินค้าอัตโนมัติ</span>
+            </div>
+            <div class="concept-body">
+                <div class="analogy-box">
+                    <div class="analogy-label">💡 Analogy</div>
+                    <p class="analogy-text">
+                        ASP.NET Core Web API เหมือน <strong>โรงงานผลิตสินค้าอัจฉริยะ</strong>:<br>
+                        • <strong>Program.cs</strong> คือพิมพ์เขียวและศูนย์ควบคุมการเปิดโรงงาน<br>
+                        • <strong>builder.Services (DI Container)</strong> คือคลังอะไหล่และช่างเฉพาะทางที่เตรียมไว้พร้อมหยิบใช้งาน<br>
+                        • <strong>app (Middleware Pipeline)</strong> คือสายพานลำเลียงที่ทุกคำขอ (Request) ต้องวิ่งผ่านด่านตรวจความปลอดภัยก่อนเข้าสู่กระบวนการผลิต<br>
+                        • <strong>Endpoints / Controllers</strong> คือแผนกผลิตสินค้าที่ส่งสินค้า (Response JSON) กลับไปให้ลูกค้า
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Folder Structure -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-dotnet); color: #fff;">01</div>
+                <h2>โครงสร้างโฟลเดอร์ของ Web API ในงานจริง</h2>
+            </div>
+            <p>เมื่อสร้างโปรเจกต์ด้วยคำสั่ง <code>dotnet new webapi</code> เราจะได้โครงสร้างไฟล์พื้นฐาน และนี่คือโครงสร้างที่ทีมพัฒนา .NET นิยมใช้แบ่งสัดส่วน:</p>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📁</span> Project Directory Tree</div>
+                </div>
+                <div class="code-block-body">
+<pre class="language-text"><code>MyWebApiProject/
+├── 📁 Controllers/         # แหล่งรวม Controller Classes สำหรับจัดการ HTTP Endpoints
+│   └── ProductsController.cs
+├── 📁 Models/              # Database Entities (ตรงกับ Table ใน Database)
+│   └── Product.cs
+├── 📁 DTOs/                # Data Transfer Objects (ข้อมูลส่งเข้า/ออกจาก API)
+│   ├── CreateProductRequest.cs
+│   └── ProductResponse.cs
+├── 📁 Services/            # Business Logic & Interfaces
+│   ├── IProductService.cs
+│   └── ProductService.cs
+├── 📁 Data/                # EF Core DbContext และ Migrations
+│   └── ApplicationDbContext.cs
+├── 📄 appsettings.json     # Configuration หลัก (Connection String, Log Levels)
+├── 📄 appsettings.Development.json # ค่า Config เฉพาะตอนรันบนเครื่อง Local
+├── 📄 Program.cs           # Entry Point หลักของ Application (.NET 8/9)
+└── 📄 MyWebApiProject.csproj # ไฟล์ระบุเวอร์ชัน .NET และ NuGet Packages</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Program.cs deep dive -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-dotnet); color: #fff;">02</div>
+                <h2>เจาะลึก Program.cs (Minimal APIs vs Controllers)</h2>
+            </div>
+            <p>ใน .NET 8 และ 9 ไม่มีไฟล์ <code>Startup.cs</code> อีกต่อไป ทุกอย่างรวมอยู่ใน <code>Program.cs</code> ภายใต้ 3 ขั้นตอนหลัก:</p>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> Program.cs</div>
+                    <button class="copy-btn">📋 Copy</button>
+                </div>
+                <div class="code-block-body">
+<pre class="language-csharp"><code>using MyWebApiProject.Data;
+using MyWebApiProject.Services;
+using Microsoft.EntityFrameworkCore;
+
+// ─── 1. สร้าง WebApplicationBuilder ───
+var builder = WebApplication.CreateBuilder(args);
+
+// ลงทะเบียน Services ใน Dependency Injection Container
+builder.Services.AddControllers(); // สำหรับ Controller-based
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// ลงทะเบียน EF Core DbContext
+builder.Services.AddDbContext&lt;ApplicationDbContext&gt;(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// ลงทะเบียน Business Service
+builder.Services.AddScoped&lt;IProductService, ProductService&gt;();
+
+// ─── 2. Build Application ───
+var app = builder.Build();
+
+// ─── 3. กำหนด Middleware Pipeline ───
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+
+// ─── 4. Map Endpoints ───
+app.MapControllers(); // Map Controllers
+
+// ตัวอย่าง Minimal API Endpoint
+app.MapGet("/api/health", () => Results.Ok(new { status = "Healthy", timestamp = DateTime.UtcNow }));
+
+app.Run();</code></pre>
+                </div>
+                <div class="code-block-output">
+                    <span class="output-label">▶ Terminal:</span>
+                    <span class="output-text">info: Microsoft.Hosting.Lifetime[14] Now listening on: https://localhost:7001</span>
+                </div>
+            </div>
+
+            <div class="callout callout-tip">
+                <div class="callout-title">💡 ความต่างระหว่าง Minimal APIs กับ Controller-based</div>
+                <p>• <strong>Minimal APIs</strong>: เหมาะสำหรับ Microservices ขนาดเล็ก, ฟังก์ชันเร็วๆ ไม่ต้องสร้าง Controller class โค้ดสั้นและ Performance สูงสุด<br>
+                • <strong>Controller-based</strong>: เหมาะสำหรับ Enterprise App ขนาดใหญ่ที่มี Endpoints จำนวนมาก แบ่งเป็นหมวดหมู่และจัดการง่ายกว่า</p>
+            </div>
+        </section>
+
+        <!-- Section 3: Configuration & appsettings.json -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-dotnet); color: #fff;">03</div>
+                <h2>การตั้งค่าระบบด้วย appsettings.json</h2>
+            </div>
+            <p>ไฟล์ <code>appsettings.json</code> ใช้เก็บค่า Configuration ต่างๆ เช่น Connection String ของฐานข้อมูล:</p>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> appsettings.json</div>
+                    <button class="copy-btn">📋 Copy</button>
+                </div>
+                <div class="code-block-body">
+<pre class="language-json"><code>{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=tcp:sqlserver.database.windows.net,1433;Database=ShopDB;User Id=dbuser;Password=YourSecurePassword;"
+  },
+  "JwtSettings": {
+    "Issuer": "https://myapp.com",
+    "Audience": "https://myapp.com",
+    "ExpiryInMinutes": 60
+  }
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="callout callout-danger">
+                <div class="callout-title">🚨 กฎความปลอดภัย White-Hat & Secret Management</div>
+                <p>ห้าม Commit รหัสผ่าน Database หรือ JWT Secret Key ลงใน Git Repo เด็ดขาด! ในเครื่อง Dev ให้ใช้คำสั่ง <code>dotnet user-secrets</code> และบน Production ให้ใช้ <strong>Azure Key Vault</strong> หรือ Environment Variables</p>
+            </div>
+        </section>
+
+        <!-- Section 4: Quiz -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-warning); color: #000;">🎯</div>
+                <h2>แบบทดสอบความเข้าใจ: โครงสร้าง ASP.NET Core</h2>
+            </div>
+            <div id="dotnet-structure-quiz"></div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/quiz-engine.js"></script>
+<script src="../js/code-visualizer.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'ใน .NET 8/9 ไฟล์ใดคือจุดเริ่มต้นหลัก (Entry Point) ของ Web API Application?',
+                options: ['Startup.cs', 'Program.cs', 'App.config', 'Web.config'],
+                answer: 1,
+                explanation: 'ใน .NET 8/9 รวมการทำงานทั้งหมดไว้ใน Program.cs ไฟล์เดียว เป็นทั้งจุดเริ่มและจุดประกอบ Pipeline',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'ส่วนใดของโค้ดใน Program.cs ใช้สำหรับลงทะเบียน Services เข้า DI Container?',
+                options: ['builder.Services.Add...', 'app.Use...', 'app.MapGet(...)', 'builder.Build()'],
+                answer: 0,
+                explanation: 'builder.Services คือ IServiceCollection ที่ใช้ลงทะเบียน Dependency Injection เช่น AddScoped, AddDbContext',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'หากต้องการอ่านค่า Connection String ชื่อ "DefaultConnection" จาก appsettings.json ควรใช้คำสั่งใด?',
+                options: [
+                    'builder.Configuration.GetConnectionString("DefaultConnection")',
+                    'builder.Configuration["Database:Connection"]',
+                    'app.GetConnection("DefaultConnection")',
+                    'Environment.GetConnectionString()'
+                ],
+                answer: 0,
+                explanation: 'builder.Configuration.GetConnectionString("DefaultConnection") เป็น Helper method มาตรฐานของ .NET',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'เหตุใดจึงไม่ควรเก็บรหัสผ่านฐานข้อมูลในไฟล์ appsettings.json ที่ถูก Push ขึ้น Public Git Repository?',
+                options: [
+                    'เพราะจะทำให้ขนาดไฟล์ใหญ่เกินไป',
+                    'เพราะใครก็ตามที่เห็น Repo จะสามารถอ่านรหัสผ่านและเข้าถึงฐานข้อมูลได้ทันที',
+                    'เพราะ .NET จะไม่อ่านไฟล์ JSON บน Production',
+                    'เพราะคำสั่ง dotnet run จะไม่ทำงาน'
+                ],
+                answer: 1,
+                explanation: 'นี่คือกฎความปลอดภัยระดับพื้นฐาน ข้อมูล Credentials และ Secrets ต้องแยกเก็บใน User Secrets หรือ Key Vault เสมอ',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Minimal APIs ใน ASP.NET Core เหมาะกับงานประเภทใดมากที่สุด?',
+                options: [
+                    'Microservices ขนาดเล็ก และ API ที่ต้องการ Performance สูง โค้ดกระชับ',
+                    'ระบบ Desktop Application แบบ WinForms',
+                    'เว็บที่ต้องแสดงผลหน้าจอแบบ 3D Animation',
+                    'ระบบที่ต้องการใช้ Web.config เท่านั้น'
+                ],
+                answer: 0,
+                explanation: 'Minimal APIs ถูกออกแบบมาเพื่อความเร็วสูงสุด โค้ดสั้น ไม่มี Overhead ของ Controller เหมาะกับ Microservices และ Cloud Endpoints',
+                difficulty: 'mid'
+            }
+        ];
+
+        QuizEngine.start('dotnet-structure-quiz', questions, {
+            quizId: 'dotnet-structure',
+            onComplete: () => {
+                Progress.completeLesson('dotnet-structure');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

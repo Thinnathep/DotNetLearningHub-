@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Interactive Playground — DotNet Learning Hub</title>
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <style>
+    /* ─── SQL Playground Custom Accents ─── */
+    .sql-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      background: rgba(247, 120, 186, 0.15);
+      border: 1px solid rgba(247, 120, 186, 0.35);
+      color: #ff7b72;
+      font-size: 0.8rem;
+      font-family: var(--font-code);
+      font-weight: 700;
+    }
+
+    .schema-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .schema-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .schema-card.active-table {
+      border-color: var(--accent-primary);
+      background: rgba(88, 166, 255, 0.05);
+      box-shadow: 0 0 15px rgba(88, 166, 255, 0.15);
+    }
+
+    .schema-card.active-table::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent-primary);
+    }
+
+    .schema-col-tag {
+      display: inline-block;
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
+      margin-right: 4px;
+      margin-bottom: 4px;
+    }
+
+    .tag-pk { background: rgba(255, 123, 114, 0.18); color: #ff7b72; border: 1px solid rgba(255, 123, 114, 0.3); }
+    .tag-fk { background: rgba(210, 168, 255, 0.18); color: #d2a8ff; border: 1px solid rgba(210, 168, 255, 0.3); }
+    .tag-normal { background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-default); }
+
+    .schema-preview-pane {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-top: var(--space-lg);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .sql-editor-container {
+      background: #090d13;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .sql-editor-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: #161b22;
+      border-bottom: 1px solid var(--border-default);
+    }
+
+    .sql-textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 16px;
+      background: transparent;
+      color: #f0f6fc;
+      border: none;
+      font-family: var(--font-code);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .sql-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      padding: 12px 16px;
+      background: #161b22;
+      border-top: 1px solid var(--border-default);
+    }
+
+    .template-btn {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-family: var(--font-code);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .template-btn:hover {
+      background: rgba(88, 166, 255, 0.15);
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+
+    .status-msg-banner {
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      margin-bottom: var(--space-md);
+    }
+    .status-msg-banner.success { background: rgba(63, 185, 80, 0.12); border: 1px solid rgba(63, 185, 80, 0.3); color: var(--accent-success); }
+    .status-msg-banner.error { background: rgba(248, 81, 73, 0.12); border: 1px solid rgba(248, 81, 73, 0.3); color: var(--accent-danger); }
+    .status-msg-banner.info { background: rgba(88, 166, 255, 0.12); border: 1px solid rgba(88, 166, 255, 0.3); color: var(--accent-primary); }
+
+    .mission-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      transition: all var(--transition-normal);
+      position: relative;
+    }
+
+    .mission-card.done {
+      border-color: var(--accent-success);
+      box-shadow: 0 0 15px rgba(63, 185, 80, 0.15);
+    }
+
+    .mission-badge-xp {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+      background: rgba(210, 153, 34, 0.15);
+      color: var(--accent-warning);
+      border: 1px solid rgba(210, 153, 34, 0.3);
+    }
+
+    .hint-drawer {
+      background: rgba(163, 113, 247, 0.08);
+      border: 1px dashed rgba(163, 113, 247, 0.35);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin: var(--space-sm) 0;
+      font-size: 0.85rem;
+      color: #d2a8ff;
+      display: none;
+    }
+
+    .hint-drawer.open {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div style="display: flex; align-items: center; gap: var(--space-md);">
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+      <a href="../index.html" class="site-logo">
+        <div class="logo-icon">🎮</div>
+        <span>DotNet Learning Hub</span>
+      </a>
+    </div>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <a href="quiz-arena.html" class="btn btn-outline btn-sm" style="border-radius: var(--radius-full);">
+        🎯 Quiz Arena
+      </a>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน <span class="link-badge badge-basic">พื้นฐาน</span></a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP <span class="link-badge badge-basic">พื้นฐาน</span></a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections & LINQ <span class="link-badge badge-mid">กลาง</span></a>
+    <a href="./csharp-advanced.html" class="sidebar-link"><span class="link-icon">📕</span> C# ขั้นสูง <span class="link-badge badge-mid">กลาง</span></a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET</a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection</a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware</a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-link"><span class="link-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link active"><span class="link-icon">🎮</span> SQL Playground <span class="link-badge badge-new" style="background: rgba(247, 120, 186, 0.2); color: #f778ba;">Live</span></a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link"><span class="link-icon">🧩</span> Blazor Components</a>
+    <a href="./xaml-basics.html" class="sidebar-link"><span class="link-icon">📐</span> XAML พื้นฐาน</a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML & JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps & Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git & CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link"><span class="link-icon">🛡️</span> Secure Coding</a>
+
+    <div class="sidebar-section-title">🟡 Web & อื่นๆ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link"><span class="link-icon">👀</span> Code Review</a>
+    <a href="./sdlc-agile.html" class="sidebar-link"><span class="link-icon">📋</span> SDLC & Agile</a>
+    <a href="./tech-docs.html" class="sidebar-link"><span class="link-icon">📝</span> Technical Docs</a>
+    <a href="./architecture.html" class="sidebar-link"><span class="link-icon">🏛️</span> Architecture</a>
+
+    <div class="sidebar-section-title">🎮 Games & Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> เตรียมสัมภาษณ์</a>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── 1. Header ─── -->
+      <div class="page-header reveal">
+        <div class="breadcrumb">
+          <a href="../index.html">🏠 หน้าแรก</a>
+          <span>/</span>
+          <span>Database Track</span>
+          <span>/</span>
+          <span class="text-primary">SQL Interactive Playground</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(247, 120, 186, 0.2); color: #f778ba; border: 1px solid rgba(247, 120, 186, 0.4);">🎮</div>
+          <div>
+            <h1>SQL Interactive Playground</h1>
+            <div class="page-description">
+              ห้องทดลองเขียนและรันคำสั่ง SQL จริงบน Browser แบบ In-Memory Database ไม่ต้องติดตั้งฐานข้อมูล พร้อมจำลองโครงสร้าง Schema ตัวอย่าง Query ด่วน และโจทย์ท้าทายรับ XP
+            </div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="level-tag level-basic">⭐ ทุกระดับ</span></span>
+          </div>
+          <div class="meta-item">
+            <span>💻</span>
+            <span>โหมด: <strong style="color: var(--accent-primary);">Interactive Live SQL Sandbox</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>รางวัล: <strong style="color: var(--accent-warning);">+50 XP ต่อโจทย์ที่ผ่าน</strong></span>
+          </div>
+          <div class="meta-item">
+            <span class="sql-hero-badge">⚡ Real-time Execution</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Stats Bar ─── -->
+      <div class="grid grid-4 mb-xl reveal">
+        <div class="card text-center">
+          <div style="font-size: 2rem; font-weight: 800; color: var(--accent-primary); font-family: var(--font-heading);">4</div>
+          <div class="text-sm text-muted">ตารางจำลอง</div>
+        </div>
+        <div class="card text-center">
+          <div style="font-size: 2rem; font-weight: 800; color: var(--accent-success); font-family: var(--font-heading);">Active</div>
+          <div class="text-sm text-muted">In-Memory Engine</div>
+        </div>
+        <div class="card text-center">
+          <div style="font-size: 2rem; font-weight: 800; color: var(--accent-warning); font-family: var(--font-heading);" id="stat-missions-done">0 / 3</div>
+          <div class="text-sm text-muted">ภารกิจสำเร็จ</div>
+        </div>
+        <div class="card text-center">
+          <div style="font-size: 2rem; font-weight: 800; color: var(--accent-info); font-family: var(--font-heading);" id="stat-queries-count">0</div>
+          <div class="text-sm text-muted">คำสั่งที่รันแล้ว</div>
+        </div>
+      </div>
+
+      <!-- ─── 2. Database Schema Visual Explorer ─── -->
+      <section class="lesson-section reveal">
+        <h2 class="mb-md">🗂️ Database Schema Visual Explorer (สำรวจโครงสร้างและข้อมูลจำลอง)</h2>
+        <p class="text-secondary mb-lg">
+          คลิกที่การ์ดตารางเพื่อดูรายละเอียดคอลัมน์ ชนิดข้อมูล คีย์ (PK/FK) และพรีวิวตัวอย่างข้อมูลแถวจริงในตาราง
+        </p>
+
+        <div class="grid grid-4" id="schema-cards-grid">
+          <!-- employees card -->
+          <div class="schema-card active-table" id="card-tbl-employees" onclick="inspectTable('employees')">
+            <div class="card-header">
+              <span class="card-icon" style="background: var(--cat-sql); color: #fff;">👥</span>
+              <div>
+                <strong style="font-size: 1.05rem; font-family: var(--font-heading);">employees</strong>
+                <div class="text-xs text-muted">6 แถวข้อมูล</div>
+              </div>
+            </div>
+            <div class="mb-sm">
+              <span class="schema-col-tag tag-pk">id (PK)</span>
+              <span class="schema-col-tag tag-normal">name</span>
+              <span class="schema-col-tag tag-normal">position</span>
+              <span class="schema-col-tag tag-normal">salary</span>
+              <span class="schema-col-tag tag-fk">dept_id (FK)</span>
+              <span class="schema-col-tag tag-normal">hire_date</span>
+            </div>
+            <span class="text-xs" style="color: var(--accent-primary); font-weight: 600;">คลิกเพื่อดูโครงสร้างและตัวอย่าง →</span>
+          </div>
+
+          <!-- departments card -->
+          <div class="schema-card" id="card-tbl-departments" onclick="inspectTable('departments')">
+            <div class="card-header">
+              <span class="card-icon" style="background: var(--cat-api); color: #fff;">🏢</span>
+              <div>
+                <strong style="font-size: 1.05rem; font-family: var(--font-heading);">departments</strong>
+                <div class="text-xs text-muted">4 แถวข้อมูล</div>
+              </div>
+            </div>
+            <div class="mb-sm">
+              <span class="schema-col-tag tag-pk">id (PK)</span>
+              <span class="schema-col-tag tag-normal">name</span>
+              <span class="schema-col-tag tag-normal">budget</span>
+            </div>
+            <span class="text-xs" style="color: var(--accent-primary); font-weight: 600;">คลิกเพื่อดูโครงสร้างและตัวอย่าง →</span>
+          </div>
+
+          <!-- products card -->
+          <div class="schema-card" id="card-tbl-products" onclick="inspectTable('products')">
+            <div class="card-header">
+              <span class="card-icon" style="background: var(--cat-web); color: #000;">📦</span>
+              <div>
+                <strong style="font-size: 1.05rem; font-family: var(--font-heading);">products</strong>
+                <div class="text-xs text-muted">5 แถวข้อมูล</div>
+              </div>
+            </div>
+            <div class="mb-sm">
+              <span class="schema-col-tag tag-pk">id (PK)</span>
+              <span class="schema-col-tag tag-normal">name</span>
+              <span class="schema-col-tag tag-normal">price</span>
+              <span class="schema-col-tag tag-normal">stock</span>
+              <span class="schema-col-tag tag-normal">category</span>
+            </div>
+            <span class="text-xs" style="color: var(--accent-primary); font-weight: 600;">คลิกเพื่อดูโครงสร้างและตัวอย่าง →</span>
+          </div>
+
+          <!-- orders card -->
+          <div class="schema-card" id="card-tbl-orders" onclick="inspectTable('orders')">
+            <div class="card-header">
+              <span class="card-icon" style="background: var(--cat-devops); color: #fff;">🛒</span>
+              <div>
+                <strong style="font-size: 1.05rem; font-family: var(--font-heading);">orders</strong>
+                <div class="text-xs text-muted">5 แถวข้อมูล</div>
+              </div>
+            </div>
+            <div class="mb-sm">
+              <span class="schema-col-tag tag-pk">id (PK)</span>
+              <span class="schema-col-tag tag-fk">emp_id (FK)</span>
+              <span class="schema-col-tag tag-fk">product_id (FK)</span>
+              <span class="schema-col-tag tag-normal">quantity</span>
+              <span class="schema-col-tag tag-normal">order_date</span>
+            </div>
+            <span class="text-xs" style="color: var(--accent-primary); font-weight: 600;">คลิกเพื่อดูโครงสร้างและตัวอย่าง →</span>
+          </div>
+        </div>
+
+        <!-- Schema Details & Preview Box -->
+        <div class="schema-preview-pane" id="schema-detail-box">
+          <!-- Populated by inspectTable() -->
+        </div>
+      </section>
+
+      <!-- ─── 3. Interactive SQL Console ─── -->
+      <section class="lesson-section reveal">
+        <h2 class="mb-md">💻 Interactive SQL Console (คอนโซลรันคำสั่ง SQL)</h2>
+        <p class="text-secondary mb-md">
+          เขียนคำสั่ง SQL ที่ต้องการ หรือเลือกเทมเพลตด่วนด้านล่างเพื่อทดลองรันคำสั่งทันที
+        </p>
+
+        <div class="sql-editor-container mb-lg">
+          <div class="sql-editor-bar">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ff5f56;"></span>
+              <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ffbd2e;"></span>
+              <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #27c93f;"></span>
+              <span style="font-family: var(--font-code); font-size: 0.8rem; color: var(--text-muted); margin-left: 6px;">query_editor.sql</span>
+            </div>
+            <div class="text-xs text-muted" style="font-family: var(--font-code);">
+              💡 กด <strong>Ctrl + Enter</strong> เพื่อรันคำสั่ง
+            </div>
+          </div>
+
+          <textarea 
+            id="sql-input" 
+            class="sql-textarea" 
+            spellcheck="false"
+            placeholder="-- พิมพ์คำสั่ง SQL ที่ต้องการทดสอบที่นี่...&#10;SELECT * FROM employees WHERE salary > 40000;"
+          >SELECT * FROM employees;</textarea>
+
+          <div class="sql-toolbar">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px;">
+              <span class="text-xs text-muted" style="font-weight: 600;">⚡ Quick Templates:</span>
+              <button class="template-btn" onclick="applyTemplate('SELECT * FROM employees;')">ดูพนักงานทั้งหมด</button>
+              <button class="template-btn" onclick="applyTemplate('SELECT employees.name, employees.position, departments.name AS department FROM employees INNER JOIN departments ON employees.dept_id = departments.id;')">JOIN พนักงานกับแผนก</button>
+              <button class="template-btn" onclick='SELECT * FROM products WHERE price > 5000 ORDER BY price DESC;'>สินค้าราคามากกว่า 5,000</button>
+              <button class="template-btn" onclick="applyTemplate('SELECT orders.id, employees.name AS emp_name, products.name AS product_name, orders.quantity FROM orders INNER JOIN employees ON orders.emp_id = employees.id INNER JOIN products ON orders.product_id = products.id;')">ยอดสั่งซื้อทั้งหมด</button>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline btn-sm" onclick="handleResetDb()">
+                🔄 รีเซ็ตฐานข้อมูล (Reset DB)
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="handleRunQuery()" id="btn-run-sql">
+                ▶ รันคำสั่ง SQL (Run Query)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── 4. Result Panel ─── -->
+        <div class="card p-lg mb-xl" id="result-panel">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-md); flex-wrap: wrap; gap: var(--space-sm);">
+            <h3 style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+              <span>📊 ผลลัพธ์ข้อมูล (Result Panel)</span>
+              <span id="result-status-badge" class="badge badge-info">พร้อมแสดงผล</span>
+            </h3>
+            <button class="btn btn-ghost btn-sm" onclick="copyResultData()" id="btn-copy-data">
+              📋 คัดลอกผลลัพธ์
+            </button>
+          </div>
+
+          <div id="execution-status-msg" class="status-msg-banner info">
+            <span>💡 กดปุ่ม <strong>"▶ รันคำสั่ง SQL"</strong> หรือกด <code>Ctrl + Enter</code> เพื่อดูผลลัพธ์</span>
+          </div>
+
+          <div style="overflow-x: auto; border: 1px solid var(--border-default); border-radius: var(--radius-md); background: #090d13;">
+            <div id="result-table-container" style="padding: var(--space-md);">
+              <p class="text-muted text-center" style="margin: 0;">กดปุ่มรันคำสั่งเพื่อดูผลลัพธ์ข้อมูลจำลอง</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 5. Challenge Missions (3 ภารกิจท้าทาย) ─── -->
+      <section class="lesson-section reveal">
+        <div class="section-header">
+          <h2>🏆 Challenge Missions (3 ภารกิจท้าทาย)</h2>
+          <p class="section-desc">
+            ฝึกเขียนคำสั่ง SQL จริงตามเงื่อนไขที่กำหนด เมื่อตรวจคำตอบถูกต้องจะได้รับ <strong>+50 XP ต่อข้อ!</strong>
+          </p>
+        </div>
+
+        <div class="grid grid-3 mb-xl">
+          <!-- Mission 1 -->
+          <div class="mission-card" id="mission-box-1">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-md);">
+              <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                <span class="card-icon" style="background: var(--accent-primary); color: #fff; width: 36px; height: 36px; font-size: 1rem;">1</span>
+                <strong style="font-size: 1.05rem;">ภารกิจที่ 1: กรองเงินเดือน</strong>
+              </div>
+              <span class="mission-badge-xp">+50 XP</span>
+            </div>
+            <p class="text-sm text-secondary mb-md">
+              ค้นหาพนักงานที่มีเงินเดือนมากกว่า 40,000 บาท (<code>salary &gt; 40000</code>) จากตาราง <code>employees</code>
+            </p>
+            <div class="hint-drawer" id="hint-box-1">
+              💡 <strong>คำใบ้:</strong> <code>SELECT * FROM employees WHERE salary &gt; 40000;</code>
+            </div>
+            <div style="display: flex; gap: 6px; margin-bottom: var(--space-md);">
+              <button class="btn btn-ghost btn-sm" onclick="toggleMissionHint(1)">💡 ขอคำใบ้</button>
+              <button class="btn btn-outline btn-sm" onclick="loadMissionTemplate(1)">📝 ใส่คำสั่งใน Console</button>
+            </div>
+            <button class="btn btn-success btn-block" onclick="verifyMission(1)" id="btn-verify-1">
+              ⭐ ตรวจคำตอบภารกิจที่ 1
+            </button>
+          </div>
+
+          <!-- Mission 2 -->
+          <div class="mission-card" id="mission-box-2">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-md);">
+              <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                <span class="card-icon" style="background: var(--accent-info); color: #fff; width: 36px; height: 36px; font-size: 1rem;">2</span>
+                <strong style="font-size: 1.05rem;">ภารกิจที่ 2: INNER JOIN</strong>
+              </div>
+              <span class="mission-badge-xp">+50 XP</span>
+            </div>
+            <p class="text-sm text-secondary mb-md">
+              ดึงข้อมูลพนักงานพร้อมชื่อแผนกด้วย INNER JOIN ระหว่างตาราง <code>employees</code> กับ <code>departments</code> โดยเชื่อมด้วย <code>employees.dept_id = departments.id</code>
+            </p>
+            <div class="hint-drawer" id="hint-box-2">
+              💡 <strong>คำใบ้:</strong> <code>SELECT * FROM employees INNER JOIN departments ON employees.dept_id = departments.id;</code>
+            </div>
+            <div style="display: flex; gap: 6px; margin-bottom: var(--space-md);">
+              <button class="btn btn-ghost btn-sm" onclick="toggleMissionHint(2)">💡 ขอคำใบ้</button>
+              <button class="btn btn-outline btn-sm" onclick="loadMissionTemplate(2)">📝 ใส่คำสั่งใน Console</button>
+            </div>
+            <button class="btn btn-success btn-block" onclick="verifyMission(2)" id="btn-verify-2">
+              ⭐ ตรวจคำตอบภารกิจที่ 2
+            </button>
+          </div>
+
+          <!-- Mission 3 -->
+          <div class="mission-card" id="mission-box-3">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-md);">
+              <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                <span class="card-icon" style="background: var(--accent-warning); color: #fff; width: 36px; height: 36px; font-size: 1rem;">3</span>
+                <strong style="font-size: 1.05rem;">ภารกิจที่ 3: กรองสินค้าซอฟต์แวร์</strong>
+              </div>
+              <span class="mission-badge-xp">+50 XP</span>
+            </div>
+            <p class="text-sm text-secondary mb-md">
+              หาสินค้าหมวดหมู่ 'Software' ที่มีราคามากกว่า 10,000 บาท (<code>category = 'Software' AND price &gt; 10000</code>) จากตาราง <code>products</code>
+            </p>
+            <div class="hint-drawer" id="hint-box-3">
+              💡 <strong>คำใบ้:</strong> <code>SELECT * FROM products WHERE category = 'Software' AND price &gt; 10000;</code>
+            </div>
+            <div style="display: flex; gap: 6px; margin-bottom: var(--space-md);">
+              <button class="btn btn-ghost btn-sm" onclick="toggleMissionHint(3)">💡 ขอคำใบ้</button>
+              <button class="btn btn-outline btn-sm" onclick="loadMissionTemplate(3)">📝 ใส่คำสั่งใน Console</button>
+            </div>
+            <button class="btn btn-success btn-block" onclick="verifyMission(3)" id="btn-verify-3">
+              ⭐ ตรวจคำตอบภารกิจที่ 3
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── SQL Reference Cheat Sheet ─── -->
+      <section class="lesson-section reveal">
+        <h2 class="mb-md">📖 สรุปไวยากรณ์ SQL สำคัญที่ควรรู้</h2>
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">💡</span>
+            <span class="concept-title">สรุปภาพรวมคำสั่ง SQL พื้นฐาน</span>
+          </div>
+          <div class="concept-body">
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th style="width: 25%;">Clause / คำสั่ง</th>
+                  <th style="width: 40%;">รูปแบบไวยากรณ์ (Syntax)</th>
+                  <th style="width: 35%;">คำอธิบายการทำงาน</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong style="color: #ff7b72;">SELECT ... FROM</strong></td>
+                  <td><code>SELECT name, salary FROM employees;</code></td>
+                  <td>ระบุคอลัมน์และตารางที่ต้องการดึงข้อมูล</td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #79c0ff;">WHERE</strong></td>
+                  <td><code>WHERE salary &gt; 40000 AND dept_id = 1</code></td>
+                  <td>กรองเฉพาะแถวที่ตรงตามเงื่อนไขเปรียบเทียบ</td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #d2a8ff;">INNER JOIN ... ON</strong></td>
+                  <td><code>JOIN departments ON employees.dept_id = departments.id</code></td>
+                  <td>เชื่อม 2 ตารางเข้าด้วยกันโดยจับคู่ Primary Key กับ Foreign Key</td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #ffa657;">ORDER BY</strong></td>
+                  <td><code>ORDER BY salary DESC</code></td>
+                  <td>เรียงลำดับผลลัพธ์ (ASC = น้อยไปมาก, DESC = มากไปน้อย)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Footer Navigation ─── -->
+      <div class="card p-xl reveal text-center" style="background: radial-gradient(circle, rgba(88, 166, 255, 0.08) 0%, rgba(22, 27, 34, 0.9) 100%);">
+        <h3 style="margin-bottom: var(--space-sm);">🚀 เรียนรู้การต่อยอดกับ C# และ .NET</h3>
+        <p class="text-secondary mb-lg">เชื่อมต่อความรู้ SQL สู่การเขียนโค้ดจริงด้วย Entity Framework Core และ LINQ</p>
+        <div style="display: flex; justify-content: center; gap: var(--space-md); flex-wrap: wrap;">
+          <a href="sql-basics.html" class="btn btn-outline">
+            ← บทเรียน SQL พื้นฐาน
+          </a>
+          <a href="ef-core.html" class="btn btn-primary">
+            🗄️ เรียนรู้ Entity Framework Core →
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+  <script src="../js/sql-playground.js"></script>
+
+  <script>
+    /* ══════════════════════════════════════════════════════════
+       SQL Playground Interactive Controller
+       ══════════════════════════════════════════════════════════ */
+    let currentTableInspected = 'employees';
+    let queryExecCount = 0;
+    let missionsCompleted = new Set();
+    let currentResultData = [];
+
+    const schemaDetails = {
+      employees: {
+        title: '👥 ตาราง employees (ข้อมูลพนักงาน)',
+        desc: 'จัดเก็บประวัติพนักงาน เงินเดือน ตำแหน่งงาน แผนกที่สังกัด และวันที่เริ่มงาน',
+        cols: [
+          { name: 'id', type: 'INT', tag: 'PK', desc: 'รหัสพนักงาน (Primary Key ไม่ซ้ำกัน)' },
+          { name: 'name', type: 'VARCHAR(100)', tag: 'COL', desc: 'ชื่อและนามสกุลของพนักงาน' },
+          { name: 'position', type: 'VARCHAR(100)', tag: 'COL', desc: 'ตำแหน่งงาน (เช่น Senior .NET Dev)' },
+          { name: 'salary', type: 'DECIMAL(10,2)', tag: 'COL', desc: 'เงินเดือนประจำ (บาท)' },
+          { name: 'dept_id', type: 'INT', tag: 'FK', desc: 'รหัสแผนก เชื่อมกับ departments.id' },
+          { name: 'hire_date', type: 'DATE', tag: 'COL', desc: 'วันที่เริ่มงาน (YYYY-MM-DD)' }
+        ]
+      },
+      departments: {
+        title: '🏢 ตาราง departments (ข้อมูลแผนก)',
+        desc: 'จัดเก็บรายชื่อแผนกและงบประมาณประจำปีของแต่ละแผนก',
+        cols: [
+          { name: 'id', type: 'INT', tag: 'PK', desc: 'รหัสแผนก (Primary Key)' },
+          { name: 'name', type: 'VARCHAR(100)', tag: 'COL', desc: 'ชื่อแผนก (เช่น IT & Software)' },
+          { name: 'budget', type: 'DECIMAL(12,2)', tag: 'COL', desc: 'งบประมาณประจำปี (บาท)' }
+        ]
+      },
+      products: {
+        title: '📦 ตาราง products (รายการสินค้า)',
+        desc: 'จัดเก็บรายการสินค้า ราคาขาย จำนวนสินค้าคงคลัง และหมวดหมู่',
+        cols: [
+          { name: 'id', type: 'INT', tag: 'PK', desc: 'รหัสสินค้า (Primary Key)' },
+          { name: 'name', type: 'VARCHAR(150)', tag: 'COL', desc: 'ชื่อสินค้า / ไลเซนส์ซอฟต์แวร์' },
+          { name: 'price', type: 'DECIMAL(10,2)', tag: 'COL', desc: 'ราคาขายต่อหน่วย (บาท)' },
+          { name: 'stock', type: 'INT', tag: 'COL', desc: 'จำนวนสินค้าคงเหลือในสต็อก' },
+          { name: 'category', type: 'VARCHAR(50)', tag: 'COL', desc: 'หมวดหมู่สินค้า (Software/Hardware)' }
+        ]
+      },
+      orders: {
+        title: '🛒 ตาราง orders (ประวัติการสั่งซื้อ)',
+        desc: 'จัดเก็บรายการสั่งซื้อ รหัสพนักงานที่สั่งซื้อ รหัสสินค้า จำนวน และวันที่สั่งซื้อ',
+        cols: [
+          { name: 'id', type: 'INT', tag: 'PK', desc: 'รหัสคำสั่งซื้อ (Primary Key)' },
+          { name: 'emp_id', type: 'INT', tag: 'FK', desc: 'รหัสพนักงานผู้ทำรายการ (employees.id)' },
+          { name: 'product_id', type: 'INT', tag: 'FK', desc: 'รหัสสินค้าที่สั่งซื้อ (products.id)' },
+          { name: 'quantity', type: 'INT', tag: 'COL', desc: 'จำนวนชิ้นที่สั่งซื้อ' },
+          { name: 'order_date', type: 'DATE', tag: 'COL', desc: 'วันที่ทำรายการสั่งซื้อ' }
+        ]
+      }
+    };
+
+    function inspectTable(tableName) {
+      currentTableInspected = tableName;
+
+      // Update card active class
+      document.querySelectorAll('#schema-cards-grid .schema-card').forEach(c => c.classList.remove('active-table'));
+      const activeCard = document.getElementById(`card-tbl-${tableName}`);
+      if (activeCard) activeCard.classList.add('active-table');
+
+      const meta = schemaDetails[tableName];
+      const dataRows = (typeof SQLPlayground !== 'undefined' && SQLPlayground.currentTables)
+        ? (SQLPlayground.currentTables[tableName] || [])
+        : [];
+
+      const box = document.getElementById('schema-detail-box');
+      if (!box || !meta) return;
+
+      const colKeys = meta.cols.map(c => c.name);
+
+      box.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md); flex-wrap: wrap; gap: var(--space-sm);">
+          <div>
+            <h3 style="margin: 0 0 4px 0; font-size: 1.15rem; color: var(--text-primary);">${meta.title}</h3>
+            <p class="text-sm text-secondary" style="margin: 0;">${meta.desc}</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="applyTemplate('SELECT * FROM ${tableName};')">
+            📝 ดึงคำสั่ง SELECT ตารางนี้ไปที่ Console
+          </button>
+        </div>
+
+        <div class="grid grid-2 mb-md" style="gap: var(--space-lg);">
+          <!-- Columns Info -->
+          <div>
+            <strong class="text-sm text-primary mb-sm" style="display: block;">📋 โครงสร้างคอลัมน์ (${meta.cols.length} คอลัมน์):</strong>
+            <table class="sql-result-table">
+              <thead>
+                <tr>
+                  <th>คอลัมน์</th>
+                  <th>ชนิดข้อมูล</th>
+                  <th>ประเภท</th>
+                  <th>คำอธิบาย</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${meta.cols.map(c => `
+                  <tr>
+                    <td><strong style="color: #79c0ff;">${c.name}</strong></td>
+                    <td><span style="color: #ffa657; font-size: 0.75rem;">${c.type}</span></td>
+                    <td>
+                      ${c.tag === 'PK' ? '<span class="schema-col-tag tag-pk">PK 🔑</span>' : ''}
+                      ${c.tag === 'FK' ? '<span class="schema-col-tag tag-fk">FK 🔗</span>' : ''}
+                      ${c.tag === 'COL' ? '<span class="schema-col-tag tag-normal">Column</span>' : ''}
+                    </td>
+                    <td class="text-xs text-secondary">${c.desc}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Data Preview -->
+          <div style="overflow-x: auto;">
+            <strong class="text-sm text-success mb-sm" style="display: block;">👀 ตัวอย่างแถวข้อมูลปัจจุบัน (${dataRows.length} แถว):</strong>
+            <table class="sql-result-table">
+              <thead>
+                <tr>
+                  ${colKeys.map(k => `<th>${k}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${dataRows.map(row => `
+                  <tr>
+                    ${colKeys.map(k => `<td>${row[k] !== undefined ? row[k] : '<span class="text-muted">null</span>'}</td>`).join('')}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function applyTemplate(sql) {
+      const textarea = document.getElementById('sql-input');
+      if (textarea) {
+        textarea.value = sql;
+        handleRunQuery();
+        document.querySelector('.sql-editor-container')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function handleRunQuery() {
+      const textarea = document.getElementById('sql-input');
+      if (!textarea) return;
+      const sql = textarea.value.trim();
+
+      if (!sql) {
+        showExecutionStatus('กรุณาพิมพ์คำสั่ง SQL ก่อนรันจ้า', 'error');
+        return;
+      }
+
+      queryExecCount++;
+      const qStat = document.getElementById('stat-queries-count');
+      if (qStat) qStat.textContent = queryExecCount;
+
+      const startTime = performance.now();
+      const res = SQLPlayground.runQuery(sql);
+      const elapsed = (performance.now() - startTime).toFixed(2);
+
+      const statusBadge = document.getElementById('result-status-badge');
+      const tableContainer = document.getElementById('result-table-container');
+
+      if (!res.success) {
+        showExecutionStatus(`❌ ${res.error}`, 'error');
+        if (statusBadge) statusBadge.textContent = 'Query Error';
+        if (tableContainer) {
+          tableContainer.innerHTML = `<p style="color: var(--accent-danger); margin: 0;">⚠️ ${res.error}</p>`;
+        }
+        return;
+      }
+
+      // Success
+      const rowCount = res.rows ? res.rows.length : 0;
+      showExecutionStatus(`⚡ ประมวลผลสำเร็จใน ${elapsed}ms • ${res.message || `พบคอลัมน์ ${res.columns.length} คอลัมน์, ${rowCount} แถว`}`, 'success');
+      if (statusBadge) statusBadge.textContent = `${rowCount} รายการ`;
+
+      currentResultData = res.rows || [];
+
+      if (!res.rows || res.rows.length === 0) {
+        tableContainer.innerHTML = '<p class="text-muted text-center" style="margin: 0;">ไม่พบแถวข้อมูลที่ตรงตามเงื่อนไข (0 rows)</p>';
+      } else {
+        let tableHtml = '<table class="sql-result-table"><thead><tr>';
+        tableHtml += '<th style="width: 40px; text-align: center;">#</th>';
+        res.columns.forEach(col => {
+          tableHtml += `<th>${col}</th>`;
+        });
+        tableHtml += '</tr></thead><tbody>';
+
+        res.rows.forEach((row, idx) => {
+          tableHtml += '<tr>';
+          tableHtml += `<td style="text-align: center; color: var(--text-muted); font-size: 0.75rem;">${idx + 1}</td>`;
+          res.columns.forEach(col => {
+            const val = row[col];
+            tableHtml += `<td>${val !== undefined ? (typeof val === 'number' ? `<strong style="color: #ffa657;">${val.toLocaleString()}</strong>` : val) : '<span class="text-muted">null</span>'}</td>`;
+          });
+          tableHtml += '</tr>';
+        });
+
+        tableHtml += '</tbody></table>';
+        tableContainer.innerHTML = tableHtml;
+      }
+
+      // Refresh inspected table view
+      inspectTable(currentTableInspected);
+    }
+
+    function showExecutionStatus(msg, type = 'info') {
+      const banner = document.getElementById('execution-status-msg');
+      if (!banner) return;
+      banner.className = `status-msg-banner ${type}`;
+      banner.innerHTML = type === 'success' 
+        ? `<span>✅ ${msg}</span>` 
+        : (type === 'error' ? `<span>⚠️ ${msg}</span>` : `<span>ℹ️ ${msg}</span>`);
+    }
+
+    function handleResetDb() {
+      if (confirm('ต้องการรีเซ็ตฐานข้อมูลจำลองกลับสู่ค่าเริ่มต้นใช่หรือไม่?')) {
+        SQLPlayground.resetDatabase();
+        inspectTable(currentTableInspected);
+        showExecutionStatus('🔄 รีเซ็ตข้อมูลทุกตารางกลับสู่สถานะเริ่มต้นเรียบร้อยแล้ว!', 'info');
+        handleRunQuery();
+      }
+    }
+
+    function copyResultData() {
+      if (!currentResultData.length) {
+        alert('ยังไม่มีผลลัพธ์ข้อมูลให้คัดลอก');
+        return;
+      }
+      navigator.clipboard.writeText(JSON.stringify(currentResultData, null, 2))
+        .then(() => {
+          const btn = document.getElementById('btn-copy-data');
+          if (btn) {
+            btn.textContent = '✅ คัดลอกแล้ว!';
+            setTimeout(() => { btn.textContent = '📋 คัดลอกผลลัพธ์'; }, 2000);
+          }
+        })
+        .catch(() => alert('ไม่สามารถคัดลอกข้อมูลได้'));
+    }
+
+    /* ─── Mission Handlers ─── */
+    function toggleMissionHint(id) {
+      const box = document.getElementById(`hint-box-${id}`);
+      if (box) box.classList.toggle('open');
+    }
+
+    function loadMissionTemplate(id) {
+      if (id === 1) {
+        applyTemplate('SELECT * FROM employees WHERE salary > 40000;');
+      } else if (id === 2) {
+        applyTemplate('SELECT * FROM employees INNER JOIN departments ON employees.dept_id = departments.id;');
+      } else if (id === 3) {
+        applyTemplate("SELECT * FROM products WHERE category = 'Software' AND price > 10000;");
+      }
+    }
+
+    function verifyMission(id) {
+      const textarea = document.getElementById('sql-input');
+      const sql = textarea ? textarea.value.trim() : '';
+
+      if (!sql) {
+        alert('กรุณากรอกและรันคำสั่ง SQL ก่อนตรวจคำตอบครับ');
+        return;
+      }
+
+      const res = SQLPlayground.runQuery(sql);
+      if (!res.success) {
+        alert(`❌ คำสั่ง SQL มีข้อผิดพลาด: ${res.error}`);
+        return;
+      }
+
+      const rows = res.rows || [];
+      let pass = false;
+
+      if (id === 1) {
+        // Mission 1: salary > 40000 on employees
+        const isEmployees = sql.toLowerCase().includes('employees');
+        const correctRows = rows.length === 3 && rows.every(r => r.salary > 40000);
+        if (isEmployees && correctRows) pass = true;
+      } else if (id === 2) {
+        // Mission 2: JOIN employees with departments
+        const isJoin = sql.toLowerCase().includes('join') && sql.toLowerCase().includes('departments');
+        const hasJoinedCols = rows.length >= 6 && rows.some(r => r.budget !== undefined || r.name !== undefined);
+        if (isJoin && hasJoinedCols) pass = true;
+      } else if (id === 3) {
+        // Mission 3: category = 'Software' AND price > 10000 on products
+        const isProducts = sql.toLowerCase().includes('products');
+        const correctProducts = rows.length === 2 && rows.every(r => 
+          String(r.category).toLowerCase() === 'software' && r.price > 10000
+        );
+        if (isProducts && correctProducts) pass = true;
+      }
+
+      if (pass) {
+        if (!missionsCompleted.has(id)) {
+          missionsCompleted.add(id);
+
+          // Add XP
+          if (typeof Progress !== 'undefined') {
+            Progress.addXP(50, `ผ่านภารกิจ SQL ที่ ${id}`);
+          }
+
+          // Visual updates
+          const box = document.getElementById(`mission-box-${id}`);
+          const btn = document.getElementById(`btn-verify-${id}`);
+          if (box) box.classList.add('done');
+          if (btn) {
+            btn.className = 'btn btn-outline btn-block';
+            btn.innerHTML = '✅ ผ่านภารกิจแล้ว (+50 XP)';
+          }
+
+          // Update stats
+          const statDone = document.getElementById('stat-missions-done');
+          if (statDone) statDone.textContent = `${missionsCompleted.size} / 3`;
+
+          alert(`🎉 ยินดีด้วยครับ! คุณผ่านภารกิจที่ ${id} สำเร็จแล้ว!\n⚡ ได้รับ +50 XP สะสมเรียบร้อย`);
+        } else {
+          alert(`✅ คุณผ่านภารกิจที่ ${id} นี้เรียบร้อยแล้วครับ!`);
+        }
+      } else {
+        alert(`❌ คำตอบยังไม่ตรงกับเงื่อนไขของภารกิจที่ ${id}\nคำแนะนำ: ตรวจสอบตารางที่เลือก เงื่อนไข WHERE หรือการเชื่อม JOIN แล้วลองใหม่อีกครั้งครับ!`);
+      }
+    }
+
+    /* ─── Keyboard Shortcut ─── */
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const textarea = document.getElementById('sql-input');
+        if (document.activeElement === textarea || textarea) {
+          e.preventDefault();
+          handleRunQuery();
+        }
+      }
+    });
+
+    /* ─── Page Init ─── */
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof SQLPlayground !== 'undefined') {
+        SQLPlayground.init();
+      }
+      inspectTable('employees');
+      handleRunQuery();
+    });
+  </script>
+</body>
+</html>

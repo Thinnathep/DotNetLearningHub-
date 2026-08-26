@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C# พื้นฐาน (Level 1) — DotNet Learning Hub</title>
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <style>
+    /* Custom styling for data type cards */
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    .type-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+    .type-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-glow);
+    }
+    .type-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-sm);
+    }
+    .type-icon {
+      font-size: 1.8rem;
+    }
+    .type-size-badge {
+      font-size: 0.7rem;
+      background: var(--bg-tertiary);
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      color: var(--text-muted);
+      font-family: var(--font-code);
+    }
+    .type-name {
+      font-family: var(--font-code);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--syn-type);
+      margin-bottom: 4px;
+    }
+    .type-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-sm);
+      line-height: 1.5;
+    }
+    .type-example {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: var(--syn-variable);
+      word-break: break-all;
+    }
+
+    /* Hierarchy visual boxes */
+    .hierarchy-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+    }
+    .hierarchy-box {
+      border: 2px dashed var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin-bottom: var(--space-sm);
+      background: rgba(255,255,255,0.01);
+    }
+    .hierarchy-box.level-1 { border-color: var(--syn-keyword); background: rgba(255, 123, 114, 0.03); }
+    .hierarchy-box.level-2 { border-color: var(--syn-type); background: rgba(121, 192, 255, 0.03); margin-left: var(--space-md); }
+    .hierarchy-box.level-3 { border-color: var(--syn-method); background: rgba(210, 168, 255, 0.03); margin-left: calc(var(--space-md) * 2); }
+    .hierarchy-box.level-4 { border-color: var(--syn-annotation); background: rgba(126, 231, 135, 0.03); margin-left: calc(var(--space-md) * 3); }
+
+    .hierarchy-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <a href="../index.html" class="site-logo">
+      <div class="logo-icon">🟣</div>
+      <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าหลัก (Dashboard)</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="./csharp-basics.html" class="sidebar-link active">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="./csharp-oop.html" class="sidebar-link">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="./csharp-collections.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>LINQ &amp; Collections (Level 3)</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="./csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>Async/Await &amp; Advanced (Lv 4)</span>
+        <span class="sidebar-badge badge-new">Lv 4</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🌐 Track .NET &amp; Web API</div>
+      <a href="./dotnet-overview.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 &amp; CLI Overview</span>
+      </a>
+      <a href="./aspnet-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>ASP.NET Core Web API</span>
+      </a>
+      <a href="./ef-core.html" class="sidebar-link">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+      </a>
+      <a href="./blazor.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Blazor Web Apps</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🛠️ Track Database &amp; Quality</div>
+      <a href="./sql-basics.html" class="sidebar-link">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; T-SQL</span>
+      </a>
+      <a href="./architecture.html" class="sidebar-link">
+        <span class="link-icon">🏛️</span>
+        <span>Clean Architecture &amp; Patterns</span>
+      </a>
+      <a href="./testing.html" class="sidebar-link">
+        <span class="link-icon">🧪</span>
+        <span>Unit Testing &amp; xUnit</span>
+      </a>
+      <a href="./devops.html" class="sidebar-link">
+        <span class="link-icon">🐳</span>
+        <span>Docker &amp; CI/CD</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header animate-fade-in">
+        <div class="breadcrumb">
+          <a href="../index.html">หน้าหลัก</a>
+          <span>/</span>
+          <span>C# Track</span>
+          <span>/</span>
+          <span class="text-primary">C# พื้นฐาน</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(104, 33, 122, 0.25); color: #d2a8ff; border: 1px solid rgba(163, 113, 247, 0.4);">🟣</div>
+          <div>
+            <h1>C# พื้นฐาน — Level 1</h1>
+            <div class="page-description">ปูพื้นฐานไวยากรณ์ภาษา C# โครงสร้างโปรแกรม ชนิดข้อมูล เงื่อนไข ลูป ฟังก์ชัน และการดักจับข้อผิดพลาด</div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="level-tag level-basic">⭐ พื้นฐาน</span></span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>เวลาเรียน: <strong>~45 นาที</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>รางวัล: <strong>+100 XP</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>💻</span>
+            <span>รองรับ .NET 8 / C# 12</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Section 1: โครงสร้างโปรแกรม C# ─── -->
+      <section class="lesson-section reveal" id="structure">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(104, 33, 122, 0.2); color: var(--syn-method); border: 1px solid var(--syn-method);">01</div>
+          <div>
+            <h2>โครงสร้างโปรแกรมภาษา C# (Program Structure)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ทำความเข้าใจชิ้นส่วนสำคัญที่ประกอบกันขึ้นเป็นไฟล์โปรแกรม C#</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">💡</span>
+            <span class="concept-title">เปรียบเทียบให้เห็นภาพ (Analogy)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🏛️ อุปมาเปรียบเทียบสถาปัตยกรรมของโปรแกรม</div>
+              <p class="analogy-text">
+                ลองนึกถึงระบบบ้านและอาคาร:
+                <br>• <strong><code>using</code> (การขออนุญาตยืมเครื่องมือ)</strong> — เหมือนหยิบกล่องเครื่องมือมาตรฐานจากคลังมาใช้งาน
+                <br>• <strong><code>namespace</code> (ชื่อหมู่บ้าน/โครงการ)</strong> — ป้องกันไม่ให้ชื่อบ้านของแต่ละโครงการชนกัน
+                <br>• <strong><code>class</code> (ตัวบ้าน/ห้องทำงาน)</strong> — พิมพ์เขียวโครงสร้างที่รวมคำสั่งและข้อมูลไว้ด้วยกัน
+                <br>• <strong><code>static void Main()</code> (ประตูรั้วหน้าบ้าน)</strong> — ประตูบานแรกที่ระบบเปิดเข้ามาทำงานเสมอ (Entry Point)
+              </p>
+            </div>
+
+            <!-- Visual Hierarchy Box -->
+            <div class="hierarchy-container">
+              <div class="hierarchy-box level-1">
+                <span class="hierarchy-label" style="color: var(--syn-keyword);">📦 1. namespace MyFirstApp (ขอบเขตโครงการ)</span>
+                <div class="hierarchy-box level-2">
+                  <span class="hierarchy-label" style="color: var(--syn-type);">🏠 2. class Program (คลาสหลัก)</span>
+                  <div class="hierarchy-box level-3">
+                    <span class="hierarchy-label" style="color: var(--syn-method);">🚪 3. static void Main(string[] args) (ประตูทางเข้าโปรแกรม)</span>
+                    <div class="hierarchy-box level-4">
+                      <span class="hierarchy-label" style="color: var(--syn-annotation);">⚡ 4. คำสั่งประมวลผล (Statements) เช่น Console.WriteLine(...)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>Program.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">// 1. นำเข้า Namespace พื้นฐานของ .NET
+using System;
+
+// 2. กำหนดขอบเขตชื่อโปรแกรม
+namespace MyFirstApp
+{
+    // 3. ประกาศ Class สำหรับเก็บโค้ด
+    class Program
+    {
+        // 4. Entry Point จุดเริ่มต้นที่โปรแกรมเริ่มรันเป็นจุดแรก
+        static void Main(string[] args)
+        {
+            // คำสั่งพิมพ์ข้อความออกทางหน้าจอ Console
+            Console.WriteLine("ยินดีต้อนรับสู่ DotNet Learning Hub! 🚀");
+            Console.WriteLine("ภาษา C# เป็นภาษาแบบ Strongly-Typed ที่ทรงพลังและทำงานได้รวดเร็ว");
+
+            // การอ่านข้อมูลอินพุต
+            string learner = "Developer";
+            Console.WriteLine($"สวัสดีคุณ {learner}! ขอให้สนุกกับการเขียนโค้ด");
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">ยินดีต้อนรับสู่ DotNet Learning Hub! 🚀
+ภาษา C# เป็นภาษาแบบ Strongly-Typed ที่ทรงพลังและทำงานได้รวดเร็ว
+สวัสดีคุณ Developer! ขอให้สนุกกับการเขียนโค้ด</span>
+          </div>
+          <div class="color-legend">
+            <div class="legend-item"><span class="legend-dot" style="background:var(--syn-keyword)"></span> Keyword (using, namespace, class, static, void)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--syn-type)"></span> Type/Class (string, Program, Console)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--syn-method)"></span> Method (Main, WriteLine)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--syn-variable)"></span> Parameter/Variable (args, learner)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--syn-string)"></span> String Literal ("ข้อความ")</div>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">💡 เกร็ดน่ารู้: Top-Level Statements ใน C# 9, 10, 11, 12</div>
+          <p style="margin-bottom: 0;">ในโปรเจกต์ .NET ยุคใหม่ คุณสามารถเขียนเพียงบรรทัดเดียว เช่น <code>Console.WriteLine("Hello!");</code> ได้ทันทีโดยไม่ต้องครอบ <code>namespace</code>, <code>class</code>, หรือ <code>Main()</code> แต่เบื้องหลังคอมไพเลอร์ยังคงสร้างโครงสร้างเต็มรูปแบบให้อัตโนมัติ!</p>
+        </div>
+      </section>
+
+      <!-- ─── Section 2: ตัวแปรและชนิดข้อมูล ─── -->
+      <section class="lesson-section reveal" id="datatypes">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(88, 166, 255, 0.2); color: var(--accent-primary); border: 1px solid var(--accent-primary);">02</div>
+          <div>
+            <h2>ตัวแปรและชนิดข้อมูล (Variables &amp; Data Types)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">การเก็บข้อมูลในหน่วยความจำด้วยชนิดข้อมูลที่ถูกต้องและปลอดภัย</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">📦</span>
+            <span class="concept-title">กล่องใส่ของ (Data Type Analogy)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🏷️ กล่องแต่ละใบรับสิ่งของคนละประเภท</div>
+              <p class="analogy-text">
+                ตัวแปรเปรียบเสมือน <strong>กล่องใส่ของที่ติดป้ายกำกับไว้</strong>:
+                <br>• กล่อง <code>int</code> ออกแบบมาใส่ตัวเลขจำนวนเต็มเท่านั้น จะเอาน้ำหวาน (ข้อความ) มาเทใส่ไม่ได้
+                <br>• ภาษา C# เป็นภาษา <strong>Strongly-Typed</strong> คอมไพเลอร์จะตรวจเช็กความถูกต้องของประเภทข้อมูลเสมอ ช่วยป้องกันข้อผิดพลาดตั้งแต่ตอนเขียนโค้ด
+              </p>
+            </div>
+
+            <!-- Visual Cards for Data Types -->
+            <div class="type-grid">
+              <!-- int -->
+              <div class="type-card">
+                <div class="type-card-top">
+                  <span class="type-icon">🔢</span>
+                  <span class="type-size-badge">4 bytes (32-bit)</span>
+                </div>
+                <div class="type-name">int</div>
+                <div class="type-desc">จำนวนเต็มบวก/ลบ (-2.14B ถึง +2.14B) เหมาะสำหรับนับจำนวน รอบลูป อายุ</div>
+                <div class="type-example">int count = 42;</div>
+              </div>
+
+              <!-- string -->
+              <div class="type-card">
+                <div class="type-card-top">
+                  <span class="type-icon">📝</span>
+                  <span class="type-size-badge">2 bytes / char</span>
+                </div>
+                <div class="type-name">string</div>
+                <div class="type-desc">ข้อความ ล้อมรอบด้วยเครื่องหมายคำพูดคู่ <code>""</code> รองรับภาษาไทย UTF-16</div>
+                <div class="type-example">string name = "สมชาย";</div>
+              </div>
+
+              <!-- bool -->
+              <div class="type-card">
+                <div class="type-card-top">
+                  <span class="type-icon">✅❌</span>
+                  <span class="type-size-badge">1 byte</span>
+                </div>
+                <div class="type-name">bool</div>
+                <div class="type-desc">ค่าความจริง มีเพียง 2 สถานะคือ <code>true</code> (จริง) หรือ <code>false</code> (เท็จ)</div>
+                <div class="type-example">bool isActive = true;</div>
+              </div>
+
+              <!-- double -->
+              <div class="type-card">
+                <div class="type-card-top">
+                  <span class="type-icon">📊</span>
+                  <span class="type-size-badge">8 bytes (64-bit)</span>
+                </div>
+                <div class="type-name">double</div>
+                <div class="type-desc">เลขทศนิยมความละเอียด 15-17 ตำแหน่ง เหมาะกับการคำนวณทางวิทยาศาสตร์ พิกัด</div>
+                <div class="type-example">double gpa = 3.85;</div>
+              </div>
+
+              <!-- decimal -->
+              <div class="type-card">
+                <div class="type-card-top">
+                  <span class="type-icon">💰</span>
+                  <span class="type-size-badge">16 bytes (128-bit)</span>
+                </div>
+                <div class="type-name">decimal</div>
+                <div class="type-desc">ทศนิยมความละเอียดสูงมาก ต้องลงท้ายด้วย <code>m</code> หรือ <code>M</code> สำหรับงานการเงิน</div>
+                <div class="type-example">decimal price = 1250.75m;</div>
+              </div>
+
+              <!-- char -->
+              <div class="type-card">
+                <div class="type-card-top">
+                  <span class="type-icon">🔤</span>
+                  <span class="type-size-badge">2 bytes</span>
+                </div>
+                <div class="type-name">char</div>
+                <div class="type-desc">อักขระเดี่ยวตัวเดียว ล้อมรอบด้วยเครื่องหมายคำพูดเดี่ยว <code>''</code></div>
+                <div class="type-example">char grade = 'A';</div>
+              </div>
+
+              <!-- var -->
+              <div class="type-card" style="border-color: rgba(210, 168, 255, 0.4);">
+                <div class="type-card-top">
+                  <span class="type-icon">🎁</span>
+                  <span class="type-size-badge">Type Inference</span>
+                </div>
+                <div class="type-name" style="color: var(--syn-keyword);">var</div>
+                <div class="type-desc">ให้คอมไพเลอร์คาดเดาชนิดข้อมูลอัตโนมัติจากค่าเริ่มต้น (ยังคงเป็น Strongly-Typed)</div>
+                <div class="type-example">var lang = "C# 12";</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>DataTypesDemo.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System;
+
+class Program
+{
+    static void Main()
+    {
+        // การประกาศตัวแปรชนิดต่างๆ พร้อมกำหนดค่าเริ่มต้น
+        string developerName = "กิตติพงษ์";
+        int experienceYears = 3;
+        double codeRating = 4.95;
+        decimal hourlyRate = 1200.50m; // เติม 'm' ท้ายตัวเลข decimal เสมอ
+        bool isAvailableForHire = true;
+        char rankLevel = 'S';
+        var favoriteFramework = ".NET 8 Web API"; // คอมไพเลอร์จะมองเป็น string ให้อัตโนมัติ
+
+        // แสดงผลลัพธ์โดยใช้ String Interpolation ($"...")
+        Console.WriteLine($"=== ข้อมูลนักพัฒนา: {developerName} (Rank: {rankLevel}) ===");
+        Console.WriteLine($"ประสบการณ์: {experienceYears} ปี | คะแนนเฉลี่ย: {codeRating}/5.0");
+        Console.WriteLine($"อัตราค่าจ้าง: {hourlyRate:N2} บาท/ชม. | พร้อมรับงาน: {isAvailableForHire}");
+        Console.WriteLine($"เฟรมเวิร์กที่ถนัด: {favoriteFramework}");
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">=== ข้อมูลนักพัฒนา: กิตติพงษ์ (Rank: S) ===
+ประสบการณ์: 3 ปี | คะแนนเฉลี่ย: 4.95/5.0
+อัตราค่าจ้าง: 1,200.50 บาท/ชม. | พร้อมรับงาน: True
+เฟรมเวิร์กที่ถนัด: .NET 8 Web API</span>
+          </div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">⚠️ กฎเหล็กเรื่องเงิน: ให้ใช้ decimal เสมอ!</div>
+          <p style="margin-bottom: 0;">ห้ามใช้ <code>double</code> หรือ <code>float</code> ในการคำนวณเงินหรือยอดบัญชี เพราะเลขทศนิยมฐานสอง (Binary Floating-point) มีโอกาสเกิดเศษทศนิยมคลาดเคลื่อน เช่น <code>0.1 + 0.2 = 0.30000000000000004</code> ในขณะที่ <code>decimal</code> ใช้เลขฐาน 10 จึงคำนวณเงินได้อย่างแม่นยำ 100%</p>
+        </div>
+      </section>
+
+      <!-- ─── Section 3: เงื่อนไขและการตัดสินใจ ─── -->
+      <section class="lesson-section reveal" id="conditions">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(210, 153, 34, 0.2); color: var(--accent-warning); border: 1px solid var(--accent-warning);">03</div>
+          <div>
+            <h2>เงื่อนไขและการตัดสินใจ (Control Flow: if, else, switch)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">การกำหนดทิศทางการทำงานของโปรแกรมตามเงื่อนไขที่กำหนด</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🚦</span>
+            <span class="concept-title">ป้ายบอกทางที่สี่แยก (Analogy)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🛣️ การเลือกเส้นทางเดินตามป้ายบอกทาง</div>
+              <p class="analogy-text">
+                คำสั่งเงื่อนไขเปรียบเหมือน <strong>ป้อมตรวจคนเข้าเมืองหรือทางแยก</strong>:
+                <br>• ถ้าคุณถือบัตร VIP ให้เลี้ยวเข้าช่องด่วน (<code>if</code>)
+                <br>• ถ้าไม่ใช่ แต่คุณมีตั๋วปกติ ให้เข้าช่องธรรมดา (<code>else if</code>)
+                <br>• ถ้าไม่มีอะไรเลย ให้เข้าช่องติดต่อสอบถาม (<code>else</code>)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- If-Else Code -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>IfElseDemo.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System;
+
+class Program
+{
+    static void Main()
+    {
+        int age = 22;
+        bool hasTicket = true;
+        bool isVipMember = true;
+
+        // โครงสร้าง if - else if - else
+        if (!hasTicket)
+        {
+            Console.WriteLine("⛔ กรุณาซื้อบัตรผ่านประตูก่อนเข้าชม");
+        }
+        else if (age >= 18 && isVipMember)
+        {
+            Console.WriteLine("👑 ยินดีต้อนรับสู่ VIP Lounge (สิทธิ์สำหรับผู้ใหญ่)");
+        }
+        else if (age >= 18)
+        {
+            Console.WriteLine("🎫 ยินดีต้อนรับสู่โซนที่นั่งปกติ");
+        }
+        else
+        {
+            Console.WriteLine("🎈 ยินดีต้อนรับสู่โซนเยาวชนและครอบครัว");
+        }
+
+        // Ternary Operator (เงื่อนไขสั้น บรรทัดเดียว: เงื่อนไข ? จริง : เท็จ)
+        string entryStatus = hasTicket ? "✅ อนุญาตให้เข้างาน" : "❌ ปฏิเสธการเข้า";
+        Console.WriteLine($"สถานะ: {entryStatus}");
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">👑 ยินดีต้อนรับสู่ VIP Lounge (สิทธิ์สำหรับผู้ใหญ่)
+สถานะ: ✅ อนุญาตให้เข้างาน</span>
+          </div>
+        </div>
+
+        <!-- Switch Code -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>SwitchDemo.cs (Classic vs Modern Switch Expression)</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System;
+
+class Program
+{
+    static void Main()
+    {
+        string role = "Admin";
+
+        // 1. Classic Switch Statement
+        Console.WriteLine("--- Classic Switch ---");
+        switch (role)
+        {
+            case "Admin":
+                Console.WriteLine("🔑 สิทธิ์ Admin: สามารถจัดการระบบทั้งหมดได้");
+                break;
+            case "Editor":
+                Console.WriteLine("✏️ สิทธิ์ Editor: สามารถสร้างและแก้ไขบทความได้");
+                break;
+            case "Viewer":
+                Console.WriteLine("👁️ สิทธิ์ Viewer: สามารถอ่านเนื้อหาได้อย่างเดียว");
+                break;
+            default:
+                Console.WriteLine("❓ ไม่พบสิทธิ์ที่ถูกต้องในระบบ");
+                break;
+        }
+
+        // 2. Modern Switch Expression (C# 8+) — กะทัดรัด สวยงาม คืนค่าได้ทันที
+        Console.WriteLine("\n--- Modern Switch Expression ---");
+        int statusCode = 200;
+        string message = statusCode switch
+        {
+            200 => "OK: คำขอสำเร็จบริบูรณ์ 🎉",
+            201 => "Created: สร้างข้อมูลสำเร็จ",
+            400 => "Bad Request: ข้อมูลส่งมาไม่ถูกต้อง",
+            404 => "Not Found: ไม่พบหน้านี้ในเซิร์ฟเวอร์",
+            500 => "Internal Server Error: เซิร์ฟเวอร์มีปัญหา",
+            _   => "Unknown Status Code" // '_' คือ default
+        };
+
+        Console.WriteLine($"HTTP Status {statusCode}: {message}");
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">--- Classic Switch ---
+🔑 สิทธิ์ Admin: สามารถจัดการระบบทั้งหมดได้
+
+--- Modern Switch Expression ---
+HTTP Status 200: OK: คำขอสำเร็จบริบูรณ์ 🎉</span>
+          </div>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">🎯 สรุปแนวทางเลือกใช้เงื่อนไข</div>
+          <p style="margin-bottom: 0;">
+            • ใช้ <strong><code>if / else</code></strong> เมื่อเงื่อนไขเป็นช่วง เช่น <code>score &gt;= 80</code> หรือมีหลายตัวแปรร่วมกัน<br>
+            • ใช้ <strong><code>switch / switch expression</code></strong> เมื่อต้องการเปรียบเทียบค่าคงที่ที่แน่นอนของตัวแปรเดี่ยว เช่น Role, Status Code, เมนูที่เลือก<br>
+            • ใช้ <strong><code>Ternary ( ? : )</code></strong> เมื่อต้องการกำหนดค่าให้ตัวแปรอย่างรวดเร็วแบบ 2 ทางเลือก
+          </p>
+        </div>
+      </section>
+
+      <!-- ─── Section 4: การวนซ้ำ ─── -->
+      <section class="lesson-section reveal" id="loops">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(63, 185, 80, 0.2); color: var(--accent-success); border: 1px solid var(--accent-success);">04</div>
+          <div>
+            <h2>การวนซ้ำ (Loops: for, while, foreach)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">การสั่งให้คอมพิวเตอร์ทำงานเดิมซ้ำๆ อย่างแม่นยำและมีประสิทธิภาพ</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">🏃‍♂️</span>
+            <span class="concept-title">การวิ่งรอบสนาม (Analogy)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🔄 รูปแบบการวิ่งวนแต่ละแบบ</div>
+              <p class="analogy-text">
+                • <strong><code>for</code> loop</strong> — เหมือน <em>"ครูสั่งให้วิ่ง 5 รอบสนาม"</em> เรารู้จำนวนรอบที่แน่นอนก่อนออกวิ่ง<br>
+                • <strong><code>while</code> loop</strong> — เหมือน <em>"วิ่งไปเรื่อยๆ ตราบใดที่พระอาทิตย์ยังไม่ตกดิน"</em> ตรวจสอบเงื่อนไขก่อนวิ่งแต่ละรอบ<br>
+                • <strong><code>foreach</code> loop</strong> — เหมือน <em>"วิ่งไปแวะทักทายเพื่อนทุกคนที่ยืนเรียงแถวอยู่ตามรายชื่อ"</em> วนอ่านสมาชิกทุกคนในกลุ่มข้อมูลจนครบ
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Block for Loops -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>LoopsDemo.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System;
+
+class Program
+{
+    static void Main()
+    {
+        // 1. for loop: นับ 1 ถึง 5 (รู้จำนวนรอบแน่นอน)
+        Console.WriteLine("--- 1. for loop (นับ 1-5) ---");
+        for (int i = 1; i <= 5; i++)
+        {
+            Console.WriteLine($"🚩 วิ่งรอบที่ {i}");
+        }
+
+        // 2. while loop: ทำงานจนกว่าแบตเตอรี่จะหมด
+        Console.WriteLine("\n--- 2. while loop ---");
+        int battery = 3;
+        while (battery > 0)
+        {
+            Console.WriteLine($"🔋 ใช้งานโดรน... พลังงานเหลือ: {battery} ขีด");
+            battery--; // ลดค่าลงเพื่อไม่ให้เกิด Infinite Loop
+        }
+        Console.WriteLine("🪫 แบตเตอรี่หมดเกลี้ยง! กำลังลงจอดฉุกเฉิน");
+
+        // 3. foreach loop: วนลูปอ่านค่าใน Array สะดวก ปลอดภัย ไม่ต้องกังวลเรื่อง Index
+        Console.WriteLine("\n--- 3. foreach loop ---");
+        string[] frameworks = { "ASP.NET Core", "Entity Framework", "Blazor", "MAUI" };
+        
+        foreach (string fw in frameworks)
+        {
+            Console.WriteLine($"⭐ เทคโนโลยี .NET: {fw}");
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">--- 1. for loop (นับ 1-5) ---
+🚩 วิ่งรอบที่ 1
+🚩 วิ่งรอบที่ 2
+🚩 วิ่งรอบที่ 3
+🚩 วิ่งรอบที่ 4
+🚩 วิ่งรอบที่ 5
+
+--- 2. while loop ---
+🔋 ใช้งานโดรน... พลังงานเหลือ: 3 ขีด
+🔋 ใช้งานโดรน... พลังงานเหลือ: 2 ขีด
+🔋 ใช้งานโดรน... พลังงานเหลือ: 1 ขีด
+🪫 แบตเตอรี่หมดเกลี้ยง! กำลังลงจอดฉุกเฉิน
+
+--- 3. foreach loop ---
+⭐ เทคโนโลยี .NET: ASP.NET Core
+⭐ เทคโนโลยี .NET: Entity Framework
+⭐ เทคโนโลยี .NET: Blazor
+⭐ เทคโนโลยี .NET: MAUI</span>
+          </div>
+        </div>
+
+        <div class="callout callout-danger">
+          <div class="callout-title">⚠️ ระวัง Infinite Loop (ลูปไม่รู้จบ)!</div>
+          <p style="margin-bottom: 0;">เมื่อใช้ <code>while</code> หรือ <code>do-while</code> ต้องมั่นใจว่าภายในลูปมีการเปลี่ยนแปลงค่าตัวแปรเงื่อนไข (เช่น <code>battery--</code>) เสมอ มิฉะนั้นโปรแกรมจะทำงานวนซ้ำไม่หยุดจนทำให้ CPU ทำงาน 100% หรือโปรแกรมค้าง</p>
+        </div>
+      </section>
+
+      <!-- ─── Section 5: Method (ฟังก์ชัน) ─── -->
+      <section class="lesson-section reveal" id="methods">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(163, 113, 247, 0.2); color: var(--accent-info); border: 1px solid var(--accent-info);">05</div>
+          <div>
+            <h2>เมธอดและฟังก์ชัน (Methods &amp; Functions)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">การจัดระเบียบโค้ดเป็นบล็อกย่อย เพื่อนำกลับมาใช้ซ้ำ (DRY: Don't Repeat Yourself)</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">⚙️</span>
+            <span class="concept-title">เครื่องจักรโรงงาน (Analogy)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🏭 วัตถุดิบ ➔ กระบวนการ ➔ ผลิตภัณฑ์</div>
+              <p class="analogy-text">
+                Method เปรียบเหมือน <strong>เครื่องจักรในโรงงาน</strong>:
+                <br>• <strong>Parameters (พารามิเตอร์)</strong> = วัตถุดิบที่ป้อนเข้าเครื่อง
+                <br>• <strong>Method Body ({...})</strong> = กลไกการแปรรูปและคำนวณ
+                <br>• <strong>Return Value (ค่าส่งกลับ)</strong> = สินค้าสำเร็จรูปที่ส่งออกมา
+                <br>• หากเครื่องจักรมีหน้าที่เพียงทำความสะอาดแล้วจบ ไม่ต้องส่งสินค้าชิ้นใหม่ออกมา เราจะใช้ชนิดข้อมูล <code>void</code>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Block for Methods -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>MethodsDemo.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System;
+
+class Program
+{
+    // 1. Void Method: ทำงานตามคำสั่ง ไม่คืนค่าใดๆ
+    static void PrintBanner(string title)
+    {
+        Console.WriteLine("========================================");
+        Console.WriteLine($"📌 {title}");
+        Console.WriteLine("========================================");
+    }
+
+    // 2. Return Method: รับ Parameter และส่งผลลัพธ์ตัวเลขกลับไป
+    static double CalculateDiscount(double originalPrice, double discountPercentage = 10.0)
+    {
+        double discountAmount = originalPrice * (discountPercentage / 100.0);
+        double finalPrice = originalPrice - discountAmount;
+        return finalPrice; // ส่งผลลัพธ์กลับ
+    }
+
+    // 3. Expression-Bodied Method: เขียนแบบย่อใน 1 บรรทัดด้วยแลมบ์ดา '=>' (C# 6+)
+    static bool IsEven(int number) => number % 2 == 0;
+
+    static void Main()
+    {
+        // เรียกใช้ Void Method
+        PrintBanner("ระบบคำนวณโปรโมชันสินค้า");
+
+        // เรียกใช้ Method คืนค่า
+        double itemPrice = 2500.0;
+        double salePrice = CalculateDiscount(itemPrice, 20.0);
+        Console.WriteLine($"ราคาเดิม: {itemPrice:N2} บาท");
+        Console.WriteLine($"ราคาหลังหักส่วนลด 20%: {salePrice:N2} บาท");
+
+        // เรียกใช้ Expression-Bodied Method
+        int testNumber = 42;
+        Console.WriteLine($"เลข {testNumber} เป็นเลขคู่หรือไม่? ตอบ: {IsEven(testNumber)}");
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">========================================
+📌 ระบบคำนวณโปรโมชันสินค้า
+========================================
+ราคาเดิม: 2,500.00 บาท
+ราคาหลังหักส่วนลด 20%: 2,000.00 บาท
+เลข 42 เป็นเลขคู่หรือไม่? ตอบ: True</span>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">💡 ธรรมเนียมการตั้งชื่อ (Naming Convention) ใน C#</div>
+          <p style="margin-bottom: 0;">ในภาษา C# ชื่อของ <strong>Method, Class, Namespace, Property</strong> จะนิยมใช้รูปแบบ <strong>PascalCase</strong> (ขึ้นต้นด้วยตัวพิมพ์ใหญ่ทุกคำ) เช่น <code>CalculateTotal()</code>, <code>GetUserById()</code> ซึ่งต่างจากภาษา Java หรือ JavaScript ที่ใช้ camelCase</p>
+        </div>
+      </section>
+
+      <!-- ─── Section 6: Error Handling ─── -->
+      <section class="lesson-section reveal" id="error-handling">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(248, 81, 73, 0.2); color: var(--accent-danger); border: 1px solid var(--accent-danger);">06</div>
+          <div>
+            <h2>การจัดการข้อผิดพลาด (Error Handling: try / catch / finally)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ปกป้องแอปพลิเคชันจากการหยุดทำงานกะทันหันเมื่อเกิดเหตุการณ์ไม่คาดคิด</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <span class="concept-emoji">☂️</span>
+            <span class="concept-title">ร่มกันฝนและถุงลมนิรภัย (Analogy)</span>
+          </div>
+          <div class="concept-body">
+            <div class="analogy-box">
+              <div class="analogy-label">🛡️ การตั้งรับความผิดพลาดล่วงหน้า</div>
+              <p class="analogy-text">
+                • <strong><code>try</code> (การออกไปข้างนอก)</strong> — ลองทำสิ่งที่อาจเกิดเหตุการณ์ไม่คาดคิด (เช่น ฝนตก หรือ ข้อมูลที่ผู้ใช้ป้อนผิด)<br>
+                • <strong><code>catch</code> (กางร่ม / ถุงลมนิรภัยทำงาน)</strong> — ดักจับเหตุการณ์และจัดการอย่างนุ่มนวล ไม่ให้โปรแกรมแครชพัง<br>
+                • <strong><code>finally</code> (กลับมาล้างเท้า / เก็บของ)</strong> — คำสั่งที่ <em>ต้องทำเสมอ</em> ไม่ว่าฝนจะตกหรือไม่ก็ตาม (เช่น ปิดไฟล์, ปิดการเชื่อมต่อฐานข้อมูล)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Block for Try Catch -->
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>TryCatchDemo.cs</span>
+            </div>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div class="code-block-body">
+            <pre class="language-csharp"><code class="language-csharp">using System;
+
+class Program
+{
+    static void Main()
+    {
+        string rawInput = "not-a-number"; // สมมติว่าผู้ใช้ป้อนข้อความแทนตัวเลข
+
+        try
+        {
+            Console.WriteLine("1. เริ่มต้นบล็อก try: กำลังพยายามแปลงข้อมูล...");
+            int parsedNumber = int.Parse(rawInput); // จะเกิด FormatException ทันที!
+            
+            // บรรทัดนี้จะไม่ถูกเรียกทำงานเพราะเกิด Exception ก่อนหน้า
+            int calculation = 100 / parsedNumber;
+            Console.WriteLine($"ผลลัพธ์: {calculation}");
+        }
+        catch (FormatException ex)
+        {
+            // ดักจับเฉพาะ Error ที่เกิดจากรูปแบบข้อความไม่ถูกต้อง
+            Console.WriteLine($"⚠️ [FormatException]: ป้อนค่าไม่ใช่ตัวเลข! รายละเอียด: {ex.Message}");
+        }
+        catch (DivideByZeroException)
+        {
+            // ดักจับเฉพาะ Error การหารด้วยศูนย์
+            Console.WriteLine("⚠️ [DivideByZeroException]: ตัวหารต้องไม่เป็นศูนย์ (0)");
+        }
+        catch (Exception ex)
+        {
+            // ดักจับ Exception ทั่วไปอื่นๆ ที่เหลือ
+            Console.WriteLine($"❌ [General Exception]: เกิดข้อผิดพลาดไม่ทราบสาเหตุ: {ex.Message}");
+        }
+        finally
+        {
+            // ทำงานเสมอ 100% ไม่ว่าจะสำเร็จหรือเกิด Error
+            Console.WriteLine("🔒 บล็อก finally: ปิดการเชื่อมต่อและคืนทรัพยากรเรียบร้อย");
+        }
+
+        Console.WriteLine("✅ โปรแกรมทำงานต่อได้ตามปกติ ไม่แครชดับกลางคัน!");
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">▶ Output:</span>
+            <span class="output-text">1. เริ่มต้นบล็อก try: กำลังพยายามแปลงข้อมูล...
+⚠️ [FormatException]: ป้อนค่าไม่ใช่ตัวเลข! รายละเอียด: The input string 'not-a-number' was not in a correct format.
+🔒 บล็อก finally: ปิดการเชื่อมต่อและคืนทรัพยากรเรียบร้อย
+✅ โปรแกรมทำงานต่อได้ตามปกติ ไม่แครชดับกลางคัน!</span>
+          </div>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">💡 Pro Tip: การใช้ int.TryParse()</div>
+          <p style="margin-bottom: 0;">หากต้องการแปลงสตริงเป็นตัวเลข การใช้ <code>int.TryParse(input, out int result)</code> จะให้ประสิทธิภาพสูงกว่าการใช้ <code>try-catch</code> มาก เพราะไม่ต้องสร้าง Exception Object ในหน่วยความจำเมื่อแปลงไม่สำเร็จ!</p>
+        </div>
+      </section>
+
+      <!-- ─── Section 7: Inline Quiz ─── -->
+      <section class="lesson-section reveal" id="quiz-section">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(210, 168, 255, 0.2); color: var(--syn-method); border: 1px solid var(--syn-method);">07</div>
+          <div>
+            <h2>แบบทดสอบวัดความเข้าใจ (Level 1 Quiz)</h2>
+            <p class="text-muted" style="margin-bottom: 0;">ทดสอบความรู้พื้นฐานภาษา C# จำนวน 5 ข้อ ตอบถูกรับ XP สะสมทันที!</p>
+          </div>
+        </div>
+
+        <!-- Quiz Container rendered by QuizEngine -->
+        <div id="csharp-basics-quiz"></div>
+      </section>
+
+      <!-- ─── Next Lesson Navigation ─── -->
+      <div class="card mt-2xl reveal" style="border-color: var(--border-active); background: linear-gradient(135deg, rgba(104, 33, 122, 0.15) 0%, rgba(22, 27, 34, 0.8) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge badge-success mb-xs">🎉 ยอดเยี่ยม! ผ่านบทเรียน C# Basics</span>
+            <h3 style="margin-top: 4px; margin-bottom: 4px;">พร้อมไปต่อกับ Level 2: C# OOP &amp; คลาส แล้วหรือยัง?</h3>
+            <p class="text-muted" style="margin-bottom: 0;">เรียนรู้เรื่อง Class, Object, Encapsulation, Inheritance และ Polymorphism</p>
+          </div>
+          <div>
+            <a href="./csharp-oop.html" class="btn btn-primary btn-lg">
+              <span>ไปบทเรียนถัดไป Level 2 →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Mark this lesson as completed in Progress tracker
+      if (typeof Progress !== 'undefined') {
+        Progress.completeLesson('csharp-basics');
+        Progress.setModuleProgress('csharp', 25);
+      }
+
+      // Quiz Questions Definition
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'โครงสร้างใดในภาษา C# ที่เปรียบเสมือน "ประตูทางเข้าหลัก" (Entry Point) ที่โปรแกรมจะเริ่มทำงานเป็นจุดแรกเสมอ?',
+          options: [
+            'namespace MyProject',
+            'static void Main(string[] args)',
+            'using System;',
+            'class Program'
+          ],
+          answer: 1,
+          explanation: 'static void Main() คือ Entry Point หรือจุดเริ่มต้นหลักที่ .NET Runtime จะเรียกใช้เมื่อเปิดโปรแกรม'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'หากต้องการเก็บข้อมูล "ยอดเงินในบัญชีธนาคาร" หรือ "ราคาสินค้าที่มีทศนิยม" ควรเลือกใช้ชนิดข้อมูล (Data Type) ใดจึงจะเหมาะสมที่สุดและไม่เกิดปัญหาเศษทศนิยมคลาดเคลื่อน?',
+          options: [
+            'float',
+            'double',
+            'decimal',
+            'int'
+          ],
+          answer: 2,
+          explanation: 'decimal เป็นชนิดข้อมูล 128-bit ที่ใช้ระบบเลขฐานสิบความแม่นยำสูงมาก ออกแบบมาสำหรับงานการเงินและบัญชีโดยเฉพาะ ป้องกันปัญหา Floating-point rounding error'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ข้อใดอธิบายความแตกต่างหลักระหว่าง for loop และ foreach loop ได้ถูกต้องที่สุด?',
+          options: [
+            'for loop ใช้ได้เฉพาะกับตัวเลข ส่วน foreach ใช้ได้เฉพาะกับตัวอักษร',
+            'for loop เหมาะกับกรณีที่รู้จำนวนรอบชัดเจน ส่วน foreach ใช้วนอ่านทุกสมาชิกใน Collection/Array ทีละตัวอย่างปลอดภัย',
+            'foreach ทำงานได้เร็วกว่า for loop เสมอในทุกสถานการณ์',
+            'for loop ไม่สามารถใช้คำสั่ง break หรือ continue ได้'
+          ],
+          answer: 1,
+          explanation: 'for loop เหมาะกับการควบคุม index และรู้จำนวนรอบแน่นอน ส่วน foreach ใช้วนอ่านสมาชิกใน array หรือ list ได้สะดวก ปลอดภัย และอ่านง่ายที่สุด'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'คีย์เวิร์ด "void" ด้านหน้าชื่อ Method มีความหมายว่าอย่างไร?',
+          options: [
+            'Method นี้ต้องรับ Parameter เสมอ',
+            'Method นี้ทำงานแบบ Asynchronous',
+            'Method นี้ไม่มีการส่งค่าผลลัพธ์กลับ (No return value)',
+            'Method นี้เป็น Private และไม่สามารถเรียกใช้งานได้'
+          ],
+          answer: 2,
+          explanation: 'void คือ Return Type ที่ระบุว่าเมธอดนี้ทำงานตามคำสั่งจนเสร็จสิ้นโดยไม่มีการ return ข้อมูลใดๆ ส่งกลับออกมา'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ในโครงสร้าง try - catch - finally บล็อกคำสั่งใดจะถูกเรียกทำงานเสมอ 100% ไม่ว่าจะเกิด Exception ข้อผิดพลาดขึ้นหรือไม่ก็ตาม?',
+          options: [
+            'try',
+            'catch',
+            'finally',
+            'throw'
+          ],
+          answer: 2,
+          explanation: 'บล็อก finally จะถูกทำงานเสมอไม่ว่าจะเกิดข้อผิดพลาดหรือไม่ เหมาะสำหรับงานคืนหน่วยความจำ ปิดไฟล์ หรือปิดการเชื่อมต่อฐานข้อมูล'
+        }
+      ];
+
+      // Initialize Quiz
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('csharp-basics-quiz', quizQuestions, {
+          quizId: 'csharp-basics',
+          showTimer: false,
+          showExplanation: true
+        });
+      }
+    });
+  </script>
+</body>
+</html>

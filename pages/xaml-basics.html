@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XAML พื้นฐานสำหรับ .NET MAUI & WPF — DotNet Learning Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">📐</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน</a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP</a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections & LINQ</a>
+    <a href="./csharp-advanced.html" class="sidebar-link"><span class="link-icon">📕</span> C# ขั้นสูง</a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET</a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection</a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware</a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-link"><span class="link-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link"><span class="link-icon">🎮</span> SQL Playground</a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link"><span class="link-icon">🧩</span> Blazor Components</a>
+    <a href="./xaml-basics.html" class="sidebar-link active"><span class="link-icon">📐</span> XAML พื้นฐาน <span class="link-badge badge-basic">พื้นฐาน</span></a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML & JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps & Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git & CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link"><span class="link-icon">🛡️</span> Secure Coding</a>
+
+    <div class="sidebar-section-title">🟡 Web & คุณภาพ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link"><span class="link-icon">👀</span> Code Review</a>
+    <a href="./sdlc-agile.html" class="sidebar-link"><span class="link-icon">📋</span> SDLC & Agile</a>
+    <a href="./tech-docs.html" class="sidebar-link"><span class="link-icon">📝</span> Technical Docs</a>
+    <a href="./architecture.html" class="sidebar-link"><span class="link-icon">🏛️</span> Architecture</a>
+
+    <div class="sidebar-section-title">🎮 Games & Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> เตรียมสัมภาษณ์</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header reveal">
+            <div class="breadcrumb">
+                <a href="../index.html">🏠 หน้าแรก</a>
+                <span>/</span>
+                <span>Markup & UI Track</span>
+                <span>/</span>
+                <span>XAML พื้นฐาน</span>
+            </div>
+            <div class="page-title">
+                <div class="title-icon" style="background: var(--cat-blazor); color: #fff;">📐</div>
+                <h1>XAML พื้นฐานสำหรับ .NET MAUI & WPF</h1>
+            </div>
+            <p class="page-description">
+                ภาษา Declarative Markup บนโครงสร้าง XML สำหรับออกแบบ User Interface บน Cross-Platform Desktop/Mobile, Layout Panels, Data Binding และสถาปัตยกรรม MVVM
+            </p>
+            <div class="page-meta">
+                <span class="meta-item">⭐ ระดับ: พื้นฐาน > กลาง</span>
+                <span class="meta-item">⏱️ เวลา: ~45 นาที</span>
+                <span class="meta-item">⚡ รางวัล: +100 XP</span>
+                <span class="meta-item">🏷️ .NET MAUI / WPF / MVVM</span>
+            </div>
+        </div>
+
+        <!-- Analogy Section -->
+        <div class="concept-card reveal">
+            <div class="concept-header">
+                <span class="concept-emoji">🏠</span>
+                <span class="concept-title">เปรียบเทียบให้เห็นภาพ: พิมพ์เขียวบ้านและระบบสายไฟในผนัง</span>
+            </div>
+            <div class="concept-body">
+                <div class="analogy-box">
+                    <div class="analogy-label">💡 Analogy</div>
+                    <p class="analogy-text">
+                        • <strong>XAML File (.xaml):</strong> เหมือน <strong>ผนังห้องและตำแหน่งเฟอร์นิเจอร์ (View)</strong> ที่บอกว่าสวิตช์ไฟ หลอดไฟ อยู่ตรงไหน<br>
+                        • <strong>Data Binding:</strong> เหมือน <strong>สายไฟที่ร้อยอยู่ในผนัง</strong> เชื่อมปุ่มกดบนผนังเข้ากับกล่องควบคุมในห้องเครื่อง<br>
+                        • <strong>ViewModel (.cs):</strong> เหมือน <strong>กล่องควบคุมไฟฟ้า (Logic)</strong> ที่รับคำสั่งเปิด-ปิดไฟ คำนวณค่าไฟ โดยไม่ต้องสนใจว่าหลอดไฟที่ติดอยู่บนผนังเป็นโคมแบบไหน (UI-independent)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: XAML Structure -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-blazor); color: #fff;">01</div>
+                <h2>โครงสร้างพื้นฐานของไฟล์ XAML</h2>
+            </div>
+            <p>XAML (Extensible Application Markup Language) ใช้แท็ก XML ในการประกาศ Elements และ Properties ของหน้าจอ:</p>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> MainPage.xaml (.NET MAUI)</div>
+                    <button class="copy-btn">📋 Copy</button>
+                </div>
+                <div class="code-block-body">
+<pre class="language-xml"><code>&lt;?xml version="1.0" encoding="utf-8" ?&gt;
+&lt;ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MyApp.ViewModels"
+             x:Class="MyApp.MainPage"
+             Title="หน้าหลัก"&gt;
+
+    &lt;VerticalStackLayout Spacing="20" Padding="30"&gt;
+        &lt;Label Text="ยินดีต้อนรับสู่ .NET MAUI!"
+               FontSize="24"
+               HorizontalOptions="Center"
+               TextColor="#58A6FF" /&gt;
+
+        &lt;Entry Text="{Binding Username, Mode=TwoWay}"
+               Placeholder="กรุณากรอกชื่อของคุณ" /&gt;
+
+        &lt;Button Text="เข้าสู่ระบบ"
+                Command="{Binding LoginCommand}"
+                BackgroundColor="#3FB950"
+                TextColor="White" /&gt;
+    &lt;/VerticalStackLayout&gt;
+
+&lt;/ContentPage&gt;</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Layout Containers -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-blazor); color: #fff;">02</div>
+                <h2>Layout Containers สำคัญใน XAML</h2>
+            </div>
+
+            <div class="grid grid-3 mb-lg">
+                <div class="card">
+                    <h3 style="color: var(--accent-primary); margin-bottom: 8px;">📑 StackLayout</h3>
+                    <p class="text-sm">จัดเรียงองค์ประกอบต่อกันในทิศทางเดียว (แนวตั้ง <code>VerticalStackLayout</code> หรือแนวนอน <code>HorizontalStackLayout</code>)</p>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--accent-success); margin-bottom: 8px;">📊 Grid Layout</h3>
+                    <p class="text-sm">จัดวางแบบตารางแถวและคอลัมน์ (RowDefinitions, ColumnDefinitions) รองรับขนาด <code>*</code> (Proportional) และ <code>Auto</code></p>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--accent-warning); margin-bottom: 8px;">🔲 FlexLayout</h3>
+                    <p class="text-sm">จัดเรียงคล้าย CSS Flexbox รองรับการขึ้นบรรทัดใหม่อัตโนมัติ (Wrap) เหมาะสำหรับ Responsive UI</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: MVVM Pattern -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-blazor); color: #fff;">03</div>
+                <h2>สถาปัตยกรรม MVVM (Model - View - ViewModel)</h2>
+            </div>
+            <p>MVVM คือหัวใจหลักของการพัฒนาแอปด้วย XAML เพื่อแยก UI ออกจาก Business Logic:</p>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> MainViewModel.cs (CommunityToolkit.Mvvm)</div>
+                    <button class="copy-btn">📋 Copy</button>
+                </div>
+                <div class="code-block-body">
+<pre class="language-csharp"><code>using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
+public partial class MainViewModel : ObservableObject
+{
+    // สร้าง Property พร้อมระบบแจ้งเตือน UI อัตโนมัติ (INotifyPropertyChanged)
+    [ObservableProperty]
+    private string _username = string.Empty;
+
+    [ObservableProperty]
+    private bool _isLoading;
+
+    // สร้าง Command แทน Event Handler เดิม
+    [RelayCommand]
+    private async Task LoginAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Username)) return;
+
+        IsLoading = true;
+        await Task.Delay(1000); // จำลองการเรียก API
+        IsLoading = false;
+    }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Quiz -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-warning); color: #000;">🎯</div>
+                <h2>แบบทดสอบความเข้าใจ: XAML & MVVM</h2>
+            </div>
+            <div id="xaml-basics-quiz"></div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/quiz-engine.js"></script>
+<script src="../js/code-visualizer.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'XAML ย่อมาจากคำว่าอะไร?',
+                options: [
+                    'Extensible Application Markup Language',
+                    'XML Application Modern Language',
+                    'Extended App Machine Layout',
+                    'X-Platform App Management Logic'
+                ],
+                answer: 0,
+                explanation: 'XAML ย่อมาจาก Extensible Application Markup Language ใช้สำหรับสร้าง UI ใน .NET MAUI, WPF, UWP',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'ในสถาปัตยกรรม MVVM ส่วนใดมีหน้าที่จัดการ State และ Business Logic โดยไม่ผูกติดกับหน้าจอ UI?',
+                options: ['View', 'ViewModel', 'Model', 'XAML Tag'],
+                answer: 1,
+                explanation: 'ViewModel ทำหน้าที่เป็นตัวกลางควบคุม State, Data Binding, และ Commands โดยไม่มีโค้ดของ UI Controls',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'หากต้องการให้การเปลี่ยนแปลงข้อความใน Entry ส่งผลต่อ Property ใน ViewModel และในทางกลับกัน ควรใช้ Binding Mode ใด?',
+                options: ['OneWay', 'TwoWay', 'OneTime', 'OneWayToSource'],
+                answer: 1,
+                explanation: 'TwoWay Binding ทำให้ข้อมูลซิงก์กันทั้งสองทิศทาง (UI ➔ ViewModel และ ViewModel ➔ UI)',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'ใน Grid Layout ของ XAML สัญลักษณ์เครื่องหมายดอกจัน (*) ใน RowDefinitions หมายถึงอะไร?',
+                options: [
+                    'ขนาดปรับตามพื้นที่ที่เหลืออยู่แบบตามสัดส่วน (Proportional)',
+                    'ขนาดปรับตามขนาดของเนื้อหาข้างใน (Auto)',
+                    'ขนาด 100 Pixel ตายตัว',
+                    'ซ่อนแถวนั้น'
+                ],
+                answer: 0,
+                explanation: 'เครื่องหมาย * หมายถึง Star Sizing ใช้แบ่งพื้นที่ที่เหลือตามสัดส่วน เช่น 1* กับ 2*',
+                difficulty: 'mid'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Interface ใดที่ C# ViewModel ต้อง Implement เพื่อแจ้งให้ XAML UI อัปเดตเมื่อค่าใน Property เปลี่ยนแปลง?',
+                options: ['INotifyPropertyChanged', 'IDisposable', 'IEnumerable', 'IComparable'],
+                answer: 0,
+                explanation: 'INotifyPropertyChanged คือ Interface มาตรฐานของ .NET สำหรับแจ้ง PropertyChanged event สู่ UI',
+                difficulty: 'mid'
+            }
+        ];
+
+        QuizEngine.start('xaml-basics-quiz', questions, {
+            quizId: 'xaml-basics',
+            onComplete: () => {
+                Progress.completeLesson('xaml-basics');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

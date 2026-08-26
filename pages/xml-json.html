@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XML &amp; JSON ในระบบ .NET และ System Integration — DotNet Learning Hub</title>
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/code-theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <style>
+    /* ─── Custom Page Accents & Badges ─── */
+    .hero-badge-json {
+      background: rgba(247, 223, 30, 0.15);
+      border: 1px solid rgba(247, 223, 30, 0.4);
+      color: #ffe66d;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .hero-badge-xml {
+      background: rgba(121, 192, 255, 0.15);
+      border: 1px solid rgba(121, 192, 255, 0.4);
+      color: #79c0ff;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    /* ─── Container Analogy Visualizer ─── */
+    .container-analogy-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container-analogy-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #ff7b72, #79c0ff, #d2a8ff, #7ee787);
+    }
+
+    .cargo-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+
+    @media (max-width: 768px) {
+      .cargo-grid { grid-template-columns: 1fr; }
+    }
+
+    .cargo-endpoint {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      text-align: center;
+    }
+
+    .cargo-endpoint .endpoint-lang {
+      font-family: var(--font-code);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      margin-bottom: 4px;
+    }
+
+    .cargo-endpoint .endpoint-memory {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: var(--font-code);
+    }
+
+    .cargo-channel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .cargo-container-box {
+      background: linear-gradient(135deg, rgba(88, 166, 255, 0.12), rgba(163, 113, 247, 0.12));
+      border: 2px dashed var(--accent-primary);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      text-align: center;
+      animation: pulseGlow 3s infinite alternate;
+    }
+
+    .cargo-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #79c0ff;
+      font-family: var(--font-heading);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .cargo-sub {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 5px rgba(88, 166, 255, 0.2); }
+      100% { box-shadow: 0 0 16px rgba(163, 113, 247, 0.4); }
+    }
+
+    /* ─── Interactive Option Toggler Sandbox ─── */
+    .serializer-sandbox {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin: var(--space-lg) 0;
+    }
+
+    .sandbox-head {
+      background: var(--bg-tertiary);
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .sandbox-body-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 380px;
+    }
+
+    @media (max-width: 900px) {
+      .sandbox-body-grid { grid-template-columns: 1fr; }
+    }
+
+    .sandbox-options-panel {
+      background: var(--bg-secondary);
+      padding: var(--space-lg);
+      border-right: 1px solid var(--border-default);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    @media (max-width: 900px) {
+      .sandbox-options-panel { border-right: none; border-bottom: 1px solid var(--border-default); }
+    }
+
+    .option-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .option-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toggle-switch-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      transition: all var(--transition-fast);
+    }
+
+    .toggle-switch-wrapper:hover {
+      border-color: var(--accent-primary);
+    }
+
+    .toggle-switch-wrapper input {
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent-primary);
+    }
+
+    .sandbox-preview-panel {
+      padding: 0;
+      background: var(--bg-code);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .preview-panel-header {
+      padding: 8px var(--space-md);
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-code);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .preview-panel-content {
+      padding: var(--space-md);
+      flex: 1;
+      overflow: auto;
+    }
+
+    .preview-panel-content pre {
+      margin: 0;
+      background: transparent;
+      padding: 0;
+    }
+
+    /* ─── Attribute Feature Grid ─── */
+    .attr-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+
+    .attr-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      transition: all var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .attr-card:hover {
+      border-color: var(--syn-annotation);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(126, 231, 135, 0.12);
+    }
+
+    .attr-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .attr-tag {
+      font-family: var(--font-code);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--syn-annotation);
+      background: rgba(126, 231, 135, 0.1);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(126, 231, 135, 0.25);
+    }
+
+    .attr-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: var(--space-sm);
+    }
+
+    .attr-code-snippet {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-family: var(--font-code);
+      font-size: 0.78rem;
+      color: var(--text-primary);
+      overflow-x: auto;
+    }
+
+    /* ─── XML Architecture Visual ─── */
+    .xml-dom-diagram {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin: var(--space-lg) 0;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+    }
+
+    .xml-node {
+      border-left: 2px solid var(--border-default);
+      padding-left: 16px;
+      margin-left: 12px;
+      margin-top: 6px;
+      position: relative;
+    }
+
+    .xml-node::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 12px;
+      height: 1px;
+      background: var(--border-default);
+    }
+
+    .node-tag { color: var(--syn-tag); font-weight: 700; }
+    .node-attr { color: var(--syn-attribute); }
+    .node-val { color: var(--syn-string); }
+    .node-cdata { color: #f0883e; background: rgba(240, 136, 62, 0.12); padding: 2px 6px; border-radius: 4px; }
+    .node-comment { color: var(--syn-comment); font-style: italic; }
+
+    /* ─── Real-World Use Case Badges ─── */
+    .use-case-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+
+    .use-case-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      transition: all var(--transition-normal);
+    }
+
+    .use-case-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+
+    .use-case-top {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: 8px;
+    }
+
+    .use-case-icon {
+      font-size: 1.5rem;
+    }
+
+    .use-case-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    .use-case-badge {
+      display: inline-block;
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-tertiary);
+      color: var(--accent-primary);
+      margin-bottom: 6px;
+    }
+
+    .use-case-desc {
+      font-size: 0.83rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ─── Quick Converter Box ─── */
+    .converter-tool-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+
+    .converter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+    }
+
+    @media (max-width: 768px) {
+      .converter-grid { grid-template-columns: 1fr; }
+    }
+
+    .converter-textarea {
+      width: 100%;
+      height: 220px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      color: var(--text-primary);
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .converter-textarea:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Header
+       ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div style="display: flex; align-items: center; gap: var(--space-md);">
+      <button class="hamburger" aria-label="Toggle navigation">☰</button>
+      <a href="../index.html" class="site-logo">
+        <div class="logo-icon">📄</div>
+        <span>DotNet Learning Hub</span>
+      </a>
+    </div>
+    <div class="header-nav">
+      <div class="header-xp">
+        <span>⚡</span>
+        <span class="xp-value">0</span>
+        <span class="xp-label text-muted" style="margin-left: 4px; font-size: 0.75rem;">XP</span>
+      </div>
+      <a href="quiz-arena.html" class="btn btn-outline btn-sm" style="border-radius: var(--radius-full);">
+        🎮 Quiz Arena
+      </a>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Sidebar Navigation (All Tracks)
+       ══════════════════════════════════════════════════════════ -->
+  <nav class="site-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">ภาพรวม</div>
+      <a href="../index.html" class="sidebar-link">
+        <span class="link-icon">🏠</span>
+        <span>หน้าแรก (Dashboard)</span>
+      </a>
+    </div>
+
+    <!-- 🟣 Track C# Language -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟣 Track C# Language</div>
+      <a href="csharp-basics.html" class="sidebar-link">
+        <span class="link-icon">🌱</span>
+        <span>C# พื้นฐาน (Level 1)</span>
+        <span class="sidebar-badge badge-basic">Lv 1</span>
+      </a>
+      <a href="csharp-oop.html" class="sidebar-link">
+        <span class="link-icon">🧱</span>
+        <span>C# OOP &amp; คลาส (Level 2)</span>
+        <span class="sidebar-badge badge-basic">Lv 2</span>
+      </a>
+      <a href="csharp-collections.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Collections &amp; Generics</span>
+        <span class="sidebar-badge badge-mid">Lv 3</span>
+      </a>
+      <a href="csharp-advanced.html" class="sidebar-link">
+        <span class="link-icon">🚀</span>
+        <span>LINQ &amp; Async/Await</span>
+        <span class="sidebar-badge badge-mid">Lv 4</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track .NET & Web API -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track .NET &amp; Web API</div>
+      <a href="dotnet-structure.html" class="sidebar-link">
+        <span class="link-icon">⚙️</span>
+        <span>.NET 8 Project Structure</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="dotnet-di.html" class="sidebar-link">
+        <span class="link-icon">💉</span>
+        <span>Dependency Injection</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="dotnet-middleware.html" class="sidebar-link">
+        <span class="link-icon">🛡️</span>
+        <span>Middleware Pipeline</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="rest-api.html" class="sidebar-link">
+        <span class="link-icon">🔌</span>
+        <span>RESTful API Design</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="system-integration.html" class="sidebar-link">
+        <span class="link-icon">🔄</span>
+        <span>System Integration</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🔴 Track Database & ORM -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔴 Track Database &amp; ORM</div>
+      <a href="sql-basics.html" class="sidebar-link">
+        <span class="link-icon">💾</span>
+        <span>SQL Server &amp; CRUD</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="sql-advanced.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>SQL Advanced &amp; Index</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="sql-playground.html" class="sidebar-link">
+        <span class="link-icon">💻</span>
+        <span>SQL Playground Live</span>
+        <span class="sidebar-badge badge-new">Live</span>
+      </a>
+      <a href="ef-core.html" class="sidebar-link">
+        <span class="link-icon">🗄️</span>
+        <span>Entity Framework Core</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+
+    <!-- 🟢 Track Blazor & Frontend / Markup -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟢 Track Blazor &amp; Markup</div>
+      <a href="blazor-intro.html" class="sidebar-link">
+        <span class="link-icon">⚡</span>
+        <span>Blazor Intro &amp; WASM</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="blazor-components.html" class="sidebar-link">
+        <span class="link-icon">🧩</span>
+        <span>Blazor Components</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="xaml-basics.html" class="sidebar-link">
+        <span class="link-icon">📐</span>
+        <span>XAML Basics (.NET MAUI)</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+      <a href="xml-json.html" class="sidebar-link active">
+        <span class="link-icon">📄</span>
+        <span>XML &amp; JSON Data Formats</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🟡 Track Web Basics -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🟡 Track Web Basics</div>
+      <a href="html-css-js.html" class="sidebar-link">
+        <span class="link-icon">🌐</span>
+        <span>HTML, CSS &amp; JavaScript</span>
+        <span class="sidebar-badge badge-basic">Basic</span>
+      </a>
+    </div>
+
+    <!-- 🔵 Track DevOps & Security -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🔵 Track DevOps &amp; Security</div>
+      <a href="git-cicd.html" class="sidebar-link">
+        <span class="link-icon">🐙</span>
+        <span>Git &amp; CI/CD Pipelines</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+      <a href="secure-coding.html" class="sidebar-link">
+        <span class="link-icon">🔒</span>
+        <span>Secure Coding &amp; OWASP</span>
+        <span class="sidebar-badge badge-mid">Mid</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Main Content
+       ══════════════════════════════════════════════════════════ -->
+  <main class="site-main">
+    <div class="content-wrapper">
+
+      <!-- ─── Page Header ─── -->
+      <div class="page-header animate-fade-in">
+        <div class="breadcrumb">
+          <a href="../index.html">หน้าหลัก</a>
+          <span>/</span>
+          <span>Data Formats &amp; Integration</span>
+          <span>/</span>
+          <span class="text-primary">XML &amp; JSON</span>
+        </div>
+        <div class="page-title">
+          <div class="title-icon" style="background: rgba(247, 223, 30, 0.15); color: #ffe66d; border: 1px solid rgba(247, 223, 30, 0.35);">📄</div>
+          <div>
+            <h1>XML &amp; JSON ในระบบ .NET และ System Integration</h1>
+            <div class="page-description">เจาะลึกมาตรฐานการแลกเปลี่ยนข้อมูลระหว่างระบบ การใช้งาน System.Text.Json สมัยใหม่, Newtonsoft.Json, LINQ to XML, Attributes ควบคุมการ Serialize และเทคนิคแปลงโครงสร้างข้อมูลใน .NET 8</div>
+          </div>
+        </div>
+        <div class="page-meta">
+          <div class="meta-item">
+            <span>🎯</span>
+            <span>ระดับ: <span class="level-tag level-basic">⭐ พื้นฐาน &gt; กลาง</span></span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>เวลาเรียน: <strong>~40 นาที</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>⚡</span>
+            <span>รางวัล: <strong>+100 XP</strong></span>
+          </div>
+          <div class="meta-item">
+            <span>💻</span>
+            <span>รองรับ .NET 8 / C# 12</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Section: Analogy (ตู้คอนเทนเนอร์ขนส่งสินค้ามาตรฐานโลก) ─── -->
+      <section class="lesson-section reveal" id="analogy">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(88, 166, 255, 0.2); color: var(--accent-primary); border: 1px solid var(--accent-primary);">00</div>
+          <div>
+            <h2>แนวคิดหลัก: ตู้คอนเทนเนอร์ขนส่งสินค้ามาตรฐานโลก (Universal Data Container)</h2>
+            <p class="section-subtitle">ทำไมระบบคอมพิวเตอร์ที่ต่างภาษาและต่างแพลตฟอร์มถึงคุยกันรู้เรื่องอย่างไร้รอยต่อ?</p>
+          </div>
+        </div>
+
+        <div class="container-analogy-box">
+          <div class="analogy-box" style="margin-bottom: var(--space-md);">
+            <div class="analogy-label">💡 เปรียบเทียบให้เห็นภาพจริง (Real-World Analogy)</div>
+            <p class="analogy-text">
+              ลองนึกภาพการขนส่งสินค้าระหว่างประเทศ: เรือเดินสมุทร รถไฟ และรถบรรทุก ต่างมีขนาดและกลไกเครื่องยนต์ที่ต่างกันอย่างสิ้นเชิง 
+              แต่ทำไมสินค้าทุกชนิดในโลกถึงถูกขนถ่ายและถ่ายโอนระหว่างกันได้อย่างราบรื่น? คำตอบคือ <strong>"ตู้คอนเทนเนอร์มาตรฐานสากล (ISO Shipping Container)"</strong>
+            </p>
+          </div>
+
+          <p style="color: var(--text-secondary); line-height: 1.7; font-size: 0.95rem;">
+            ในโลกของการพัฒนาซอฟต์แวร์ <strong>Backend ของคุณอาจเขียนด้วย C# .NET 8</strong>, Mobile App ฝั่งไคลเอนต์เขียนด้วย <strong>Swift / Flutter</strong>, 
+            และระบบปัญญาประดิษฐ์เขียนด้วย <strong>Python</strong> — หน่วยความจำ RAM และออบเจกต์ในภาษาเหล่านี้จัดเก็บข้อมูลต่างกันโดยสิ้นเชิง 
+            แต่เมื่อเราต้องการส่งข้อมูลผ่านอินเทอร์เน็ต (HTTP / TCP / Message Queue) เราจะแปลงออบเจกต์เหล่านั้นให้อยู่ในรูปข้อความมาตรฐาน นั่นคือ 
+            <span class="hero-badge-json">JSON</span> หรือ <span class="hero-badge-xml">XML</span> เพื่อให้ปลายทางเปิดอ่านและแปลงกลับเป็นออบเจกต์ของภาษาตนเองได้อย่างสมบูรณ์แบบ 100%
+          </p>
+
+          <!-- Visual Cargo Flow Diagram -->
+          <div class="cargo-grid">
+            <div class="cargo-endpoint">
+              <div style="font-size: 2rem; margin-bottom: 4px;">🟣</div>
+              <div class="endpoint-lang">ASP.NET Core (C#)</div>
+              <div class="endpoint-memory"><code>Order { Id = 101, Total = 500 }</code></div>
+              <div style="margin-top: 8px; font-size: 0.75rem; color: var(--accent-success);">Serialize (แพ็กใส่กล่อง) ➔</div>
+            </div>
+
+            <div class="cargo-channel">
+              <div class="cargo-container-box">
+                <div class="cargo-title">
+                  <span>📦 Universal Wire Format</span>
+                </div>
+                <div class="cargo-sub">
+                  <code>{"id":101,"total":500}</code><br>
+                  <span style="font-size: 0.7rem; color: var(--text-muted);">เดินทางผ่าน HTTP Network Payload</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="cargo-endpoint">
+              <div style="font-size: 2rem; margin-bottom: 4px;">🐍 / ⚛️</div>
+              <div class="endpoint-lang">Python AI / React Web</div>
+              <div class="endpoint-memory"><code>dict(id=101, total=500)</code></div>
+              <div style="margin-top: 8px; font-size: 0.75rem; color: var(--accent-info);">➔ Deserialize (แกะกล่องใช้งาน)</div>
+            </div>
+          </div>
+
+          <div style="background: var(--bg-tertiary); padding: 12px 16px; border-radius: var(--radius-md); border-left: 3px solid var(--accent-warning); font-size: 0.88rem; color: var(--text-secondary);">
+            <strong style="color: var(--accent-warning);">ข้อควรจำของกระบวนการ:</strong>
+            <ul style="margin: 6px 0 0 18px; padding: 0;">
+              <li><strong>Serialization:</strong> การแปลง In-Memory C# Object ให้อยู่ในรูปข้อความ JSON หรือ XML String / Stream</li>
+              <li><strong>Deserialization:</strong> การแปลงข้อความ JSON หรือ XML กลับมาเป็น C# Object ที่พร้อมเรียกใช้งาน Property &amp; Method</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 1: JSON vs XML Comparison Table ─── -->
+      <section class="lesson-section reveal" id="comparison">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(247, 223, 30, 0.2); color: #ffe66d; border: 1px solid #ffe66d;">01</div>
+          <div>
+            <h2>ตารางเปรียบเทียบหมัดต่อหมัด: JSON vs XML</h2>
+            <p class="section-subtitle">วิเคราะห์เชิงลึกทั้งไวยากรณ์, ประสิทธิภาพ, ความเข้มงวดของ Schema และสถานการณ์ที่ควรเลือกใช้</p>
+          </div>
+        </div>
+
+        <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--space-md);">
+          ทั้ง <strong>JSON (JavaScript Object Notation)</strong> และ <strong>XML (eXtensible Markup Language)</strong> ต่างเป็นรูปแบบข้อความเชิงโครงสร้างที่มนุษย์อ่านเข้าใจ (Human-Readable) และคอมพิวเตอร์ประมวลผลได้ง่าย (Machine-Parseable) แต่มีจุดแข็งและประวัติศาสตร์ที่แตกต่างกันอย่างสิ้นเชิง:
+        </p>
+
+        <!-- Comparison Table Component -->
+        <div style="overflow-x: auto; margin: var(--space-lg) 0;">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th style="width: 22%;">มิติการเปรียบเทียบ</th>
+                <th style="width: 39%; color: #ffe66d;"><span class="hero-badge-json">JSON</span></th>
+                <th style="width: 39%; color: #79c0ff;"><span class="hero-badge-xml">XML</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1. รูปแบบไวยากรณ์ (Syntax)</strong></td>
+                <td>
+                  ใช้รูปแบบ <strong>Key-Value Pairs</strong> <code>{"key": "value"}</code> และ Array <code>[1, 2, 3]</code> สั้นกระชับ ไม่มีแท็กปิดที่เยิ่นเย้อ
+                </td>
+                <td>
+                  ใช้รูปแบบ <strong>Nested Tree &amp; Tags</strong> คล้าย HTML <code>&lt;user id="1"&gt;&lt;name&gt;John&lt;/name&gt;&lt;/user&gt;</code> มีทั้ง Tags และ Attributes
+                </td>
+              </tr>
+              <tr>
+                <td><strong>2. ขนาดข้อมูล (Payload Size)</strong></td>
+                <td>
+                  <span class="badge badge-success" style="font-size: 0.75rem;">เบามาก (Lightweight)</span><br>
+                  ประหยัด Bandwidth ของเครือข่าย เพราะไม่มี Closing Tags ซ้ำซ้อน เหมาะกับ Mobile App และ Cloud Microservices
+                </td>
+                <td>
+                  <span class="badge badge-warning" style="font-size: 0.75rem;">หนักกว่า (Verbose)</span><br>
+                  มี Overhead ของชื่อแท็กเปิด-ปิด (Closing tags) และการระบุ Namespace ทำให้ขนาดไฟล์เฉลี่ยใหญ่กว่า JSON ราว 20-50%
+                </td>
+              </tr>
+              <tr>
+                <td><strong>3. ความเร็วในการประมวลผล (Parsing Speed)</strong></td>
+                <td>
+                  <strong>เร็วมาก (Fast)</strong><br>
+                  โครงสร้างตรงกับ Memory Object ของภาษาโปรแกรมสมัยใหม่ โดยเฉพาะใน .NET 8 ที่ใช้ <code>Utf8JsonReader</code> ประมวลผลระดับ Zero-Allocation
+                </td>
+                <td>
+                  <strong>ช้ากว่าปานกลาง</strong><br>
+                  ต้องสร้าง Document Object Model (DOM Tree) หรือใช้ Event-based SAX / StAX Stream ในการตรวจสอบโครงสร้างที่ซับซ้อน
+                </td>
+              </tr>
+              <tr>
+                <td><strong>4. ชนิดข้อมูล (Data Types)</strong></td>
+                <td>
+                  <strong>Native Data Types:</strong><br>
+                  รองรับ String, Number, Boolean, Array, Object และ <code>null</code> ในตัวโดยไม่ต้องมี Schema กำกับ
+                </td>
+                <td>
+                  <strong>Text-Based (ทุกอย่างเป็น String):</strong><br>
+                  ตัวเลข วันที่ บูลีน จะถูกมองเป็นตัวหนังสือทั้งหมด เว้นแต่จะระบุ Type ใน XSD Schema หรือแปลงผ่าน Parser
+                </td>
+              </tr>
+              <tr>
+                <td><strong>5. การตรวจสอบความถูกต้อง (Schema &amp; Validation)</strong></td>
+                <td>
+                  <strong>JSON Schema:</strong><br>
+                  มีความยืดหยุ่นสูง กำหนดเงื่อนไขได้กระชับ นิยมใช้ในการตรวจสอบ OpenAPI / Swagger แต่ไม่เคร่งครัดเท่า XSD
+                </td>
+                <td>
+                  <strong>XSD (XML Schema Definition) &amp; DTD:</strong><br>
+                  <span class="badge badge-primary" style="font-size: 0.75rem;">เข้มงวดสูงสุด</span><br>
+                  ตรวจสอบโครงสร้าง ความถูกต้องของ Type, ลำดับการปรากฏ, กฎ Regular Expression และบังคับความปลอดภัยได้แน่นหนามาก
+                </td>
+              </tr>
+              <tr>
+                <td><strong>6. ฟีเจอร์ขั้นสูงเฉพาะตัว</strong></td>
+                <td>
+                  • เรียบง่าย เป็น First-class citizen ของ JavaScript/TypeScript Web<br>
+                  • สนับสนุน JSON-LD และ BSON (Binary JSON)
+                </td>
+                <td>
+                  • รองรับ <strong>Namespaces</strong> แยกชื่อข้อมูลไม่ให้ชนกัน<br>
+                  • รองรับ <strong>CDATA</strong> เก็บข้อมูลดิบ (เช่น HTML / Binary Base64)<br>
+                  • รองรับ <strong>XPath &amp; XSLT</strong> แปลงเอกสาร XML สู่รูปแบบอื่นได้อัตโนมัติ
+                </td>
+              </tr>
+              <tr>
+                <td><strong>7. งานจริงที่นิยมใช้ในปัจจุบัน (Best Use Cases)</strong></td>
+                <td>
+                  • <strong>RESTful APIs</strong> (ASP.NET Core Web API)<br>
+                  • แอปพลิเคชัน Single Page App (React, Vue, Blazor)<br>
+                  • ไฟล์ตั้งค่าใน .NET: <code>appsettings.json</code><br>
+                  • NoSQL Databases (MongoDB, Cosmos DB)
+                </td>
+                <td>
+                  • <strong>SOAP Web Services &amp; WCF</strong> (ระบบธนาคาร/ประกัน/รัฐบาล)<br>
+                  • ไฟล์คอนฟิกโปรเจกต์ .NET: <code>.csproj</code>, <code>web.config</code><br>
+                  • ระบบชำระเงินระหว่างประเทศ: <strong>ISO 20022</strong> &amp; SWIFT<br>
+                  • Single Sign-On Tokens: <strong>SAML 2.0</strong><br>
+                  • ไฟล์เอกสาร Microsoft Office (OpenXML .docx, .xlsx)
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">💡 คำแนะนำในการตัดสินใจสำหรับสถาปัตยกรรมระบบ</div>
+          <p>
+            หากคุณสร้าง <strong>ระบบใหม่ (Greenfield System)</strong>, Web API หรือ Mobile Backend — <strong>JSON คือตัวเลือกอันดับ 1 เสมอ</strong> เพราะประสิทธิภาพสูงและพัฒนาได้รวดเร็วกว่า 
+            แต่หากต้องเชื่อมต่อกับ <strong>ระบบองค์กรขนาดใหญ่ (Legacy Enterprise Integration)</strong>, ธุรกรรมการเงินข้ามชาติ (ISO 20022), หรือระบบราชการ/ประกันภัยที่บังคับใช้ XSD Schema — <strong>XML ยังคงเป็นหัวใจสำคัญที่หลีกเลี่ยงไม่ได้</strong>
+          </p>
+        </div>
+      </section>
+
+      <!-- ─── Section 2: JSON ใน .NET ด้วย System.Text.Json & Newtonsoft ─── -->
+      <section class="lesson-section reveal" id="dotnet-json">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(126, 231, 135, 0.2); color: var(--accent-success); border: 1px solid var(--accent-success);">02</div>
+          <div>
+            <h2>JSON ใน .NET: พลังของ System.Text.Json และ Newtonsoft.Json</h2>
+            <p class="section-subtitle">เรียนรู้ Serializer ประสิทธิภาพสูงมาตรฐานใหม่ของ .NET 8, การปรับแต่ง Options และ Attributes ที่พบบ่อยที่สุด</p>
+          </div>
+        </div>
+
+        <div class="concept-card">
+          <div class="concept-header">
+            <div class="concept-emoji">⚡</div>
+            <div>
+              <div class="concept-title">System.Text.Json vs Newtonsoft.Json (Json.NET)</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">ทำไม Microsoft จึงสร้าง System.Text.Json ขึ้นมาใหม่ใน .NET Core / .NET 8?</div>
+            </div>
+          </div>
+          <div class="concept-body">
+            <p style="color: var(--text-secondary); line-height: 1.6;">
+              ในอดีต .NET Framework พึ่งพาไลบรารีภายนอก <strong>Newtonsoft.Json (Json.NET)</strong> ของ James Newton-King ซึ่งมีความสามารถรอบตัวและยืดหยุ่นสูงมาก 
+              แต่เมื่อเข้าสู่ยุค High-Performance Cloud Native ใน .NET Core / .NET 8 ทาง Microsoft จึงได้พัฒนา <code>System.Text.Json</code> ขึ้นมาเป็น Built-in namespace:
+            </p>
+            <ul style="color: var(--text-secondary); line-height: 1.7; margin-left: 20px;">
+              <li><strong>Zero / Low Memory Allocation:</strong> ทำงานบน <code>ReadOnlySpan&lt;byte&gt;</code> และ <code>Utf8JsonReader</code> อ่านข้อมูล UTF-8 โดยตรงไม่ต้องแปลงเป็น Intermediate String ช่วยลดภาระ Garbage Collection (GC) มหาศาล</li>
+              <li><strong>Speed:</strong> เร็วกว่า Newtonsoft.Json เฉลี่ย <strong>2x – 5x เท่า</strong> ในการ Serialize และ Deserialize งานทั่วไป</li>
+              <li><strong>AOT Ready (Source Generator):</strong> รองรับการสร้างโค้ด Serialization ในขั้นตอน Compile Time ทำให้ทำงานร่วมกับ Native AOT ใน .NET 8 ได้อย่างสมบูรณ์แบบโดยไม่ต้องใช้ Reflection</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 2.1 Basic Serialize & Deserialize -->
+        <h3 style="margin-top: var(--space-xl); color: var(--text-primary);"><span style="color: var(--syn-method);">#</span> 1. การใช้งานพื้นฐาน: Serialize &amp; Deserialize</h3>
+        <p style="color: var(--text-secondary);">
+          มาดูตัวอย่างการแปลงระหว่าง C# POCO Class กับ JSON String อย่างง่าย:
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📄</span>
+              <span>JsonBasicsDemo.cs</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='คัดลอกแล้ว!'; setTimeout(()=>this.innerText='คัดลอก', 2000);">คัดลอก</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">using System;
+using System.Text.Json;
+
+// 1. กำหนดโครงสร้างข้อมูลด้วย C# Model
+public class UserProfile
+{
+    public int Id { get; set; }
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public bool IsActive { get; set; }
+    public decimal Balance { get; set; }
+    public string[] Roles { get; set; } = Array.Empty&lt;string&gt;();
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        var user = new UserProfile
+        {
+            Id = 1001,
+            FullName = "สมชาย สายโค้ด",
+            Email = "somchai@dotnet.dev",
+            IsActive = true,
+            Balance = 15450.75m,
+            Roles = new[] { "Developer", "Admin" }
+        };
+
+        // 2. C# Object ➔ JSON String (Serialization)
+        string jsonString = JsonSerializer.Serialize(user);
+        Console.WriteLine("JSON Output:");
+        Console.WriteLine(jsonString);
+
+        // 3. JSON String ➔ C# Object (Deserialization)
+        string rawInputJson = """
+        {
+            "Id": 1002,
+            "FullName": "สมหญิง มุ่งมั่น",
+            "Email": "somying@dotnet.dev",
+            "IsActive": true,
+            "Balance": 9200.00,
+            "Roles": ["Tester"]
+        }
+        """;
+
+        UserProfile? deserializedUser = JsonSerializer.Deserialize&lt;UserProfile&gt;(rawInputJson);
+        Console.WriteLine($"\nแปลงกลับสำเร็จ: ID={deserializedUser?.Id}, ชื่อ={deserializedUser?.FullName}");
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">🖥️ Output:</span>
+            <span class="output-text">
+              JSON Output:<br>
+              {"Id":1001,"FullName":"สมชาย สายโค้ด","Email":"somchai@dotnet.dev","IsActive":true,"Balance":15450.75,"Roles":["Developer","Admin"]}<br><br>
+              แปลงกลับสำเร็จ: ID=1002, ชื่อ=สมหญิง มุ่งมั่น
+            </span>
+          </div>
+        </div>
+
+        <!-- 2.2 Popular JSON Attributes -->
+        <h3 style="margin-top: var(--space-xl); color: var(--text-primary);"><span style="color: var(--syn-annotation);">#</span> 2. Attributes ยอดฮิตที่ควบคุมโครงสร้าง JSON</h3>
+        <p style="color: var(--text-secondary);">
+          ในโลกแห่งความเป็นจริง API ภายนอกมักใช้รูปแบบชื่อแบบ <code>snake_case</code> หรือ <code>kebab-case</code> ในขณะที่ C# ใช้ <code>PascalCase</code> 
+          หรือเราอาจต้องการซ่อนข้อมูลความลับ (เช่น Password) ไม่ให้หลุดไปใน JSON เราสามารถควบคุมพฤติกรรมได้ด้วย Attributes ใน <code>System.Text.Json.Serialization</code>:
+        </p>
+
+        <div class="attr-grid">
+          <!-- Card 1: JsonPropertyName -->
+          <div class="attr-card">
+            <div>
+              <div class="attr-header">
+                <span class="attr-tag">[JsonPropertyName("name")]</span>
+              </div>
+              <div class="attr-desc">
+                กำหนดชื่อ Key ใน JSON ให้ตรงกับ API ปลายทาง แม้ว่าชื่อ Property ใน C# จะสะกดแบบ PascalCase ก็ตาม
+              </div>
+            </div>
+            <div class="attr-code-snippet">
+              [JsonPropertyName("user_id")]<br>
+              public int UserId { get; set; }
+            </div>
+          </div>
+
+          <!-- Card 2: JsonIgnore -->
+          <div class="attr-card">
+            <div>
+              <div class="attr-header">
+                <span class="attr-tag">[JsonIgnore]</span>
+              </div>
+              <div class="attr-desc">
+                ข้าม Property นี้โดยสมบูรณ์ ไม่นำมา Serialize หรือ Deserialize ป้องกันข้อมูลสำคัญรั่วไหล เช่น รหัสผ่าน หรือ Internal Cache
+              </div>
+            </div>
+            <div class="attr-code-snippet">
+              [JsonIgnore]<br>
+              public string PasswordHash { get; set; }
+            </div>
+          </div>
+
+          <!-- Card 3: JsonInclude -->
+          <div class="attr-card">
+            <div>
+              <div class="attr-header">
+                <span class="attr-tag">[JsonInclude]</span>
+              </div>
+              <div class="attr-desc">
+                บังคับให้ Serialize ตัวแปรที่เป็น <code>private / internal</code> หรือ Property ที่มี private setter ซึ่งปกติ System.Text.Json จะมองข้าม
+              </div>
+            </div>
+            <div class="attr-code-snippet">
+              [JsonInclude]<br>
+              private decimal _internalDiscount;
+            </div>
+          </div>
+
+          <!-- Card 4: JsonIgnore Condition -->
+          <div class="attr-card">
+            <div>
+              <div class="attr-header">
+                <span class="attr-tag">[JsonIgnore(Condition = ...)]</span>
+              </div>
+              <div class="attr-desc">
+                ข้ามการเขียน Property ลงใน JSON เฉพาะเมื่อค่านั้นมีค่าเป็น <code>null</code> หรือค่า Default ช่วยลดขนาด Payload
+              </div>
+            </div>
+            <div class="attr-code-snippet">
+              [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]<br>
+              public string? MiddleName { get; set; }
+            </div>
+          </div>
+
+          <!-- Card 5: JsonNumberHandling -->
+          <div class="attr-card">
+            <div>
+              <div class="attr-header">
+                <span class="attr-tag">[JsonNumberHandling]</span>
+              </div>
+              <div class="attr-desc">
+                อนุญาตให้อ่านตัวเลขที่ถูกครอบด้วยเครื่องหมายคำพูด (เช่น <code>"123"</code>) หรือเขียนตัวเลขเป็น String ได้อย่างยืดหยุ่น
+              </div>
+            </div>
+            <div class="attr-code-snippet">
+              [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]<br>
+              public int Quantity { get; set; }
+            </div>
+          </div>
+
+          <!-- Card 6: JsonConverter -->
+          <div class="attr-card">
+            <div>
+              <div class="attr-header">
+                <span class="attr-tag">[JsonConverter(typeof(...))]</span>
+              </div>
+              <div class="attr-desc">
+                ปรับแต่งการแปลงข้อมูลขั้นสูง เช่น แปลง Enum เป็นข้อความ (<code>JsonStringEnumConverter</code>) หรือจัดรูปแบบวันที่เฉพาะ
+              </div>
+            </div>
+            <div class="attr-code-snippet">
+              [JsonConverter(typeof(JsonStringEnumConverter))]<br>
+              public OrderStatus Status { get; set; }
+            </div>
+          </div>
+        </div>
+
+        <!-- 2.3 JsonSerializerOptions & Thai Encoding Fix -->
+        <h3 style="margin-top: var(--space-xl); color: var(--text-primary);"><span style="color: var(--accent-primary);">#</span> 3. JsonSerializerOptions และการแก้ปัญหาภาษาไทยถูก Escape</h3>
+        <p style="color: var(--text-secondary);">
+          การตั้งค่า <code>JsonSerializerOptions</code> ช่วยให้เราควบคุมการทำงานทั้งแอปพลิเคชันได้โดยไม่ต้องแปะ Attribute ทีละตัว:
+        </p>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">⚠️ ปัญหาคลาสสิก: ทำไมภาษาไทยกลายเป็น \u0E2A\u0E21\u0E0A\u0E32\u0E22 ใน System.Text.Json?</div>
+          <p>
+            โดยค่าเริ่มต้นเพื่อความปลอดภัยจาก XSS ทาง <code>System.Text.Json</code> จะทำการ Escape อักขระที่ไม่ใช่ Basic Latin (ASCII) ทั้งหมด! 
+            ทำให้ข้อความภาษาไทยถูกแปลงเป็นรหัส Unicode Escaped sequence <code>\uXXXX</code><br>
+            <strong>วิธีแก้:</strong> กำหนด <code>Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)</code> หรือ <code>UnicodeRanges.Thai</code> ใน Options
+          </p>
+        </div>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚙️</span>
+              <span>JsonOptionsConfiguration.cs</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='คัดลอกแล้ว!'; setTimeout(()=>this.innerText='คัดลอก', 2000);">คัดลอก</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">using System;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
+
+public class ConfigExample
+{
+    public static void DemoOptions()
+    {
+        var model = new
+        {
+            customer_name = "นายกิตติศักดิ์ พัฒนาระบบ",
+            total_price = 24900.50,
+            coupon_code = (string?)null, // มีค่าเป็น null
+            created_at = DateTime.Now
+        };
+
+        // 🌟 ปรับแต่ง JsonSerializerOptions แบบมืออาชีพ
+        var options = new JsonSerializerOptions
+        {
+            // 1. จัดย่อหน้าให้อ่านง่าย สวยงาม (Pretty Print)
+            WriteIndented = true,
+
+            // 2. แปลงชื่อ Property เป็น camelCase อัตโนมัติ (เช่น CustomerName ➔ customerName)
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+
+            // 3. ไม่สนใจตัวพิมพ์เล็ก-ใหญ่ตอน Deserialize (เช่น "id", "ID", "Id" อ่านได้หมด)
+            PropertyNameCaseInsensitive = true,
+
+            // 4. ไม่ส่งฟิลด์ที่มีค่าเป็น null ออกมาใน JSON ช่วยประหยัด Payload
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+
+            // 5. ปลดล็อกภาษาไทย! ป้องกันไม่ให้อักษรไทยกลายเป็น \u0E...
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+
+            // 6. ยอมรับ Comma ตัวสุดท้ายใน Array / Object ตอน Deserialize
+            AllowTrailingCommas = true
+        };
+
+        string output = JsonSerializer.Serialize(model, options);
+        Console.WriteLine(output);
+    }
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- 2.4 Interactive Serializer Simulator Playground -->
+        <h3 style="margin-top: var(--space-xl); color: var(--text-primary);">🎛️ ห้องทดลองจำลองผลลัพธ์ JsonSerializerOptions แบบเรียลไทม์</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+          ลองเปิด-ปิดตัวเลือกด้านซ้าย เพื่อดูว่า .NET จะสร้างผลลัพธ์ JSON ออกมาในรูปแบบใด:
+        </p>
+
+        <div class="serializer-sandbox">
+          <div class="sandbox-head">
+            <div style="font-weight: 700; font-family: var(--font-heading); color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+              <span>🧪</span>
+              <span>Interactive JSON Serializer Options Simulator</span>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--accent-success); font-family: var(--font-code);">
+              ● Live Dynamic Evaluation
+            </div>
+          </div>
+          <div class="sandbox-body-grid">
+            <div class="sandbox-options-panel">
+              <div class="option-group">
+                <label>🏷️ Naming Policy</label>
+                <select id="opt-naming" style="width: 100%; padding: 8px; background: var(--bg-primary); border: 1px solid var(--border-default); border-radius: var(--radius-sm); color: var(--text-primary); font-family: var(--font-code); font-size: 0.82rem;">
+                  <option value="camelCase">JsonNamingPolicy.CamelCase (camelCase)</option>
+                  <option value="snake_case">JsonNamingPolicy.SnakeCaseLower (snake_case)</option>
+                  <option value="kebab-case">JsonNamingPolicy.KebabCaseLower (kebab-case)</option>
+                  <option value="PascalCase">Default / PascalCase (ไม่แปลงชื่อ)</option>
+                </select>
+              </div>
+
+              <div class="option-group">
+                <label class="toggle-switch-wrapper">
+                  <span>WriteIndented (จัดระเบียบ)</span>
+                  <input type="checkbox" id="opt-indented" checked>
+                </label>
+              </div>
+
+              <div class="option-group">
+                <label class="toggle-switch-wrapper">
+                  <span>Ignore Null Values</span>
+                  <input type="checkbox" id="opt-ignore-null" checked>
+                </label>
+              </div>
+
+              <div class="option-group">
+                <label class="toggle-switch-wrapper">
+                  <span>แก้ภาษาไทย (UnicodeRanges.All)</span>
+                  <input type="checkbox" id="opt-thai-fix" checked>
+                </label>
+              </div>
+
+              <div class="option-group">
+                <label class="toggle-switch-wrapper">
+                  <span>ซ่อน Secret [JsonIgnore]</span>
+                  <input type="checkbox" id="opt-ignore-secret" checked>
+                </label>
+              </div>
+            </div>
+
+            <div class="sandbox-preview-panel">
+              <div class="preview-panel-header">
+                <span>Output: System.Text.Json Result</span>
+                <span id="output-size-badge" style="color: var(--accent-primary);">~ 142 bytes</span>
+              </div>
+              <div class="preview-panel-content">
+                <pre><code id="json-sandbox-output" class="language-json">กำลังโหลดผลลัพธ์...</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 3: XML ใน .NET (XDocument, LINQ to XML, XmlSerializer) ─── -->
+      <section class="lesson-section reveal" id="dotnet-xml">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(121, 192, 255, 0.2); color: #79c0ff; border: 1px solid #79c0ff;">03</div>
+          <div>
+            <h2>XML ใน .NET: โครงสร้าง, LINQ to XML และ XmlSerializer</h2>
+            <p class="section-subtitle">เข้าใจองค์ประกอบสำคัญของ XML, การจัดการผ่าน XDocument ยุคใหม่ และการใช้งานจริงในงาน Enterprise</p>
+          </div>
+        </div>
+
+        <!-- 3.1 XML Structure Core Elements -->
+        <h3 style="color: var(--text-primary);"><span style="color: var(--syn-tag);">#</span> 1. โครงสร้างและองค์ประกอบหลักของเอกสาร XML</h3>
+        <p style="color: var(--text-secondary); line-height: 1.6;">
+          เอกสาร XML มีโครงสร้างเป็น <strong>Hierarchical Tree Node</strong> ที่ต้องมี Root Element เพียงตัวเดียวเสมอ:
+        </p>
+
+        <div class="xml-dom-diagram">
+          <div class="node-comment">&lt;!-- 1. XML Declaration กำหนดเวอร์ชันและ Encoding --&gt;</div>
+          <div>&lt;?xml version="1.0" encoding="UTF-8"?&gt;</div>
+          
+          <div class="xml-node">
+            <span class="node-tag">&lt;Invoice</span> <span class="node-attr">xmlns="http://schemas.company.com/invoice"</span> <span class="node-attr">id="INV-2026-88"</span> <span class="node-attr">status="Approved"</span><span class="node-tag">&gt;</span>
+            
+            <div class="xml-node">
+              <span class="node-tag">&lt;Customer&gt;</span>
+              <div class="xml-node"><span class="node-tag">&lt;Name&gt;</span><span class="node-val">บริษัท ดอทเน็ต อินโนเวชั่น จำกัด</span><span class="node-tag">&lt;/Name&gt;</span></div>
+              <div class="xml-node"><span class="node-tag">&lt;TaxId&gt;</span><span class="node-val">0105566001234</span><span class="node-tag">&lt;/TaxId&gt;</span></div>
+              <span class="node-tag">&lt;/Customer&gt;</span>
+            </div>
+
+            <div class="xml-node">
+              <span class="node-tag">&lt;Items&gt;</span>
+              <div class="xml-node">
+                <span class="node-tag">&lt;Item</span> <span class="node-attr">sku="DOTNET-COURSE"</span><span class="node-tag">&gt;</span>
+                <div class="xml-node"><span class="node-tag">&lt;Description&gt;</span><span class="node-val">คอร์ส .NET 8 Enterprise Architecture</span><span class="node-tag">&lt;/Description&gt;</span></div>
+                <div class="xml-node"><span class="node-tag">&lt;UnitPrice&gt;</span><span class="node-val">12500.00</span><span class="node-tag">&lt;/UnitPrice&gt;</span></div>
+                <span class="node-tag">&lt;/Item&gt;</span>
+              </div>
+              <span class="node-tag">&lt;/Items&gt;</span>
+            </div>
+
+            <div class="xml-node">
+              <div class="node-comment">&lt;!-- 2. CDATA Block ป้องกัน XML Parser เข้าใจผิดเมื่อมีอักขระ &lt; &gt; &amp; --&gt;</div>
+              <span class="node-tag">&lt;TermsAndConditions&gt;</span>
+              <span class="node-cdata">&lt;![CDATA[ &lt;b&gt;เงื่อนไข:&lt;/b&gt; กรุณาชำระเงินภายใน 30 วัน &amp; ติดต่อ support@company.com ]]&gt;</span>
+              <span class="node-tag">&lt;/TermsAndConditions&gt;</span>
+            </div>
+
+            <span class="node-tag">&lt;/Invoice&gt;</span>
+          </div>
+        </div>
+
+        <div class="concept-card" style="margin-top: var(--space-md);">
+          <div class="concept-header">
+            <div class="concept-emoji">💡</div>
+            <div class="concept-title">CDATA คืออะไร และทำไมต้องใช้?</div>
+          </div>
+          <div class="concept-body" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+            <strong>CDATA (Character Data)</strong> คือบล็อกพิเศษใน XML ที่ระบุว่า <em>"ข้อความภายในนี้คือตัวหนังสือธรรมดา อย่าทำการ Parse เป็น Tag"</em><br>
+            หากคุณต้องการฝังโค้ด HTML, ข้อความที่มีเครื่องหมายน้อยกว่า <code>&lt;</code>, มากกว่า <code>&gt;</code> หรือแอมเพอร์แซนด์ <code>&amp;</code> โดยไม่ต้องคอยแปลงเป็น <code>&amp;lt;</code>, <code>&amp;gt;</code>, <code>&amp;amp;</code> การครอบด้วย <code>&lt;![CDATA[ ... ]]&gt;</code> จะช่วยป้องกัน XML Parse Exception ได้ทันที
+          </div>
+        </div>
+
+        <!-- 3.2 LINQ to XML (XDocument & XElement) -->
+        <h3 style="margin-top: var(--space-xl); color: var(--text-primary);"><span style="color: var(--syn-type);">#</span> 2. การสร้างและสืบค้น XML ด้วย LINQ to XML (XDocument)</h3>
+        <p style="color: var(--text-secondary);">
+          ใน .NET ยุคใหม่ <code>System.Xml.Linq</code> เป็นเครื่องมือที่ดีที่สุดในการทำงานกับ XML เพราะเขียนโค้ดสั้น ใช้งานร่วมกับคำสั่ง LINQ ได้อย่างทรงพลัง (แทนที่ <code>XmlDocument</code> แบบเก่าใน .NET 2.0):
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">⚡</span>
+              <span>LinqToXmlExample.cs</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='คัดลอกแล้ว!'; setTimeout(()=>this.innerText='คัดลอก', 2000);">คัดลอก</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">using System;
+using System.Linq;
+using System.Xml.Linq;
+
+public class XmlLinqDemo
+{
+    public static void Run()
+    {
+        // 🌟 1. สร้าง XML Document ด้วย Functional Construction (อ่านง่ายมาก)
+        var xmlDoc = new XDocument(
+            new XDeclaration("1.0", "utf-8", "yes"),
+            new XElement("Warehouse",
+                new XElement("Product",
+                    new XAttribute("id", "P001"),
+                    new XAttribute("category", "Hardware"),
+                    new XElement("Name", "NVMe SSD 2TB"),
+                    new XElement("Price", 4500),
+                    new XElement("Stock", 15)
+                ),
+                new XElement("Product",
+                    new XAttribute("id", "P002"),
+                    new XAttribute("category", "Software"),
+                    new XElement("Name", "Visual Studio Enterprise"),
+                    new XElement("Price", 42000),
+                    new XElement("Stock", 99)
+                ),
+                new XElement("Product",
+                    new XAttribute("id", "P003"),
+                    new XAttribute("category", "Hardware"),
+                    new XElement("Name", "RAM DDR5 64GB"),
+                    new XElement("Price", 7800),
+                    new XElement("Stock", 4)
+                )
+            )
+        );
+
+        // 🌟 2. ค้นหาข้อมูลด้วย LINQ Query อันทรงพลัง
+        // โจทย์: ค้นหาสินค้าหมวด 'Hardware' ที่มีราคามากกว่า 5,000 บาท
+        var expensiveHardware = from prod in xmlDoc.Descendants("Product")
+                                where (string)prod.Attribute("category")! == "Hardware"
+                                   && (decimal)prod.Element("Price")! > 5000
+                                select new
+                                {
+                                    Id = (string)prod.Attribute("id")!,
+                                    Name = (string)prod.Element("Name")!,
+                                    Price = (decimal)prod.Element("Price")!
+                                };
+
+        Console.WriteLine("=== สินค้า Hardware ราคา > 5,000 บาท ===");
+        foreach (var item in expensiveHardware)
+        {
+            Console.WriteLine($"[{item.Id}] {item.Name} - ฿{item.Price:N0}");
+        }
+
+        // 🌟 3. อัปเดตข้อมูลใน XML Node ได้ทันที
+        var ssdNode = xmlDoc.Descendants("Product")
+                            .FirstOrDefault(p => (string)p.Attribute("id")! == "P001");
+        if (ssdNode != null)
+        {
+            ssdNode.Element("Price")!.Value = "4190"; // ลดราคา
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="code-block-output">
+            <span class="output-label">🖥️ Output:</span>
+            <span class="output-text">
+              === สินค้า Hardware ราคา &gt; 5,000 บาท ===<br>
+              [P003] RAM DDR5 64GB - ฿7,800
+            </span>
+          </div>
+        </div>
+
+        <!-- 3.3 XmlSerializer with Attributes -->
+        <h3 style="margin-top: var(--space-xl); color: var(--text-primary);"><span style="color: var(--syn-method);">#</span> 3. แปลง POCO Class เป็น XML ด้วย XmlSerializer</h3>
+        <p style="color: var(--text-secondary);">
+          หากต้องการ Serialize ออบเจกต์ C# ให้กลายเป็น XML แบบอัตโนมัติ เราสามารถใช้ <code>XmlSerializer</code> ร่วมกับ XML Attributes:
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">📦</span>
+              <span>XmlSerializerDemo.cs</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='คัดลอกแล้ว!'; setTimeout(()=>this.innerText='คัดลอก', 2000);">คัดลอก</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">using System;
+using System.IO;
+using System.Xml.Serialization;
+
+// 1. ตกแต่ง C# Class ด้วย XML Serialization Attributes
+[XmlRoot("PurchaseOrder", Namespace = "https://ecommerce.example.com/po")]
+public class PurchaseOrder
+{
+    [XmlAttribute("orderNo")]
+    public string OrderNumber { get; set; } = string.Empty;
+
+    [XmlElement("OrderDate")]
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
+    [XmlElement("BuyerName")]
+    public string Customer { get; set; } = string.Empty;
+
+    [XmlArray("OrderItems")]
+    [XmlArrayItem("Item")]
+    public OrderItem[] Items { get; set; } = Array.Empty&lt;OrderItem&gt;();
+
+    [XmlIgnore] // ไม่นำฟิลด์นี้มาบันทึกลง XML
+    public string InternalSecretNotes { get; set; } = string.Empty;
+}
+
+public class OrderItem
+{
+    [XmlAttribute("code")]
+    public string ProductCode { get; set; } = string.Empty;
+
+    [XmlElement("Quantity")]
+    public int Qty { get; set; }
+
+    [XmlElement("Amount")]
+    public decimal Price { get; set; }
+}
+
+public class SerializerProgram
+{
+    public static void Main()
+    {
+        var po = new PurchaseOrder
+        {
+            OrderNumber = "PO-99412",
+            Customer = "นายอนันต์ นพคุณ",
+            Items = new[]
+            {
+                new OrderItem { ProductCode = "SKU-01", Qty = 2, Price = 1500m },
+                new OrderItem { ProductCode = "SKU-02", Qty = 1, Price = 3200m }
+            }
+        };
+
+        var serializer = new XmlSerializer(typeof(PurchaseOrder));
+        using var stringWriter = new StringWriter();
+        serializer.Serialize(stringWriter, po);
+
+        Console.WriteLine(stringWriter.ToString());
+    }
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- 3.4 XML in Real-World .NET Systems -->
+        <h3 style="margin-top: var(--space-xl); color: var(--text-primary);">🏢 XML ในงานจริงของนักพัฒนา .NET (Enterprise Real-World Scenarios)</h3>
+        <p style="color: var(--text-secondary);">
+          แม้ว่า JSON จะครองโลก REST API แต่ในระบบ Enterprise คุณจะได้พบกับ XML ในบริบทสำคัญต่อไปนี้เสมอ:
+        </p>
+
+        <div class="use-case-grid">
+          <div class="use-case-card">
+            <div class="use-case-top">
+              <div class="use-case-icon">📁</div>
+              <div>
+                <div class="use-case-title">.csproj Project Files</div>
+                <div class="use-case-badge">MSBuild Engine</div>
+              </div>
+            </div>
+            <div class="use-case-desc">
+              ไฟล์โปรเจกต์ของ .NET ทั้งหมด (เช่น .csproj, .vbproj) คือเอกสาร XML แท้ๆ ที่ระบุ TargetFramework, NuGet Packages, Build Configurations และ Source Files
+            </div>
+          </div>
+
+          <div class="use-case-card">
+            <div class="use-case-top">
+              <div class="use-case-icon">🏦</div>
+              <div>
+                <div class="use-case-title">ISO 20022 Financial Standard</div>
+                <div class="use-case-badge">SWIFT &amp; National Banking</div>
+              </div>
+            </div>
+            <div class="use-case-desc">
+              มาตรฐานการส่งข้อความทางการเงินระดับโลก (เช่น ระบบพร้อมเพย์, SWIFT MX Messages) ใช้ XML + XSD Schema ตรวจสอบความถูกต้องของการโอนเงินอย่างเข้มงวด
+            </div>
+          </div>
+
+          <div class="use-case-card">
+            <div class="use-case-top">
+              <div class="use-case-icon">🛡️</div>
+              <div>
+                <div class="use-case-title">SAML 2.0 Identity Tokens</div>
+                <div class="use-case-badge">Enterprise SSO &amp; ADFS</div>
+              </div>
+            </div>
+            <div class="use-case-desc">
+              ระบบ Single Sign-On ภายในองค์กรขนาดใหญ่ (เช่น Microsoft Entra ID / Okta / Shibboleth) ส่ง Assertions ในรูป XML ที่มีการเข้ารหัสและเซ็น Digital Signature
+            </div>
+          </div>
+
+          <div class="use-case-card">
+            <div class="use-case-top">
+              <div class="use-case-icon">🔌</div>
+              <div>
+                <div class="use-case-title">SOAP &amp; WSDL Web Services</div>
+                <div class="use-case-badge">Legacy WCF &amp; Gov APIs</div>
+              </div>
+            </div>
+            <div class="use-case-desc">
+              บริการเว็บเซอร์วิสรุ่นเก๋าของหน่วยงานรัฐ, บริษัทประกันภัย และ Core Banking ที่สื่อสารด้วย SOAP Envelopes ผ่าน XML
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 4: การแปลงระหว่าง JSON กับ C# Classes (Productivity) ─── -->
+      <section class="lesson-section reveal" id="conversion-tools">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(210, 168, 255, 0.2); color: #d2a8ff; border: 1px solid #d2a8ff;">04</div>
+          <div>
+            <h2>ทางลัดเพิ่ม Productivity: แปลง JSON สู่ C# Classes &amp; Records</h2>
+            <p class="section-subtitle">เทคนิคระดับโปรใน Visual Studio, เครื่องมือออนไลน์ และการออกแบบ DTO ที่ปลอดภัย</p>
+          </div>
+        </div>
+
+        <!-- 4.1 Paste JSON as Classes -->
+        <div class="concept-card">
+          <div class="concept-header">
+            <div class="concept-emoji">⚡</div>
+            <div>
+              <div class="concept-title">Visual Studio Secret: Edit &gt; Paste Special &gt; Paste JSON as Classes</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">ฟีเจอร์เด็ดที่ไม่ต้องพิมพ์ C# Class เองแม้แต่บรรทัดเดียว!</div>
+            </div>
+          </div>
+          <div class="concept-body">
+            <p style="color: var(--text-secondary); line-height: 1.6;">
+              เมื่อคุณได้ตัวอย่าง JSON ก้อนยักษ์มาจาก Third-Party API (เช่น Stripe, Payment Gateway หรือ Twitter API) คุณไม่จำเป็นต้องมานั่งพิมพ์ Class ทีละ Property:
+            </p>
+            <ol style="color: var(--text-secondary); line-height: 1.8; margin-left: 20px;">
+              <li>คัดลอก (Copy) ข้อความ JSON ก้อนตัวอย่าง</li>
+              <li>เปิด Visual Studio ในไฟล์ <code>.cs</code> ที่ต้องการวาง</li>
+              <li>ไปที่เมนูด้านบน: <strong>Edit ➔ Paste Special ➔ Paste JSON as Classes</strong> (หรือ <em>Paste XML as Classes</em>)</li>
+              <li>Visual Studio จะสร้างโครงสร้าง Class พร้อม Nested Classes และ Types ที่ถูกต้องให้ทันทีภายใน 1 วินาที!</li>
+            </ol>
+
+            <div style="display: flex; gap: var(--space-md); flex-wrap: wrap; margin-top: var(--space-md);">
+              <a href="https://quicktype.io" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+                🌐 quicktype.io (รองรับ C# Record &amp; System.Text.Json)
+              </a>
+              <a href="https://json2csharp.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+                🌐 json2csharp.com
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4.2 C# 9+ Record DTO Pattern -->
+        <h3 style="margin-top: var(--space-xl); color: var(--text-primary);"><span style="color: var(--syn-method);">#</span> Modern DTO Modeling: ใช้ Positional Records (C# 9+)</h3>
+        <p style="color: var(--text-secondary);">
+          ใน .NET 8 การออกแบบ Data Transfer Object (DTO) นิยมใช้ <code>record</code> เพราะเขียนสั้น ได้ความสามารถ Immutability (Read-only) และ Value-equality ในตัว:
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <div class="file-info">
+              <span class="file-icon">💎</span>
+              <span>ModernDtoPatterns.cs</span>
+            </div>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); this.innerText='คัดลอกแล้ว!'; setTimeout(()=>this.innerText='คัดลอก', 2000);">คัดลอก</button>
+          </div>
+          <div class="code-block-body">
+            <pre><code class="language-csharp">using System;
+using System.Text.Json.Serialization;
+
+namespace DotNetHub.Dtos;
+
+// 🌟 ตัวอย่างการสร้าง DTO ด้วย Positional Record เขียนแค่บรรทัดเดียว!
+public record WeatherForecastDto(
+    [property: JsonPropertyName("date")] DateOnly Date,
+    [property: JsonPropertyName("temperature_c")] int TemperatureC,
+    [property: JsonPropertyName("summary")] string? Summary
+)
+{
+    // คำนวณค่าเพิ่มเติมได้สะดวก
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}
+
+// 🌟 ซ้อนออบเจกต์ (Nested Records) ได้อย่างคลีน
+public record ApiResponseDto&lt;T&gt;(
+    [property: JsonPropertyName("status_code")] int StatusCode,
+    [property: JsonPropertyName("is_success")] bool IsSuccess,
+    [property: JsonPropertyName("message")] string Message,
+    [property: JsonPropertyName("data")] T? Data
+);</code></pre>
+          </div>
+        </div>
+
+        <!-- 4.3 Interactive JSON to C# Converter Sandbox -->
+        <h3 style="margin-top: var(--space-xl); color: var(--text-primary);">🛠️ เครื่องมือแปลง JSON เป็น C# DTO แบบสดบนเบราว์เซอร์</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+          วาง JSON ของคุณลงในช่องซ้ายมือ แล้วกดปุ่มแปลงเพื่อดูโค้ด C# Class / Record ได้ทันที:
+        </p>
+
+        <div class="converter-tool-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-sm);">
+            <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary);">
+              🔄 Quick JSON to C# Generator
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <select id="gen-mode" style="padding: 6px 10px; background: var(--bg-tertiary); border: 1px solid var(--border-default); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.8rem; font-family: var(--font-code);">
+                <option value="record">C# Positional Record (Modern)</option>
+                <option value="class">C# Standard Class (POCO)</option>
+              </select>
+              <button id="btn-convert-json" class="btn btn-primary btn-sm">
+                ⚡ แปลงทันที
+              </button>
+            </div>
+          </div>
+
+          <div class="converter-grid">
+            <div>
+              <div style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; font-family: var(--font-code);">
+                JSON Input:
+              </div>
+              <textarea id="json-raw-input" class="converter-textarea">{
+  "user_id": 4029,
+  "user_name": "seeya_dev",
+  "email": "seeya@example.com",
+  "is_verified": true,
+  "credit_balance": 1850.50,
+  "skills": ["C#", ".NET 8", "SQL", "Blazor"]
+}</textarea>
+            </div>
+            <div>
+              <div style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; font-family: var(--font-code);">
+                Generated C# Model:
+              </div>
+              <textarea id="csharp-generated-output" class="converter-textarea" readonly style="background: var(--bg-code); color: var(--syn-type);"></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section 5: Inline Quiz ─── -->
+      <section class="lesson-section reveal" id="quiz">
+        <div class="section-header">
+          <div class="section-number" style="background: rgba(248, 81, 73, 0.2); color: var(--accent-danger); border: 1px solid var(--accent-danger);">05</div>
+          <div>
+            <h2>แบบทดสอบวัดความเข้าใจ (XML &amp; JSON Mastery Quiz)</h2>
+            <p class="section-subtitle">ทดสอบความรู้ 5 ข้อเกี่ยวกับ Serialization, Attributes, LINQ to XML และการแก้ปัญหาใน .NET 8</p>
+          </div>
+        </div>
+
+        <!-- Quiz Container targeted by QuizEngine -->
+        <div id="xml-json-quiz" class="quiz-container">
+          <!-- Rendered dynamically by QuizEngine -->
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       Scripts
+       ══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+  <script src="../js/code-visualizer.js"></script>
+  <script src="../js/animation-controller.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ══════════════════════════════════════════════════════════
+      // 1. Live Serializer Options Simulator Logic
+      // ══════════════════════════════════════════════════════════
+      const optNaming = document.getElementById('opt-naming');
+      const optIndented = document.getElementById('opt-indented');
+      const optIgnoreNull = document.getElementById('opt-ignore-null');
+      const optThaiFix = document.getElementById('opt-thai-fix');
+      const optIgnoreSecret = document.getElementById('opt-ignore-secret');
+      const outputElem = document.getElementById('json-sandbox-output');
+      const outputSizeBadge = document.getElementById('output-size-badge');
+
+      function updateJsonSimulation() {
+        const naming = optNaming.value;
+        const indented = optIndented.checked;
+        const ignoreNull = optIgnoreNull.checked;
+        const thaiFix = optThaiFix.checked;
+        const ignoreSecret = optIgnoreSecret.checked;
+
+        // Base Data Dictionary
+        const rawData = [
+          { key: "UserId", val: 108 },
+          { key: "CustomerName", val: thaiFix ? "นายธนวัฒน์ เจริญสุข" : "\\u0E18\\u0E19\\u0E27\\u0E31\\u0E12\\u0E19\\u0E4C \\u0E40\\u0E08\\u0E23\\u0E34\\u0E0D\\u0E2Parse" },
+          { key: "IsSubscribed", val: true },
+          { key: "PhoneNumber", val: null },
+          { key: "InternalSecretToken", val: "sec_9941a8b9f", isSecret: true },
+          { key: "AccountBalance", val: 8450.50 }
+        ];
+
+        // Format Keys
+        function formatKey(key) {
+          if (naming === 'camelCase') {
+            return key.charAt(0).toLowerCase() + key.slice(1);
+          } else if (naming === 'snake_case') {
+            return key.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+          } else if (naming === 'kebab-case') {
+            return key.replace(/([A-Z])/g, '-$1').toLowerCase().replace(/^-/, '');
+          }
+          return key; // PascalCase
+        }
+
+        const filtered = {};
+        rawData.forEach(item => {
+          if (item.isSecret && ignoreSecret) return; // [JsonIgnore]
+          if (item.val === null && ignoreNull) return; // WhenWritingNull
+          
+          filtered[formatKey(item.key)] = item.val;
+        });
+
+        let jsonStr = "";
+        if (indented) {
+          jsonStr = JSON.stringify(filtered, null, 2);
+        } else {
+          jsonStr = JSON.stringify(filtered);
+        }
+
+        // Unescape mock Thai unicode if checked
+        if (!thaiFix) {
+          jsonStr = jsonStr.replace('"นายธนวัฒน์ เจริญสุข"', '"\\u0E18\\u0E19\\u0E27\\u0E31\\u0E12\\u0E19\\u0E4C \\u0E40\\u0E08\\u0E23\\u0E34\\u0E0D\\u0E2A\\u0E38\\u0E02"');
+        }
+
+        outputElem.textContent = jsonStr;
+        outputSizeBadge.textContent = `~ ${new Blob([jsonStr]).size} bytes`;
+
+        if (window.Prism) {
+          Prism.highlightElement(outputElem);
+        }
+      }
+
+      [optNaming, optIndented, optIgnoreNull, optThaiFix, optIgnoreSecret].forEach(el => {
+        if (el) el.addEventListener('change', updateJsonSimulation);
+      });
+      updateJsonSimulation();
+
+      // ══════════════════════════════════════════════════════════
+      // 2. Interactive JSON to C# Generator Logic
+      // ══════════════════════════════════════════════════════════
+      const btnConvert = document.getElementById('btn-convert-json');
+      const jsonRawInput = document.getElementById('json-raw-input');
+      const csharpOutput = document.getElementById('csharp-generated-output');
+      const genMode = document.getElementById('gen-mode');
+
+      function generateCSharp() {
+        try {
+          const parsed = JSON.parse(jsonRawInput.value);
+          const isRecord = genMode.value === 'record';
+
+          function toPascal(str) {
+            return str
+              .replace(/[-_](.)/g, (_, c) => c.toUpperCase())
+              .replace(/^(.)/, c => c.toUpperCase());
+          }
+
+          function inferType(val) {
+            if (val === null) return "string?";
+            if (typeof val === 'number') return Number.isInteger(val) ? "int" : "decimal";
+            if (typeof val === 'boolean') return "bool";
+            if (Array.isArray(val)) {
+              if (val.length === 0) return "string[]";
+              return `${inferType(val[0])}[]`;
+            }
+            if (typeof val === 'object') return "object";
+            return "string";
+          }
+
+          let code = "";
+          if (isRecord) {
+            code += "// Generated with .NET 8 Positional Record Pattern\n";
+            code += "using System.Text.Json.Serialization;\n\n";
+            code += "public record UserDataDto(\n";
+            const keys = Object.keys(parsed);
+            keys.forEach((k, idx) => {
+              const type = inferType(parsed[k]);
+              const propName = toPascal(k);
+              const isLast = idx === keys.length - 1;
+              code += `    [property: JsonPropertyName("${k}")] ${type} ${propName}${isLast ? "" : ","}\n`;
+            });
+            code += ");";
+          } else {
+            code += "// Generated with Standard C# POCO Class Pattern\n";
+            code += "using System.Text.Json.Serialization;\n\n";
+            code += "public class UserDataDto\n{\n";
+            for (const [k, v] of Object.entries(parsed)) {
+              const type = inferType(v);
+              const propName = toPascal(k);
+              code += `    [JsonPropertyName("${k}")]\n`;
+              code += `    public ${type} ${propName} { get; set; }\n\n`;
+            }
+            code += "}";
+          }
+
+          csharpOutput.value = code;
+        } catch (e) {
+          csharpOutput.value = `// ❌ JSON Format Error: ${e.message}`;
+        }
+      }
+
+      if (btnConvert) {
+        btnConvert.addEventListener('click', generateCSharp);
+        generateCSharp();
+      }
+
+      // ══════════════════════════════════════════════════════════
+      // 3. Quiz Definition & Initialization
+      // ══════════════════════════════════════════════════════════
+      const quizQuestions = [
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ใน System.Text.Json หากต้องการเปลี่ยนชื่อ Key ใน JSON เช่น "user_id" ให้แมปเข้ากับ Property ใน C# ที่ชื่อ "UserId" จะต้องใช้ Attribute ใด?',
+          options: [
+            '[JsonMap("user_id")]',
+            '[JsonPropertyName("user_id")]',
+            '[DataMember(Name = "user_id")]',
+            '[XmlAttribute("user_id")]'
+          ],
+          answer: 1,
+          explanation: '[JsonPropertyName("name")] ใน System.Text.Json.Serialization ใช้ระบุชื่อ key ใน JSON ที่ต้องการให้อ่านและเขียนจับคู่กับ Property ของ C#'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ข้อใดคือเหตุผลหลักที่ System.Text.Json ใน .NET 8 มีประสิทธิภาพและความเร็วสูงกว่า Newtonsoft.Json (Json.NET) รุ่นดั้งเดิม?',
+          options: [
+            'System.Text.Json ไม่รองรับการอ่านตัวเลขทศนิยม',
+            'ทำงานบน ReadOnlySpan<byte> และ Utf8JsonReader จัดการหน่วยความจำแบบ Zero/Low Allocation โดยตรงกับ UTF-8 byte stream',
+            'System.Text.Json บังคับให้เขียนโค้ดด้วยภาษา C++ เสมอ',
+            'ตัดการทำงานของ Thread Pool ออกทั้งหมด'
+          ],
+          answer: 1,
+          explanation: 'System.Text.Json ถูกออกแบบใหม่ตั้งแต่ฐานรากใน .NET Core โดยใช้ Span<T>, Memory<T> และ Utf8JsonReader เพื่อประมวลผล UTF-8 bytes โดยตรง ช่วยลดการจอง Memory (Allocation) และลดภาระ Garbage Collection มหาศาล'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'intermediate',
+          question: 'เมื่อ Serialize ข้อมูลภาษาไทยด้วย System.Text.Json แล้วพบว่าข้อความกลายเป็น Unicode Escape เช่น "\\u0E2A\\u0E21\\u0E0A\\u0E32\\u0E22" จะต้องแก้ไขผ่าน JsonSerializerOptions อย่างไร?',
+          options: [
+            'กำหนด PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower',
+            'กำหนด AllowTrailingCommas = true',
+            'กำหนด Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) หรือ UnicodeRanges.Thai',
+            'กำหนด DefaultIgnoreCondition = JsonIgnoreCondition.Always'
+          ],
+          answer: 2,
+          explanation: 'ค่าเริ่มต้นของ System.Text.Json จะ Escape อักขระที่ไม่ใช่ Basic Latin เพื่อความปลอดภัยทางเว็บ การกำหนด JavaScriptEncoder.Create(UnicodeRanges.All) จะอนุญาตให้อักขระภาษาไทยถูกเขียนออกมาเป็นตัวหนังสือไทยที่อ่านได้ตามปกติ'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'basic',
+          question: 'ในโครงสร้างของเอกสาร XML บล็อก <![CDATA[ ... ]]> มีไว้เพื่อวัตถุประสงค์ใด?',
+          options: [
+            'ใช้สำหรับเข้ารหัสรหัสผ่านด้วยวิธี SHA-256',
+            'ใช้เก็บข้อความดิบที่มีอักขระพิเศษ (เช่น <, >, & หรือโค้ด HTML) โดยไม่ให้ XML Parser ตีความเป็นแท็กโครงสร้าง',
+            'ใช้กำหนดให้ XML ประมวลผลแบบ Multi-threading',
+            'ใช้ระบุ URL สำหรับดาวน์โหลด XSD Schema อัตโนมัติ'
+          ],
+          answer: 1,
+          explanation: 'CDATA (Character Data) บอก XML Parser ว่าข้อมูลภายในเป็นเพียง Text ธรรมดา ห้ามประมวลผลเป็นแท็ก ทำให้สามารถใส่เครื่องหมาย <, > และ & ได้อย่างปลอดภัยโดยไม่เกิด Parse Error'
+        },
+        {
+          type: 'multiple-choice',
+          difficulty: 'intermediate',
+          question: 'ใน .NET ยุคใหม่ หากต้องการสร้าง ค้นหา และปรับปรุงข้อมูลในเอกสาร XML ร่วมกับคำสั่ง LINQ ได้อย่างสะดวกและกระชับที่สุด ควรเลือกใช้คลาสใดใน System.Xml.Linq?',
+          options: [
+            'XmlDocument และ XmlNode (DOM รุ่นเก่า)',
+            'XDocument และ XElement (LINQ to XML)',
+            'XmlTextWriter แบบ Forward-only',
+            'BinaryFormatter'
+          ],
+          answer: 1,
+          explanation: 'XDocument และ XElement ใน System.Xml.Linq (LINQ to XML) เป็น API สมัยใหม่ที่ออกแบบมาเพื่อทำงานร่วมกับ LINQ และ Functional Construction ได้อย่างมีประสิทธิภาพและอ่านง่ายกว่า XmlDocument แบบดั้งเดิม'
+        }
+      ];
+
+      // Initialize Quiz with QuizEngine
+      if (typeof QuizEngine !== 'undefined') {
+        QuizEngine.start('xml-json-quiz', quizQuestions, {
+          quizId: 'xml-json-mastery',
+          showTimer: false,
+          showExplanation: true
+        });
+      }
+    });
+  </script>
+</body>
+</html>

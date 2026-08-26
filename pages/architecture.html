@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Architecture & Clean Architecture — DotNet Learning Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">🏛️</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน</a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP</a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections & LINQ</a>
+    <a href="./csharp-advanced.html" class="sidebar-link"><span class="link-icon">📕</span> C# ขั้นสูง</a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET</a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection</a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware</a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-link"><span class="link-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link"><span class="link-icon">🎮</span> SQL Playground</a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link"><span class="link-icon">🧩</span> Blazor Components</a>
+    <a href="./xaml-basics.html" class="sidebar-link"><span class="link-icon">📐</span> XAML พื้นฐาน</a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML & JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps & Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git & CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link"><span class="link-icon">🛡️</span> Secure Coding</a>
+
+    <div class="sidebar-section-title">🟡 Web & คุณภาพ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link"><span class="link-icon">👀</span> Code Review</a>
+    <a href="./sdlc-agile.html" class="sidebar-link"><span class="link-icon">📋</span> SDLC & Agile</a>
+    <a href="./tech-docs.html" class="sidebar-link"><span class="link-icon">📝</span> Technical Docs</a>
+    <a href="./architecture.html" class="sidebar-link active"><span class="link-icon">🏛️</span> Architecture <span class="link-badge badge-mid">กลาง</span></a>
+
+    <div class="sidebar-section-title">🎮 Games & Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> เตรียมสัมภาษณ์</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header reveal">
+            <div class="breadcrumb">
+                <a href="../index.html">🏠 หน้าแรก</a>
+                <span>/</span>
+                <span>Architecture Track</span>
+                <span>/</span>
+                <span>Clean Architecture & Patterns</span>
+            </div>
+            <div class="page-title">
+                <div class="title-icon" style="background: var(--cat-arch); color: #fff;">🏛️</div>
+                <h1>Clean Architecture & Enterprise Patterns ใน .NET</h1>
+            </div>
+            <p class="page-description">
+                สถาปัตยกรรมระดับองค์กร (Clean Architecture / Onion Architecture), การแบ่ง 4 เลเยอร์มาตรฐาน, Repository Pattern, CQRS และ MediatR
+            </p>
+            <div class="page-meta">
+                <span class="meta-item">⭐ ระดับ: กลาง</span>
+                <span class="meta-item">⏱️ เวลา: ~50 นาที</span>
+                <span class="meta-item">⚡ รางวัล: +100 XP</span>
+                <span class="meta-item">🏷️ Clean Architecture / CQRS / MediatR</span>
+            </div>
+        </div>
+
+        <!-- Analogy Section -->
+        <div class="concept-card reveal">
+            <div class="concept-header">
+                <span class="concept-emoji">🧅</span>
+                <span class="concept-title">เปรียบเทียบให้เห็นภาพ: หัวหอมและกำแพงเมืองโบราณ</span>
+            </div>
+            <div class="concept-body">
+                <div class="analogy-box">
+                    <div class="analogy-label">💡 Analogy</div>
+                    <p class="analogy-text">
+                        • <strong>Domain Layer (แก่นกลางหัวหอม):</strong> เหมือน <strong>พระราชวังชั้นในสุด</strong> ที่มีกฎทางธุรกิจ (Business Rules/Entities) บริสุทธิ์ที่สุด ไม่ขึ้นต่อใครเลย ไม่รู้ด้วยซ้ำว่าข้างนอกใช้ Database อะไร<br>
+                        • <strong>Application Layer:</strong> เหมือน <strong>เหล่าขุนนางที่ดูแลคำสั่งราชการ (Use Cases / CQRS Handlers)</strong> กำหนดว่าเมื่อมีคำสั่งซื้อเกิดขึ้น ต้องทำอะไรตามลำดับ<br>
+                        • <strong>Infrastructure Layer:</strong> เหมือน <strong>กองทหารขนส่งและคลังอาวุธ</strong> เชื่อมต่อกับโลกภายนอก (SQL Server, Email Server, Third-Party API)<br>
+                        • <strong>Presentation / API Layer (เปลือกนอกสุด):</strong> เหมือน <strong>ประตูเมืองและตลาดรับแขก</strong> (Controllers, Swagger) รับคำขอจากลูกค้าแล้วส่งต่อเข้าวัง
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: The 4 Layers -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-arch); color: #fff;">01</div>
+                <h2>4 เลเยอร์มาตรฐานของ Clean Architecture ใน .NET</h2>
+            </div>
+
+            <div class="flow-diagram mb-lg">
+                <div class="mermaid">
+graph TD
+    API["🌐 Presentation Layer (Web API, Controllers, Program.cs)"]
+    Infra["🗄️ Infrastructure Layer (EF Core, SQL Server, EmailClient)"]
+    App["⚙️ Application Layer (Use Cases, DTOs, MediatR Handlers)"]
+    Domain["💎 Domain Layer (Entities, Enums, Value Objects)"]
+
+    API --> App
+    Infra --> App
+    App --> Domain
+    Infra --> Domain
+                </div>
+            </div>
+
+            <div class="callout callout-info">
+                <div class="callout-title">📐 กฎ Dependency Rule ของ Clean Architecture</div>
+                <p><strong>การพึ่งพา (Dependency) ต้องชี้เข้าสู่ด้านในเสมอ!</strong> เลเยอร์ชั้นใน (Domain & Application) ต้อง <strong>ไม่มีการอ้างอิง (Reference)</strong> ไปยังเลเยอร์ชั้นนอก (Infrastructure หรือ Presentation) เลยเด็ดขาด</p>
+            </div>
+        </section>
+
+        <!-- Section 2: CQRS & MediatR -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-arch); color: #fff;">02</div>
+                <h2>CQRS Pattern (Command Query Responsibility Segregation) & MediatR</h2>
+            </div>
+            <p><strong>CQRS</strong> แยกการทำงานระหว่าง <strong>คำสั่งแก้ไขข้อมูล (Command)</strong> และ <strong>คำขอดึงข้อมูล (Query)</strong> ออกจากกันเพื่อความสะอาดและ Scale ง่าย:</p>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> CreateProductCommand.cs (MediatR Example)</div>
+                    <button class="copy-btn">📋 Copy</button>
+                </div>
+                <div class="code-block-body">
+<pre class="language-csharp"><code>// 1. Command (ข้อมูลคำขอสร้างสินค้า)
+public record CreateProductCommand(string Name, decimal Price, int Stock) : IRequest&lt;int&gt;;
+
+// 2. Command Handler (Logic การประมวลผลคำสั่ง)
+public class CreateProductCommandHandler : IRequestHandler&lt;CreateProductCommand, int&gt;
+{
+    private readonly ApplicationDbContext _db;
+
+    public CreateProductCommandHandler(ApplicationDbContext db)
+    {
+        _db = db;
+    }
+
+    public async Task&lt;int&gt; Handle(CreateProductCommand request, CancellationToken cancellationToken)
+    {
+        var product = new Product
+        {
+            Name = request.Name,
+            Price = request.Price,
+            Stock = request.Stock
+        };
+
+        _db.Products.Add(product);
+        await _db.SaveChangesAsync(cancellationToken);
+
+        return product.Id; // ส่ง ID ที่สร้างกลับไป
+    }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Quiz -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-warning); color: #000;">🎯</div>
+                <h2>แบบทดสอบความเข้าใจ: Clean Architecture</h2>
+            </div>
+            <div id="architecture-quiz"></div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/quiz-engine.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'ใน Clean Architecture เลเยอร์ใดเป็นแก่นกลางของระบบ (Core) และต้องไม่มีการพึ่งพา (Dependency) เลเยอร์อื่นเลย?',
+                options: ['Domain Layer', 'Infrastructure Layer', 'Presentation Layer', 'Web API Layer'],
+                answer: 0,
+                explanation: 'Domain Layer คือหัวใจของ Business Logic บริสุทธิ์ ประกอบด้วย Entities, Enums และ Business Rules',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'ตามกฎ Dependency Rule ของ Clean Architecture ทิศทางการพึ่งพาของโค้ดควรเป็นอย่างไร?',
+                options: [
+                    'เลเยอร์ชั้นนอกต้องพึ่งพาเลเยอร์ชั้นใน โดยเลเยอร์ชั้นในต้องไม่รู้รายละเอียดของเลเยอร์ชั้นนอก',
+                    'ทุกเลเยอร์พึ่งพาซึ่งกันและกันได้อิสระ',
+                    'Domain ต้องพึ่งพา Database SQL Server เสมอ',
+                    'Controllers ต้องสร้าง Table เอง'
+                ],
+                answer: 0,
+                explanation: 'Dependency Rule บังคับให้ Dependencies ชี้เข้าสู่ศูนย์กลางเสมอ เพื่อให้ Business Logic เป็นอิสระจาก Framework และ Database',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'CQRS ย่อมาจากคำว่าอะไร?',
+                options: [
+                    'Command Query Responsibility Segregation',
+                    'Central Query Resource Server',
+                    'Core Quality Realtime System',
+                    'Control Queue Response Standard'
+                ],
+                answer: 0,
+                explanation: 'CQRS แยกการประมวลผลคำสั่งเปลี่ยนแปลงข้อมูล (Command) ออกจากการสืบค้นข้อมูล (Query)',
+                difficulty: 'basic'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'EF Core DbContext และการเชื่อมต่อ SQL Server ควรจัดวางอยู่ในเลเยอร์ใดของ Clean Architecture?',
+                options: ['Infrastructure Layer', 'Domain Layer', 'Application Layer', 'Client UI'],
+                answer: 0,
+                explanation: 'Infrastructure Layer มีหน้าที่ดูแลการเชื่อมต่อกับเครื่องมือภายนอก เช่น Database, File System, Email Client',
+                difficulty: 'mid'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'ประโยชน์หลักของการใช้ MediatR ร่วมกับ CQRS ใน ASP.NET Core คืออะไร?',
+                options: [
+                    'ช่วยลดความหนาแน่นของ Controller (Skinny Controllers) โดยส่ง Request ผ่าน Mediator ไปยัง Handlers เฉพาะทาง',
+                    'ช่วยให้รันโค้ดโดยไม่ต้องติดตั้ง .NET',
+                    'ช่วยปิดระบบ Antivirus',
+                    'ช่วยลดขนาดของไฟล์รูปภาพ'
+                ],
+                answer: 0,
+                explanation: 'MediatR ช่วย decouple Controllers ออกจาก Business Logic ส่งผลให้แต่ละ Use Case เป็นอิสระและเขียน Unit Test ได้ง่ายมาก',
+                difficulty: 'mid'
+            }
+        ];
+
+        QuizEngine.start('architecture-quiz', questions, {
+            quizId: 'architecture',
+            onComplete: () => {
+                Progress.completeLesson('architecture');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

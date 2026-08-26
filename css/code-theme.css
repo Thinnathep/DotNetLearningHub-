@@ -1,0 +1,244 @@
+/* ══════════════════════════════════════════════════════════
+   DotNet Learning Hub — Custom Prism.js Theme
+   "Neon Terminal" — matches design system color tokens
+   ══════════════════════════════════════════════════════════ */
+
+/* Code blocks */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: var(--text-primary);
+  background: none;
+  font-family: var(--font-code);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  direction: ltr;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  tab-size: 4;
+  hyphens: none;
+}
+
+pre[class*="language-"] {
+  padding: var(--space-lg);
+  margin: 0;
+  overflow: auto;
+  background: var(--bg-code);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+}
+
+:not(pre) > code[class*="language-"] {
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+}
+
+/* ─── Token Colors (mapped to design system) ─── */
+
+/* Comments */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: var(--syn-comment);
+  font-style: italic;
+}
+
+/* Punctuation */
+.token.punctuation {
+  color: var(--text-secondary);
+}
+
+/* Namespace / tag modifier */
+.token.namespace {
+  opacity: 0.8;
+}
+
+/* Keywords — 🔴 class, if, for, public, using, return, new, void, async, await */
+.token.keyword,
+.token.control-flow-keyword {
+  color: var(--syn-keyword);
+  font-weight: 500;
+}
+
+/* Types — 🔵 int, string, bool, List<T>, Task, DbContext */
+.token.class-name,
+.token.type-name,
+.token.builtin {
+  color: var(--syn-type);
+}
+
+/* Strings — 🩵 "Hello World" */
+.token.string,
+.token.char,
+.token.template-string {
+  color: var(--syn-string);
+}
+
+/* Methods/Functions — 🟣 .Where(), .Select(), Main() */
+.token.function,
+.token.method {
+  color: var(--syn-method);
+}
+
+/* Variables / Properties — 🟠 */
+.token.property,
+.token.parameter {
+  color: var(--syn-variable);
+}
+
+/* Numbers — 🔵 42, 3.14 */
+.token.number,
+.token.boolean {
+  color: var(--syn-number);
+}
+
+/* Attributes/Annotations — 🟢 [HttpGet], [Authorize] */
+.token.attr-name,
+.token.annotation {
+  color: var(--syn-annotation);
+}
+
+/* Tags (HTML/XML) — 🔴 <div>, <Button> */
+.token.tag {
+  color: var(--syn-tag);
+}
+
+/* Attribute values */
+.token.attr-value {
+  color: var(--syn-string);
+}
+
+/* Operators */
+.token.operator {
+  color: var(--syn-keyword);
+}
+
+/* Constants / special */
+.token.constant {
+  color: var(--syn-variable);
+}
+
+/* Regex */
+.token.regex {
+  color: var(--accent-warning);
+}
+
+/* Important */
+.token.important {
+  color: var(--accent-danger);
+  font-weight: bold;
+}
+
+/* Entity */
+.token.entity {
+  color: var(--syn-variable);
+  cursor: help;
+}
+
+/* URL */
+.token.url {
+  color: var(--syn-string);
+}
+
+/* Selector (CSS) */
+.token.selector {
+  color: var(--syn-annotation);
+}
+
+/* Atrule (CSS @rules) */
+.token.atrule {
+  color: var(--syn-keyword);
+}
+
+/* Generic-type */
+.token.generic-method,
+.token.type-list {
+  color: var(--syn-type);
+}
+
+/* XAML specific */
+.language-xml .token.tag { color: var(--syn-tag); }
+.language-xml .token.attr-name { color: var(--syn-annotation); }
+.language-xml .token.attr-value { color: var(--syn-string); }
+
+/* SQL specific */
+.language-sql .token.keyword { color: var(--syn-keyword); text-transform: uppercase; }
+.language-sql .token.function { color: var(--syn-method); }
+
+/* JSON specific */
+.language-json .token.property { color: var(--syn-annotation); }
+.language-json .token.string { color: var(--syn-string); }
+.language-json .token.number { color: var(--syn-number); }
+.language-json .token.boolean { color: var(--syn-keyword); }
+
+/* ─── Line Numbers ─── */
+pre[class*="language-"].line-numbers {
+  position: relative;
+  padding-left: 3.5em;
+  counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+  position: relative;
+  white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+  position: absolute;
+  pointer-events: none;
+  top: var(--space-lg);
+  left: 0;
+  width: 3em;
+  letter-spacing: -1px;
+  border-right: 1px solid var(--border-default);
+  font-size: 100%;
+  user-select: none;
+}
+
+.line-numbers-rows > span {
+  display: block;
+  counter-increment: linenumber;
+}
+
+.line-numbers-rows > span::before {
+  content: counter(linenumber);
+  color: var(--text-muted);
+  display: block;
+  padding-right: 0.8em;
+  text-align: right;
+}
+
+/* ─── Code Highlight Effect (click to explain) ─── */
+.token.highlighted {
+  background: rgba(88,166,255,0.15);
+  border-radius: 3px;
+  padding: 1px 2px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.token.highlighted:hover {
+  background: rgba(88,166,255,0.3);
+}
+
+.token.highlighted.active {
+  background: rgba(88,166,255,0.35);
+  outline: 1px solid var(--accent-primary);
+}
+
+/* ─── Diff Highlighting ─── */
+.token.deleted,
+.token.deleted .token {
+  color: var(--accent-danger);
+  background: rgba(248,81,73,0.1);
+}
+
+.token.inserted,
+.token.inserted .token {
+  color: var(--accent-success);
+  background: rgba(63,185,80,0.1);
+}
