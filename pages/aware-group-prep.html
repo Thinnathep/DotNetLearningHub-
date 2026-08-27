@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aware Group — Company Research & Interview Prep — DotNet Learning Hub</title>
+    <link rel="manifest" href="../manifest.json">
+    <meta name="theme-color" content="#0d1117">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        .aware-hero {
+            background: radial-gradient(circle at top right, rgba(88, 166, 255, 0.2) 0%, rgba(22, 27, 34, 0.95) 75%);
+            border: 1px solid rgba(88, 166, 255, 0.35);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-2xl);
+            position: relative;
+        }
+        .aware-badge {
+            background: rgba(88, 166, 255, 0.15);
+            border: 1px solid rgba(88, 166, 255, 0.4);
+            color: var(--accent-primary);
+            padding: 4px 14px;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: var(--space-md);
+        }
+        .stage-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
+            transition: all var(--transition-normal);
+        }
+        .stage-box:hover {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-glow);
+        }
+        .interview-qa-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">🏢</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🌟 5 Core Master Hubs</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">🏠</span> 1. แดชบอร์ด &amp; Roadmap</a>
+    <a href="./logic-flows.html" class="sidebar-link"><span class="link-icon">🧩</span> 2. Flow ตรรกะ &amp; สั่ง AI ขั้นสูง</a>
+    <a href="./assessment-playbook.html" class="sidebar-link"><span class="link-icon">⚔️</span> 3. ข้อสอบจริง 3 Tasks &amp; Defense</a>
+    <a href="./white-hat-vault.html" class="sidebar-link"><span class="link-icon">🛡️</span> 4. White-Hat Security Vault</a>
+    <a href="./code-sandbox.html" class="sidebar-link"><span class="link-icon">💻</span> 5. Multi-Code Sandbox</a>
+
+    <div class="sidebar-section-title">🏢 Company Focus</div>
+    <a href="./aware-group-prep.html" class="sidebar-link active"><span class="link-icon">🏢</span> Aware Group Prep <span class="link-badge badge-new">Target</span></a>
+
+    <div class="sidebar-section-title">📚 คลังบทเรียนเสริม</div>
+    <a href="./study-guide.html" class="sidebar-link"><span class="link-icon">🧭</span> คู่มือการเรียน 3 สัปดาห์</a>
+    <a href="./tech-glossary.html" class="sidebar-link"><span class="link-icon">📖</span> ศัพท์เทคนิค &amp; คำอ่าน</a>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> ซ้อมสัมภาษณ์ STAR</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Aware Hero -->
+        <div class="aware-hero reveal">
+            <div class="aware-badge">
+                <span>🏢</span>
+                <span>Company Intelligence &amp; Target Prep</span>
+            </div>
+            <h1 style="font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 900; margin-bottom: var(--space-md); color: #fff;">
+                🏢 Aware Group — Company Research &amp; Interview Playbook
+            </h1>
+            <p class="text-md text-secondary" style="line-height: 1.8; max-width: 850px;">
+                เจาะลึกโครงสร้างองค์กร Aware Group, กระบวนการคัดเลือกและสอบสัมภาษณ์ 3 ด่าน (Screening ➔ Test ➔ Tech Lead), เทคโนโลยีหลัก (.NET, C#, SQL Server, Azure) และแนวทางตอบคำถามเพื่อคว้างานแรกของคุณ!
+            </p>
+        </div>
+
+        <!-- 🏢 1. Company Profile & DNA -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-primary); color: #fff;">01</div>
+                <h2>🏢 ข้อมูลบริษัท &amp; ดีเอ็นเอขององค์กร (Company DNA)</h2>
+            </div>
+
+            <div class="grid grid-3 mb-lg">
+                <div class="card">
+                    <h4 style="color: var(--accent-primary); margin-bottom: 8px;">🌍 ขนาดและความน่าเชื่อถือ</h4>
+                    <p class="text-xs text-secondary line-height-relaxed">
+                        หนึ่งในบริษัทผู้นำด้าน Software Development &amp; IT Professional Services ชั้นนำในไทย มีวิศวกรซอฟต์แวร์กว่า 1,000+ คน และมีสำนักงานใน <strong>กรุงเทพฯ, เชียงใหม่ และเชียงราย</strong>
+                    </p>
+                </div>
+                <div class="card">
+                    <h4 style="color: var(--accent-success); margin-bottom: 8px;">💼 บริการหลัก (Core Business)</h4>
+                    <p class="text-xs text-secondary line-height-relaxed">
+                        พัฒนา Enterprise Custom Software, Cloud Modernization (.NET &amp; Microsoft Azure), Outsourcing Solution, Data &amp; AI Integration, และ QA Software Testing
+                    </p>
+                </div>
+                <div class="card">
+                    <h4 style="color: var(--accent-warning); margin-bottom: 8px;">🤝 วัฒนธรรม (Work Culture)</h4>
+                    <p class="text-xs text-secondary line-height-relaxed">
+                        เน้นการทำงานเป็นทีม (Agile/Scrum), เปิดรับคนรุ่นใหม่และผู้เปลี่ยนสายงาน (Career Changers) ที่มีความกระตือรือร้นและพร้อมเรียนรู้สิ่งใหม่เสมอ
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🎯 2. The 3-Stage Interview Process -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-dotnet); color: #fff;">02</div>
+                <h2>🎯 กระบวนการสัมภาษณ์ 3 ด่านของ Aware Group</h2>
+            </div>
+
+            <div class="stage-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <h3 style="color: var(--accent-primary); margin:0;">📞 ด่านที่ 1: Initial Telephone Screening (ฝ่ายบุคคล)</h3>
+                    <span class="badge badge-info">15 - 30 นาที</span>
+                </div>
+                <p class="text-xs text-secondary">
+                    Recruiter จะติดต่อกลับหลังส่งเรซูเม่ (โดยทั่วไปภายใน 2 วันทำการ) เพื่อสอบถามประวัติการศึกษา, ความสนใจในสาย .NET, ความพร้อมในการทำงาน และการสื่อสารภาษาอังกฤษเบื้องต้น
+                </p>
+            </div>
+
+            <div class="stage-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <h3 style="color: var(--accent-warning); margin:0;">💻 ด่านที่ 2: Technical Assessment &amp; Coding Test</h3>
+                    <span class="badge badge-warning">1 - 2 ชั่วโมง</span>
+                </div>
+                <p class="text-xs text-secondary">
+                    ทำแบบทดสอบทางเทคนิค: ข้อสอบวัดความเข้าใจ C# (.NET Core, OOP, Data Types), SQL Server (CRUD, JOINs, Query Optimization), และ Logic Testing เช่น การดักจับ Edge Cases และการเขียน Web API
+                </p>
+            </div>
+
+            <div class="stage-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <h3 style="color: var(--accent-success); margin:0;">🎙️ ด่านที่ 3: Technical Hiring Manager &amp; Team Interview</h3>
+                    <span class="badge badge-success">45 - 60 นาที</span>
+                </div>
+                <p class="text-xs text-secondary">
+                    สัมภาษณ์กับ Tech Lead / Engineering Manager (1–3 ท่าน) เพื่อพูดคุยเกี่ยวกับโค้ดที่ทำในข้อสอบ, ความเป็นเจ้าของโค้ด (Code Ownership), สถาปัตยกรรม Clean Architecture, และทดสอบ Culture Fit การทำงานเป็นทีม
+                </p>
+            </div>
+        </section>
+
+        <!-- 💎 3. Target Tech Stack for Aware Group -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-sql); color: #fff;">03</div>
+                <h2>💎 ทักษะหลักที่ Aware Group มองหาในตัว Junior .NET</h2>
+            </div>
+
+            <div class="grid grid-2 mb-lg">
+                <div class="card">
+                    <h4 style="color: var(--accent-primary);">⚡ C# &amp; ASP.NET Core</h4>
+                    <ul class="text-xs text-secondary" style="line-height: 1.8; padding-left: 16px;">
+                        <li>เข้าใจ OOP 4 เสาหลัก (Encapsulation, Inheritance, Polymorphism, Abstraction)</li>
+                        <li>ใช้งาน <code>async / await</code> แบบ Non-blocking ได้อย่างถูกต้อง</li>
+                        <li>เข้าใจ Dependency Injection (Transient, Scoped, Singleton)</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4 style="color: var(--accent-success);">🗄️ Database &amp; RESTful APIs</h4>
+                    <ul class="text-xs text-secondary" style="line-height: 1.8; padding-left: 16px;">
+                        <li>เขียนคำสั่ง SQL (JOINs, GROUP BY, Indexing)</li>
+                        <li>ใช้งาน Entity Framework Core (DbContext, Eager Loading <code>.Include</code>, <code>AsNoTracking</code>)</li>
+                        <li>ออกแบบ RESTful API มาตรฐาน (HTTP Verbs, DTOs, Status Codes)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🎙️ 4. Aware Group Specific Interview Q&A -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-warning); color: #000;">04</div>
+                <h2>🎙️ แนวทางการตอบคำถามสัมภาษณ์เฉพาะของ Aware Group</h2>
+            </div>
+
+            <div class="interview-qa-card">
+                <h4 style="color: var(--accent-primary);">Q: "ทำไมคุณถึงสนใจร่วมงานกับ Aware Group?"</h4>
+                <p class="text-xs text-secondary mb-sm"><strong>แนวทางตอบระดับ Senior:</strong></p>
+                <div class="callout callout-info" style="margin:0; font-size: 0.8rem;">
+                    "ผมติดตามผลงานของ Aware Group ในฐานะผู้นำด้าน Enterprise Software Services และ Cloud Modernization ของไทยมาโดยตลอดครับ ผมประทับใจในวัฒนธรรมที่สนับสนุนการเติบโตของทีม (Continuous Learning) และความเชี่ยวชาญในระบบนิเวศของ .NET Core &amp; Microsoft Azure ซึ่งตรงกับเป้าหมายของผมที่ต้องการพัฒนาตัวเองเป็นวิศวกรซอฟต์แวร์คุณภาพในระดับองค์กรครับ"
+                </div>
+            </div>
+
+            <div class="interview-qa-card">
+                <h4 style="color: var(--accent-primary);">Q: "ถ้าคุณเจอบัคยากๆ ในงานที่คุณไม่เคยเจอมาก่อน คุณมีกระบวนการแก้อย่างไร?"</h4>
+                <p class="text-xs text-secondary mb-sm"><strong>แนวทางตอบ (STAR Method):</strong></p>
+                <div class="callout callout-info" style="margin:0; font-size: 0.8rem;">
+                    "ผมจะเริ่มจากการอ่าน Error Log และ Reproduction Step ให้ชัดเจนก่อนครับ จากนั้นใช้ Debugger ไล่ Breakpoint ตรวจสอบ Data State และหากเป็นเรื่องใหม่ ผมจะศึกษาจาก Official Microsoft Documentation หรือใช้ AI ช่วยวิเคราะห์หาสาเหตุของปัญหา จากนั้นเขียน Unit Test เพื่อพิสูจน์ว่าบัคได้รับการแก้ไขอย่างแท้จริงโดยไม่กระทบส่วนอื่นครับ"
+                </div>
+            </div>
+
+            <div class="interview-qa-card">
+                <h4 style="color: var(--accent-primary);">Q: "มีคำถามอะไรอยากถามกรรมการไหมครับ?"</h4>
+                <p class="text-xs text-secondary mb-sm"><strong>คำถามเพิ่มคะแนนที่ควรถามกลับ:</strong></p>
+                <div class="callout callout-tip" style="margin:0; font-size: 0.8rem;">
+                    1. "ในทีมที่ผมจะได้เข้าไปร่วมงาน ปัจจุบันใช้ .NET เวอร์ชันใด (เช่น .NET 8 หรือ .NET 9) และมีแนวทางการทำ CI/CD อย่างไรครับ?"<br>
+                    2. "กระบวนการทำ Code Review และการแชร์ความรู้ (Knowledge Sharing) ในทีมมีรูปแบบอย่างไรบ้างครับ?"
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Mobile Bottom Navigation Bar -->
+<nav class="mobile-bottom-nav">
+    <a href="../index.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>แดชบอร์ด</span>
+    </a>
+    <a href="./logic-flows.html" class="bottom-nav-item">
+        <span class="nav-icon">🧩</span>
+        <span>Flow ตรรกะ</span>
+    </a>
+    <a href="./assessment-playbook.html" class="bottom-nav-item">
+        <span class="nav-icon">⚔️</span>
+        <span>ข้อสอบจริง</span>
+    </a>
+    <a href="./aware-group-prep.html" class="bottom-nav-item active">
+        <span class="nav-icon">🏢</span>
+        <span>Aware Prep</span>
+    </a>
+    <a href="./code-sandbox.html" class="bottom-nav-item">
+        <span class="nav-icon">💻</span>
+        <span>Sandbox</span>
+    </a>
+</nav>
+
+<!-- Scripts -->
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+</body>
+</html>
