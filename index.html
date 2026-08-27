@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DotNet Learning Hub — แดชบอร์ดการเรียนรู้ C# และ .NET แบบ Interactive</title>
   
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DotNetHub">
+  
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/animations.css">
@@ -492,26 +498,52 @@
        Site Sidebar (Grouped by Tracks)
        ══════════════════════════════════════════════════════════ -->
   <nav class="site-sidebar">
-    <!-- Home / Dashboard -->
+    <!-- 🌟 5 Core Master Hubs -->
     <div class="sidebar-section">
+      <div class="sidebar-section-title" style="color: var(--accent-primary);">🌟 5 Core Master Hubs</div>
       <a href="index.html" class="sidebar-link active">
         <span class="link-icon">🏠</span>
-        <span>หน้าแรก (Dashboard)</span>
+        <span>1. แดชบอร์ด &amp; Roadmap</span>
       </a>
-      <a href="pages/study-guide.html" class="sidebar-link">
-        <span class="link-icon">🧭</span>
-        <span>คู่มือการเรียน &amp; Roadmap</span>
-        <span class="link-badge badge-new">แนะนำ</span>
+      <a href="pages/logic-flows.html" class="sidebar-link">
+        <span class="link-icon">🧩</span>
+        <span>2. Flow ตรรกะ &amp; สั่ง AI ขั้นสูง</span>
+        <span class="link-badge badge-new">Master</span>
+      </a>
+      <a href="pages/assessment-playbook.html" class="sidebar-link">
+        <span class="link-icon">⚔️</span>
+        <span>3. ข้อสอบจริง 3 Tasks &amp; Defense</span>
+      </a>
+      <a href="pages/white-hat-vault.html" class="sidebar-link">
+        <span class="link-icon">🛡️</span>
+        <span>4. White-Hat Security Vault</span>
+        <span class="link-badge badge-new">Secret</span>
       </a>
       <a href="pages/code-sandbox.html" class="sidebar-link">
         <span class="link-icon">💻</span>
-        <span>Multi-Code Sandbox</span>
+        <span>5. Multi-Code Sandbox</span>
         <span class="link-badge badge-new">Live</span>
+      </a>
+    </div>
+
+    <!-- 📚 Quick Guides -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">📚 คู่มือ &amp; เครื่องมือ</div>
+      <a href="pages/study-guide.html" class="sidebar-link">
+        <span class="link-icon">🧭</span>
+        <span>คู่มือการเรียน 3 สัปดาห์</span>
       </a>
       <a href="pages/tech-glossary.html" class="sidebar-link">
         <span class="link-icon">📖</span>
         <span>ศัพท์เทคนิค &amp; คำอ่าน</span>
-        <span class="link-badge badge-new">New</span>
+      </a>
+      <a href="pages/quiz-arena.html" class="sidebar-link">
+        <span class="link-icon">🎯</span>
+        <span>Quiz Arena</span>
+      </a>
+      <a href="pages/interview-prep.html" class="sidebar-link">
+        <span class="link-icon">💼</span>
+        <span>ซ้อมสัมภาษณ์ STAR</span>
       </a>
     </div>
 
@@ -1491,5 +1523,30 @@
       }
     });
   </script>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav">
+    <a href="index.html" class="bottom-nav-item active">
+      <span class="nav-icon">🏠</span>
+      <span>แดชบอร์ด</span>
+    </a>
+    <a href="pages/logic-flows.html" class="bottom-nav-item">
+      <span class="nav-icon">🧩</span>
+      <span>Flow ตรรกะ</span>
+    </a>
+    <a href="pages/assessment-playbook.html" class="bottom-nav-item">
+      <span class="nav-icon">⚔️</span>
+      <span>ข้อสอบจริง</span>
+    </a>
+    <a href="pages/white-hat-vault.html" class="bottom-nav-item">
+      <span class="nav-icon">🛡️</span>
+      <span>สายขาว</span>
+    </a>
+    <a href="pages/code-sandbox.html" class="bottom-nav-item">
+      <span class="nav-icon">💻</span>
+      <span>Sandbox</span>
+    </a>
+  </nav>
+
 </body>
 </html>

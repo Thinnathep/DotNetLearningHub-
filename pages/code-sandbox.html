@@ -592,8 +592,31 @@ function renderWebPreview() {
     const code = document.getElementById('web-editor').value;
     const iframe = document.getElementById('web-preview');
     iframe.srcdoc = code;
-}
 </script>
+
+<!-- Mobile Bottom Navigation Bar -->
+<nav class="mobile-bottom-nav">
+    <a href="../index.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>แดชบอร์ด</span>
+    </a>
+    <a href="./logic-flows.html" class="bottom-nav-item">
+        <span class="nav-icon">🧩</span>
+        <span>Flow ตรรกะ</span>
+    </a>
+    <a href="./assessment-playbook.html" class="bottom-nav-item">
+        <span class="nav-icon">⚔️</span>
+        <span>ข้อสอบจริง</span>
+    </a>
+    <a href="./white-hat-vault.html" class="bottom-nav-item">
+        <span class="nav-icon">🛡️</span>
+        <span>สายขาว</span>
+    </a>
+    <a href="./code-sandbox.html" class="bottom-nav-item active">
+        <span class="nav-icon">💻</span>
+        <span>Sandbox</span>
+    </a>
+</nav>
 
 </body>
 </html>

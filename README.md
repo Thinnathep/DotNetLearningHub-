@@ -11,7 +11,24 @@
 
 ---
 
-## 📚 สารบัญ 10 Learning Tracks (28 หน้า)
+## 🌟 5 Core Master Hubs (โครงสร้างหลัก 5 หมวดหมู่)
+
+1. [🏠 แดชบอร์ด & Roadmap](index.html) — ภาพรวมระบบ, สถิติ XP & เลเวล, และจุดเริ่มต้นการเรียนรู้
+2. [🧩 Enterprise Logic Flows & สั่ง AI ขั้นสูง](pages/logic-flows.html) — Flow การไหลของข้อมูลในองค์กร, Data Pipelines, MediatR, CQRS, และ System Prompts สำหรับควบคุม AI
+3. [⚔️ .NET Assessment & Interview Master Playbook](pages/assessment-playbook.html) — ผ่าตัดเจาะลึก 3 Tasks จากข้อสอบจริง (Eager Loading, Sorting, Integration) พร้อม Interview Defense Matrix
+4. [🛡️ White-Hat Security & Zero-Day Vault](pages/white-hat-vault.html) — คลังความปลอดภัยสายขาว (IDOR, SQLi, Race Condition), เทมเพลตรายงานแจ้งเตือนผู้บริหาร (CISO), และแบบทดสอบปลดล็อก Secret Security Code
+5. [💻 Multi-Language Code Sandbox & Studio](pages/code-sandbox.html) — รันโค้ดสดบนเว็บเบราว์เซอร์: C# Simulator, SQL Live Engine, HTML/CSS/JS Studio
+
+---
+
+## 📱 PWA Mobile App Support (ติดตั้งบน iOS & Android)
+แพลตฟอร์มรองรับ **Progressive Web App (PWA)** สามารถติดตั้งเป็นแอปพลิเคชันบนมือถือได้โดยไม่ต้องผ่าน App Store:
+- **บน iOS (iPhone/iPad):** เปิดผ่าน Safari ➔ กดปุ่ม Share (แชร์) ➔ เลือก **"Add to Home Screen (เพิ่มไปยังหน้าจอโฮม)"**
+- **บน Android:** เปิดผ่าน Chrome ➔ กดเมนู 3 จุด ➔ เลือก **"Install App (ติดตั้งแอป)"** หรือ **"Add to Home screen"**
+
+---
+
+## 📚 Supplementary Reference Tracks (คลังบทเรียนเสริม)
 
 ### 🟣 C# Language Track
 - [C# พื้นฐาน (Level 1)](pages/csharp-basics.html) — โครงสร้างโปรแกรม, ตัวแปร 7 ชนิด, เงื่อนไข, ลูป, เมธอด, Try/Catch
@@ -56,6 +73,7 @@
 - [Technical Documentation](pages/tech-docs.html) — C# XML Comments (///), Swagger/OpenAPI Specs, README.md Standard
 
 ### 🏛️ Architecture & Tools Track
+- [Assessment Master Playbook](pages/assessment-playbook.html) — วิเคราะห์เจาะลึก 3 Tasks การทดสอบจริง, Defense Matrix, AI Workflow
 - [คู่มือการเรียน & Roadmap 3 สัปดาห์](pages/study-guide.html) — ลำดับการเรียนรู้ 3 สเต็ป, Checklist ก่อนสอบสัมภาษณ์
 - [Multi-Language Code Sandbox](pages/code-sandbox.html) — รันโค้ดสดบนเว็บ: C# Simulator, SQL Live Engine, HTML/CSS/JS Studio
 - [Clean Architecture](pages/architecture.html) — 4 เลเยอร์มาตรฐาน (Domain, Application, Infrastructure, Presentation), CQRS & MediatR

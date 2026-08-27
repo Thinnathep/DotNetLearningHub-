@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>White-Hat Security & Zero-Day Vault — DotNet Learning Hub</title>
+    <link rel="manifest" href="../manifest.json">
+    <meta name="theme-color" content="#0d1117">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        .whitehat-hero {
+            background: radial-gradient(circle at top right, rgba(126, 231, 135, 0.15) 0%, rgba(22, 27, 34, 0.95) 75%);
+            border: 1px solid rgba(126, 231, 135, 0.3);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-2xl);
+            position: relative;
+        }
+        .secret-vault-box {
+            background: #06090e;
+            border: 2px dashed rgba(126, 231, 135, 0.5);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-top: var(--space-xl);
+            transition: all var(--transition-normal);
+        }
+        .secret-vault-box.unlocked {
+            border-style: solid;
+            border-color: var(--accent-success);
+            box-shadow: 0 0 30px rgba(126, 231, 135, 0.25);
+            background: radial-gradient(circle at top, rgba(126, 231, 135, 0.1) 0%, #090d13 80%);
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">🛡️</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🌟 5 Core Master Hubs</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">🏠</span> 1. แดชบอร์ด &amp; Roadmap</a>
+    <a href="./logic-flows.html" class="sidebar-link"><span class="link-icon">🧩</span> 2. Flow ตรรกะ &amp; สั่ง AI ขั้นสูง</a>
+    <a href="./assessment-playbook.html" class="sidebar-link"><span class="link-icon">⚔️</span> 3. ข้อสอบจริง 3 Tasks &amp; Defense</a>
+    <a href="./white-hat-vault.html" class="sidebar-link active"><span class="link-icon">🛡️</span> 4. White-Hat Security Vault <span class="link-badge badge-new">Secret</span></a>
+    <a href="./code-sandbox.html" class="sidebar-link"><span class="link-icon">💻</span> 5. Multi-Code Sandbox</a>
+
+    <div class="sidebar-section-title">📚 คลังบทเรียนเสริม</div>
+    <a href="./study-guide.html" class="sidebar-link"><span class="link-icon">🧭</span> คู่มือการเรียน 3 สัปดาห์</a>
+    <a href="./tech-glossary.html" class="sidebar-link"><span class="link-icon">📖</span> ศัพท์เทคนิค &amp; คำอ่าน</a>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> ซ้อมสัมภาษณ์ STAR</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- White-Hat Hero -->
+        <div class="whitehat-hero reveal">
+            <div class="badge badge-success mb-sm">
+                <span>🛡️ Ethical Hacking &amp; Security Engineering</span>
+            </div>
+            <h1 style="font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 900; margin-bottom: var(--space-md); color: #fff;">
+                🛡️ White-Hat Security &amp; Zero-Day Vault
+            </h1>
+            <p class="text-md text-secondary" style="line-height: 1.8; max-width: 850px;">
+                คลังวิชาแฮกเกอร์สายขาว: เรียนรู้วิธีการเจาะระบบเพื่อปกป้ององค์กร, ผ่าตัดกลไก Zero-Day &amp; Logic Flaws, เทมเพลตรายงานแจ้งเตือนผู้บริหาร (CISO) และทำแบบทดสอบเพื่อปลดล็อก <strong>Secret Defensive Security Code</strong>!
+            </p>
+        </div>
+
+        <!-- Section 1: The White-Hat Philosophy -->
+        <section class="lesson-section reveal">
+            <div class="concept-card" style="border-left: 4px solid var(--accent-success);">
+                <div class="concept-header">
+                    <span class="concept-emoji">🤍</span>
+                    <span class="concept-title">จิตวิญญาณแห่งสายขาว (The White-Hat Guardian)</span>
+                </div>
+                <div class="concept-body">
+                    <p class="text-sm" style="line-height: 1.8;">
+                        "การที่เราศึกษาและเข้าใจว่าแฮกเกอร์เจาะระบบอย่างไร ไม่ใช่เพื่อทำลายใคร แต่เพื่อให้เราสามารถ <strong>สร้างระบบที่ปลอดภัยและแจ้งเตือนองค์กรให้ปิดช่องโหว่ก่อนที่ผู้ไม่หวังดีจะเข้ามาทำร้าย</strong> ได้ทันท่วงที นี่คือคุณค่าสูงสุดของวิศวกรความปลอดภัยสายขาวค่ะ!"
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Zero-Day & Logic Flaws Anatomy -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-danger); color: #fff;">01</div>
+                <h2>🔓 ผ่าตัด 3 ช่องโหว่ระดับสูงและเค้าโครงกลไก (Vulnerability Anatomy)</h2>
+            </div>
+
+            <!-- Vulnerability 1 -->
+            <div class="task-card">
+                <h3 style="color: var(--accent-danger);">1. BOLA / IDOR (Insecure Direct Object Reference)</h3>
+                <p class="text-xs text-secondary mb-sm">
+                    <strong>กลไกการโจมตี:</strong> แฮกเกอร์ Login ด้วย User A แล้วเปลี่ยน <code>/api/orders/105</code> เป็น <code>/api/orders/106</code> เพื่อแอบดูข้อมูลของ User B โดยที่ API Controller ไม่ได้เช็คว่าใครเป็นเจ้าของ Order นั้น
+                </p>
+                <div class="code-block-wrapper">
+                    <div class="code-block-header">
+                        <div class="file-info"><span class="file-icon">🛡️</span> SecureOrderService.cs (โค้ดป้องกันระดับ Database-First)</div>
+                        <button class="copy-btn">📋 Copy</button>
+                    </div>
+                    <div class="code-block-body">
+<pre class="language-csharp"><code>// 🛡️ การป้องกันที่ปลอดภัย 100%: ดึง UserId จาก Claims เสมอ
+public async Task&lt;OrderDto?&gt; GetOrderByIdAsync(int orderId, int currentUserId)
+{
+    return await _context.Orders
+        .AsNoTracking()
+        .Where(o =&gt; o.Id == orderId &amp;&amp; o.UserId == currentUserId) // 👈 Database-First Check
+        .Select(o =&gt; new OrderDto(o.Id, o.TotalAmount, o.CreatedAt))
+        .FirstOrDefaultAsync();
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vulnerability 2 -->
+            <div class="task-card">
+                <h3 style="color: var(--accent-warning);">2. Financial Race Condition (Double-Spending)</h3>
+                <p class="text-xs text-secondary mb-sm">
+                    <strong>กลไกการโจมตี:</strong> ยิง Request ถอนเงินพร้อมกัน 10 ครั้งใน 1 มิลลิวินาที ทำให้ทั้ง 10 Requests อ่านยอดเงินเดิมก่อนที่ยอดจะถูกตัด ส่งผลให้ถอนเงินเกินบัญชี
+                </p>
+                <div class="code-block-wrapper">
+                    <div class="code-block-header">
+                        <div class="file-info"><span class="file-icon">🔒</span> DatabaseLock.sql (การล็อกระดับแถวข้อมูลป้องกัน Race Condition)</div>
+                        <button class="copy-btn">📋 Copy</button>
+                    </div>
+                    <div class="code-block-body">
+<pre class="language-sql"><code>-- 🔒 ใช้ Pessimistic Lock (UPDLOCK, HOLDLOCK) ใน Transaction
+BEGIN TRANSACTION;
+
+SELECT Balance 
+FROM Accounts WITH (UPDLOCK, HOLDLOCK)
+WHERE AccountId = @AccountId;
+
+-- ตัดยอดเงินอย่างปลอดภัย ไม่สามารถเกิด Double-Spending ได้
+UPDATE Accounts
+SET Balance = Balance - @Amount
+WHERE AccountId = @AccountId;
+
+COMMIT TRANSACTION;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Executive Security Disclosure Report -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-primary); color: #fff;">02</div>
+                <h2>📋 เทมเพลตรายงานแจ้งเตือนผู้บริหาร &amp; CISO (Executive Report Template)</h2>
+            </div>
+            <p class="text-sm text-secondary mb-md">
+                เมื่อเราพบช่องโหว่ การสื่อสารกับผู้บริหารระดับสูง (CEO/CFO/CISO) ต้องใช้ภาษาธุรกิจที่ชี้ให้เห็น <strong>Business Impact</strong> และ <strong>แนวทางแก้ไข (Remediation)</strong>:
+            </p>
+
+            <div class="code-block-wrapper">
+                <div class="code-block-header">
+                    <div class="file-info"><span class="file-icon">📄</span> VULNERABILITY_DISCLOSURE_REPORT.md</div>
+                    <button class="copy-btn">📋 Copy</button>
+                </div>
+                <div class="code-block-body">
+<pre class="language-markdown"><code># 🛡️ รายงานแจ้งเตือนช่องโหว่ความปลอดภัยระดับวิกฤต (Confidential Security Assessment)
+
+**เรียน:** คณะกรรมการบริหารความมั่นคงปลอดภัยสารสนเทศ (CISO / CTO)
+**ผู้รายงาน:** วิศวกรความปลอดภัยสายขาว (White-Hat Security Engineer)
+**ระดับความรุนแรง:** 🔴 High (CVSS v3.1 Score: 8.5)
+
+---
+
+## 1. บทสรุปสำหรับผู้บริหาร (Executive Summary)
+ทีมตรวจพบช่องโหว่ประเภท **Broken Object Level Authorization (IDOR)** บนระบบ Web API ฝ่ายขาย ซึ่งอาจส่งผลกระทบให้บุคคลภายนอกสามารถเข้าถึงข้อมูลใบสั่งซื้อของลูกค้ารายอื่นได้โดยไม่ได้รับอนุญาต
+
+## 2. ผลกระทบทางธุรกิจ (Business Impact)
+- ⚠️ ความเสี่ยงต่อการรั่วไหลของข้อมูลส่วนบุคคล (PDPA Compliance Violation)
+- ⚠️ ความเสียหายต่อภาพลักษณ์และความเชื่อมั่นขององค์กร
+
+## 3. ขั้นตอนการพิสูจน์ช่องโหว่ (Proof of Concept - PoC)
+1. ส่งคำขอ `GET /api/v1/orders/100` ด้วย Session ของ User A
+2. แก้ไขพารามิเตอร์เป็น `GET /api/v1/orders/101` (ของ User B)
+3. ระบบส่งข้อมูลใบสั่งซื้อกลับมาโดยไม่มีการตรวจสอบสิทธิ์ความเป็นเจ้าของ
+
+## 4. ข้อเสนอแนะและแนวทางแก้ไข (Remediation Plan)
+- บังคับใช้การตรวจสอบ Claims Identity ใน Application Layer
+- บังคับใช้ Database Row-Level Security (RLS) กรอง `UserId == CurrentUserId` เสมอ</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: The White-Hat Challenge & Secret Unlock -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-success); color: #000;">🎯</div>
+                <h2>🛡️ แบบทดสอบสายขาว (White-Hat Guardian Challenge)</h2>
+            </div>
+            <p class="text-sm text-secondary mb-md">
+                ตอบคำถามความปลอดภัยสายขาวให้ถูกต้องครบทุกข้อ เพื่อปลดล็อก <strong>"Secret White-Hat Security Code"</strong>:
+            </p>
+
+            <div id="whitehat-quiz"></div>
+
+            <!-- Secret Vault Container (Unlocked on 100% Quiz Score) -->
+            <div id="secret-vault" class="secret-vault-box hidden">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom: var(--space-md);">
+                    <span style="font-size: 2.5rem;">🔓</span>
+                    <div>
+                        <h3 style="color: var(--accent-success); margin:0;">🎉 ยินดีด้วยค่ะ! คุณปลดล็อก White-Hat Secret Vault สำเร็จ!</h3>
+                        <span class="text-xs text-muted">มอบรางวัลพิเศษ +200 XP และชุดโค้ดความปลอดภัยระดับองค์กร</span>
+                    </div>
+                </div>
+
+                <h4 style="color: var(--accent-primary); margin-top: var(--space-lg);">🛡️ โค้ดลับที่ 1: Automated Security Vulnerability Auditor (C# Tool)</h4>
+                <p class="text-xs text-secondary">เครื่องมือ C# สำหรับรันสแกนหาช่องโหว่ IDOR บน API Endpoint ขององค์กรคุณแบบอัตโนมัติ:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-block-header">
+                        <div class="file-info"><span class="file-icon">⚡</span> IdorVulnerabilityScanner.cs</div>
+                        <button class="copy-btn">📋 Copy</button>
+                    </div>
+                    <div class="code-block-body">
+<pre class="language-csharp"><code>using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+
+public class IdorVulnerabilityScanner
+{
+    private readonly HttpClient _client = new HttpClient();
+
+    public async Task AuditEndpointAsync(string baseUrl, string userToken, int victimId)
+    {
+        Console.WriteLine($"🔍 กำลังเริ่มการสแกนความปลอดภัยสายขาวที่: {baseUrl}...");
+        
+        _client.DefaultRequestHeaders.Authorization = 
+            new AuthenticationHeaderValue("Bearer", userToken);
+
+        var response = await _client.GetAsync($"{baseUrl}/{victimId}");
+        
+        if (response.IsSuccessStatusCode)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"🚨 [VULNERABILITY FOUND] ตรวจพบช่องโหว่ IDOR! ผู้ใช้สามารถเข้าถึงข้อมูล ID: {victimId} ได้!");
+            Console.ResetColor();
+        }
+        else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden || 
+                 response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"✅ [SECURE] ระบบปลอดภัย! ปฏิเสธการเข้าถึงข้อมูลข้ามบัญชีอย่างถูกต้อง ({response.StatusCode})");
+            Console.ResetColor();
+        }
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Mobile Bottom Navigation Bar -->
+<nav class="mobile-bottom-nav">
+    <a href="../index.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>แดชบอร์ด</span>
+    </a>
+    <a href="./logic-flows.html" class="bottom-nav-item">
+        <span class="nav-icon">🧩</span>
+        <span>Flow ตรรกะ</span>
+    </a>
+    <a href="./assessment-playbook.html" class="bottom-nav-item">
+        <span class="nav-icon">⚔️</span>
+        <span>ข้อสอบจริง</span>
+    </a>
+    <a href="./white-hat-vault.html" class="bottom-nav-item active">
+        <span class="nav-icon">🛡️</span>
+        <span>สายขาว</span>
+    </a>
+    <a href="./code-sandbox.html" class="bottom-nav-item">
+        <span class="nav-icon">💻</span>
+        <span>Sandbox</span>
+    </a>
+</nav>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/quiz-engine.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const questions = [
+        {
+            type: 'multiple-choice',
+            question: 'เป้าหมายหลักของการเป็นแฮกเกอร์สายขาว (White-Hat Security Engineer) คืออะไร?',
+            options: [
+                'ค้นหาช่องโหว่ความปลอดภัยอย่างมีจริยธรรม และรายงานแนวทางแก้ไขให้องค์กรทราบเพื่อปกป้องระบบ',
+                'เจาะข้อมูลเพื่อนำไปขายในตลาดมืด',
+                'ลบฐานข้อมูลของบริษัทเพื่อความสะใจ',
+                'ปิดเซิร์ฟเวอร์ของผู้อื่นโดยไม่ได้รับอนุญาต'
+            ],
+            answer: 0,
+            explanation: 'สายขาวมุ่งมั่นค้นหาช่องโหว่เพื่อสร้างเกราะป้องกันและเสริมความมั่นคงปลอดภัยให้ระบบ',
+            difficulty: 'basic'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'การป้องกันช่องโหว่ IDOR / BOLA ที่ถูกต้องและปลอดภัยที่สุดคือวิธีใด?',
+            options: [
+                'ตรวจสอบสิทธิ์ที่ระดับ Database-First โดยนำ UserId จาก Claims ไปร่วม WHERE เสมอ',
+                'ซ่อนปุ่มดูข้อมูลบนหน้าเว็บ UI',
+                'เปลี่ยนชื่อตัวแปรให้เป็นภาษาอื่น',
+                'ปิดไม่ให้ผู้ใช้สมัครสมาชิก'
+            ],
+            answer: 0,
+            explanation: 'การซ่อนปุ่มบน UI ป้องกันไม่ได้ ต้องใช้ Database-First Enforcement ตรวจสอบความเป็นเจ้าของข้อมูลเสมอ',
+            difficulty: 'mid'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'ในรายงานแจ้งเตือนผู้บริหาร (Executive Vulnerability Report) ส่วนใดที่สำคัญที่สุดสำหรับผู้บริหารระดับสูง (CISO/CEO)?',
+            options: [
+                'บทสรุปผู้บริหาร (Executive Summary) และ ผลกระทบทางธุรกิจ (Business Impact)',
+                'การอวดว่าแฮกเกอร์เก่งแค่ไหน',
+                'โค้ดดิบ 1,000 บรรทัดโดยไม่มีคำอธิบาย',
+                'การตำหนิผู้ร่วมทีม'
+            ],
+            answer: 0,
+            explanation: 'ผู้บริหารต้องการทราบความเสี่ยงทางธุรกิจและแนวทางแก้ไข เพื่อจัดสรรทรัพยากรมาปิดช่องโหว่ได้อย่างทันท่วงที',
+            difficulty: 'basic'
+        }
+    ];
+
+    QuizEngine.start('whitehat-quiz', questions, {
+        quizId: 'whitehat-vault',
+        onComplete: (score, total) => {
+            if (score === total) {
+                const vault = document.getElementById('secret-vault');
+                vault.classList.remove('hidden');
+                vault.classList.add('unlocked', 'animate-pop-in');
+                Progress.addXP(200, 'ปลดล็อก White-Hat Secret Vault');
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>

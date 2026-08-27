@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.NET Core Assessment & Interview Master Playbook — DotNet Learning Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/code-theme.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        .playbook-hero {
+            background: radial-gradient(circle at top right, rgba(247, 129, 102, 0.15) 0%, rgba(22, 27, 34, 0.95) 75%);
+            border: 1px solid rgba(247, 129, 102, 0.3);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-2xl);
+            position: relative;
+            overflow: hidden;
+        }
+        .playbook-badge {
+            background: rgba(247, 129, 102, 0.15);
+            border: 1px solid rgba(247, 129, 102, 0.4);
+            color: #f78166;
+            padding: 4px 14px;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: var(--space-md);
+        }
+        .task-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            transition: all var(--transition-normal);
+        }
+        .task-card:hover {
+            border-color: var(--border-active);
+            box-shadow: var(--shadow-glow);
+        }
+        .task-header-badge {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-family: var(--font-code);
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            display: inline-block;
+            margin-bottom: var(--space-sm);
+        }
+        .live-tester-box {
+            background: #090d13;
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin: var(--space-md) 0;
+        }
+        .defense-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--space-lg) 0;
+            font-size: 0.85rem;
+        }
+        .defense-table th, .defense-table td {
+            padding: 12px 16px;
+            border: 1px solid var(--border-default);
+            text-align: left;
+            vertical-align: top;
+        }
+        .defense-table th {
+            background: var(--bg-tertiary);
+            color: var(--accent-primary);
+            font-family: var(--font-heading);
+        }
+        .defense-table tr:nth-child(even) {
+            background: rgba(22, 27, 34, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+    <a href="../index.html" class="site-logo">
+        <div class="logo-icon">📘</div>
+        <span>DotNet Learning Hub</span>
+    </a>
+    <div class="header-nav">
+        <div class="header-xp">
+            <span>⚡</span>
+            <span class="xp-value">0</span>
+            <span class="xp-label">XP</span>
+        </div>
+        <button class="hamburger" aria-label="เปิดเมนู">☰</button>
+    </div>
+</header>
+
+<!-- ─── Sidebar ─── -->
+<nav class="site-sidebar">
+    <div class="sidebar-section-title">🏠 หน้าหลัก & คู่มือ</div>
+    <a href="../index.html" class="sidebar-link"><span class="link-icon">📊</span> Dashboard</a>
+    <a href="./study-guide.html" class="sidebar-link"><span class="link-icon">🧭</span> คู่มือการเรียน &amp; Roadmap</a>
+    <a href="./assessment-playbook.html" class="sidebar-link active"><span class="link-icon">📘</span> Assessment Playbook <span class="link-badge badge-new">Master</span></a>
+    <a href="./code-sandbox.html" class="sidebar-link"><span class="link-icon">💻</span> Multi-Code Sandbox</a>
+    <a href="./tech-glossary.html" class="sidebar-link"><span class="link-icon">📖</span> ศัพท์เทคนิค &amp; คำอ่าน</a>
+
+    <div class="sidebar-section-title">🟣 C# Track</div>
+    <a href="./csharp-basics.html" class="sidebar-link"><span class="link-icon">📗</span> C# พื้นฐาน</a>
+    <a href="./csharp-oop.html" class="sidebar-link"><span class="link-icon">📘</span> C# OOP</a>
+    <a href="./csharp-collections.html" class="sidebar-link"><span class="link-icon">📙</span> Collections &amp; LINQ</a>
+    <a href="./csharp-advanced.html" class="sidebar-link"><span class="link-icon">📕</span> C# ขั้นสูง</a>
+
+    <div class="sidebar-section-title">🔵 ASP.NET Core</div>
+    <a href="./dotnet-structure.html" class="sidebar-link"><span class="link-icon">🏗️</span> โครงสร้าง ASP.NET</a>
+    <a href="./dotnet-di.html" class="sidebar-link"><span class="link-icon">💉</span> Dependency Injection</a>
+    <a href="./dotnet-middleware.html" class="sidebar-link"><span class="link-icon">🛡️</span> Middleware</a>
+
+    <div class="sidebar-section-title">🟠 REST API</div>
+    <a href="./rest-api.html" class="sidebar-link"><span class="link-icon">🔌</span> RESTful API</a>
+    <a href="./system-integration.html" class="sidebar-link"><span class="link-icon">🔗</span> System Integration</a>
+
+    <div class="sidebar-section-title">🔴 Database</div>
+    <a href="./sql-basics.html" class="sidebar-link"><span class="link-icon">📊</span> SQL พื้นฐาน</a>
+    <a href="./sql-advanced.html" class="sidebar-link"><span class="link-icon">📈</span> SQL กลาง</a>
+    <a href="./sql-playground.html" class="sidebar-link"><span class="link-icon">🎮</span> SQL Playground</a>
+    <a href="./ef-core.html" class="sidebar-link"><span class="link-icon">🗄️</span> EF Core</a>
+
+    <div class="sidebar-section-title">🟢 Blazor + Markup</div>
+    <a href="./blazor-intro.html" class="sidebar-link"><span class="link-icon">⚡</span> Blazor พื้นฐาน</a>
+    <a href="./blazor-components.html" class="sidebar-link"><span class="link-icon">🧩</span> Blazor Components</a>
+    <a href="./xaml-basics.html" class="sidebar-link"><span class="link-icon">📐</span> XAML พื้นฐาน</a>
+    <a href="./xml-json.html" class="sidebar-link"><span class="link-icon">📄</span> XML &amp; JSON</a>
+
+    <div class="sidebar-section-title">🔵 DevOps &amp; Security</div>
+    <a href="./git-cicd.html" class="sidebar-link"><span class="link-icon">🔄</span> Git &amp; CI/CD</a>
+    <a href="./secure-coding.html" class="sidebar-link"><span class="link-icon">🛡️</span> Secure Coding</a>
+
+    <div class="sidebar-section-title">🟡 Web &amp; คุณภาพ</div>
+    <a href="./html-css-js.html" class="sidebar-link"><span class="link-icon">🌐</span> HTML/CSS/JS</a>
+    <a href="./unit-testing.html" class="sidebar-link"><span class="link-icon">✅</span> Unit Testing</a>
+    <a href="./code-review.html" class="sidebar-link"><span class="link-icon">👀</span> Code Review</a>
+    <a href="./sdlc-agile.html" class="sidebar-link"><span class="link-icon">📋</span> SDLC &amp; Agile</a>
+    <a href="./tech-docs.html" class="sidebar-link"><span class="link-icon">📝</span> Technical Docs</a>
+    <a href="./architecture.html" class="sidebar-link"><span class="link-icon">🏛️</span> Architecture</a>
+
+    <div class="sidebar-section-title">🎮 Games &amp; Arena</div>
+    <a href="./quiz-arena.html" class="sidebar-link"><span class="link-icon">🎯</span> Quiz Arena</a>
+    <a href="./interview-prep.html" class="sidebar-link"><span class="link-icon">💼</span> เตรียมสัมภาษณ์</a>
+</nav>
+<div class="sidebar-overlay"></div>
+
+<!-- ─── Main Content ─── -->
+<main class="site-main">
+    <div class="content-wrapper">
+
+        <!-- Playbook Hero -->
+        <div class="playbook-hero reveal">
+            <div class="playbook-badge">
+                <span>🎯</span>
+                <span>Anonymized Edition — คู่มือสอบระดับมืออาชีพ</span>
+            </div>
+            <h1 style="font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 900; margin-bottom: var(--space-md); color: #fff;">
+                📘 .NET Core Technical Assessment &amp; Interview Master Playbook
+            </h1>
+            <p class="text-md text-secondary" style="line-height: 1.8; max-width: 850px;">
+                คู่มือวิเคราะห์ปัญหา ตรรกะเชิงลึก และกลยุทธ์รับมือการทดสอบระดับมืออาชีพ เจาะลึก 3 โจทย์จริง (Eager Loading, Sorting &amp; Deduplication, External API Integration) พร้อมตารางดักคอคำถามกรรมการสัมภาษณ์
+            </p>
+        </div>
+
+        <!-- 🧭 1. The Assessment Landscape -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-primary); color: #fff;">01</div>
+                <h2>🧭 ภาพรวมสิ่งที่เรากำลังจะเจอ (The Assessment Landscape)</h2>
+            </div>
+            <p class="text-sm text-secondary mb-lg">
+                ในการทดสอบตำแหน่ง .NET Backend / Full-Stack Developer สิ่งที่ Tech Lead หรือ Hiring Manager ต้องการวัดผล ไม่ใช่การท่องจำ Syntax แต่คือ <strong>3 ด่านสำคัญ</strong>:
+            </p>
+
+            <div class="flow-diagram mb-xl">
+                <div class="mermaid">
+graph TD
+    Goal["🎯 สิ่งที่กำลังจะเจอในการทดสอบ"]
+
+    Goal --> D1["ด่านที่ 1: ตรวจสอบโค้ด (Code Review)<br>• ตรวจ Edge Cases<br>• ความสะอาดของโครงสร้าง<br>• การดัก Error"]
+    Goal --> D2["ด่านที่ 2: คำถามวัดตรรกะ (Live Interview)<br>• ทำไมถึงเลือกวิธีนี้?<br>• ถ้าเปลี่ยน Input ระบบจะพังไหม?<br>• ความเข้าใจเรื่อง Big-O & Data Type"]
+    Goal --> D3["ด่านที่ 3: วัดความเป็นเจ้าของโค้ด (Ownership & AI Usage)<br>• อธิบายที่มาที่ไปได้จริงไหม?<br>• เป็นคนคุมโค้ดหรือแค่ก๊อปมา?"]
+
+    style Goal fill:#161b22,stroke:#f78166,stroke-width:2px,color:#ffffff
+    style D1 fill:#0d1117,stroke:#58a6ff,stroke-width:2px,color:#ffffff
+    style D2 fill:#0d1117,stroke:#d2a8ff,stroke-width:2px,color:#ffffff
+    style D3 fill:#0d1117,stroke:#7ee787,stroke-width:2px,color:#ffffff
+                </div>
+            </div>
+        </section>
+
+        <!-- 🔬 2. Deep-Dive 3 Tasks -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--cat-sql); color: #fff;">02</div>
+                <h2>🔬 ผ่าตัดปัญหาและทางออกเจาะลึก 3 Tasks</h2>
+            </div>
+
+            <!-- Task 1 -->
+            <div class="task-card">
+                <span class="task-header-badge" style="background: rgba(88,166,255,0.15); color: var(--accent-primary); border: 1px solid var(--accent-primary);">
+                    📍 Task 1: Relational Data &amp; Eager Loading
+                </span>
+                <h3>ระบบดึงสินค้าและหมวดหมู่ (Product &amp; Category)</h3>
+
+                <div class="callout callout-warning mb-md">
+                    <div class="callout-title">⚠️ ปัญหาที่มักจะเจอ (The Challenges):</div>
+                    <ul class="text-xs" style="line-height: 1.8; margin-top: 6px; padding-left: 16px;">
+                        <li><strong>N+1 Query Problem:</strong> ดึงสินค้ามา 10 ชิ้น แต่โปรแกรมยิงคำสั่ง SQL ไปถามหาหมวดหมู่ซ้ำอีก 10 รอบ ทำให้ฐานข้อมูลทำงานหนักโดยไม่จำเป็น</li>
+                        <li><strong>Null Reference Exception:</strong> ข้อมูลหมวดหมู่ไม่ติดมาด้วย ทำให้แสดงผลหน้าบ้านเป็น <code>null</code> หรือเกิดข้อผิดพลาด</li>
+                    </ul>
+                </div>
+
+                <div class="code-block-wrapper">
+                    <div class="code-block-header">
+                        <div class="file-info"><span class="file-icon">📄</span> ProductsController.cs</div>
+                        <button class="copy-btn">📋 Copy</button>
+                    </div>
+                    <div class="code-block-body">
+<pre class="language-csharp"><code>[HttpGet]
+public async Task&lt;IActionResult&gt; GetProducts()
+{
+    var products = await _context.Products
+                           .Include(x =&gt; x.Category) // 👈 ใช้ Eager Loading ดึงข้อมูลมาพร้อมกันใน 1 SQL JOIN
+                           .AsNoTracking()           // 👈 ปิด Tracking เพิ่มความเร็วใน Read-Only
+                           .ToListAsync();
+    return Ok(products);
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="analogy-box">
+                    <div class="analogy-label">🗣️ คำอธิบายภาษาคน (Analogy):</div>
+                    <p class="analogy-text">
+                        เหมือนไปสั่ง <strong>ข้าวขาหมูหน้าร้าน</strong> ถ้าไม่ใช้ <code>.Include</code> เราต้องเดินไปสั่งข้าวรอบนึง แล้วเดินกลับมาขอน้ำซุปหมวดหมู่อีกรอบ (วนไปมา 10 รอบ) แต่การใส่ <code>.Include</code> คือการสั่งให้แม่ค้าตักทั้งข้าวและน้ำซุปหมวดหมู่ใส่ถาดเดียวมาเสิร์ฟทันทีในรอบเดียว!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Task 2 -->
+            <div class="task-card">
+                <span class="task-header-badge" style="background: rgba(210,168,255,0.15); color: var(--accent-info); border: 1px solid var(--accent-info);">
+                    📍 Task 2: Deduplication &amp; Custom Sorting
+                </span>
+                <h3>อัลกอริทึมคัดกรองตัวซ้ำและจัดเรียง (Custom Sorter)</h3>
+
+                <div class="callout callout-warning mb-md">
+                    <div class="callout-title">⚠️ ปัญหาและกับดักที่มักจะเจอ (The Challenges):</div>
+                    <ul class="text-xs" style="line-height: 1.8; margin-top: 6px; padding-left: 16px;">
+                        <li><strong>Boundary / Edge Cases:</strong> ผู้ใช้ส่งค่าว่าง (<code>""</code>), ส่งค่า <code>null</code>, หรือพิมพ์ยาวเกิน 99 ตัวอักษร</li>
+                        <li><strong>Whitespace:</strong> ผู้ใช้พิมพ์ <code>"1, 2 , 1"</code> มีช่องว่างคั่น ถ้าไม่ Trim คอมพิวเตอร์จะมองว่า <code>" 2 " != "2"</code></li>
+                        <li><strong>Lexicographical Sort Trap (กับดักการเรียงแบบตัวหนังสือ):</strong> ถ้าเรียงแบบ String ข้อความ <code>"10"</code> จะมาก่อน <code>"2"</code> (เพราะอักษร '1' มาก่อน '2') ทำให้ผลลัพธ์ทางคณิตศาสตร์ผิดเพี้ยน</li>
+                        <li><strong>Exception Crash:</strong> ถ้าใช้ <code>Convert.ToInt32("AA")</code> โปรแกรมจะระเบิดทันทีเมื่อเจอตัวหนังสือ ต้องใช้ <code>int.TryParse</code> เสมอ</li>
+                    </ul>
+                </div>
+
+                <div class="code-block-wrapper">
+                    <div class="code-block-header">
+                        <div class="file-info"><span class="file-icon">📄</span> DuplicateController.cs</div>
+                        <button class="copy-btn">📋 Copy</button>
+                    </div>
+                    <div class="code-block-body">
+<pre class="language-csharp"><code>[HttpPost]
+public IActionResult CheckDuplicate([FromBody] DuplicateRequest request)
+{
+    // 1. ดัก Validation ป้องกัน Input ผิดพลาด
+    if (request == null || string.IsNullOrEmpty(request.p1))
+        return BadRequest("กรุณากรอกข้อมูล");
+    if (request.p1.Length &gt; 99)
+        return BadRequest("ความยาวเกินกว่า 99 ตัว");
+
+    // 2. ตัด Comma และ Trim ช่องว่าง
+    string[] items = request.p1.Split(',');
+
+    // 3. กรองเฉพาะตัวที่ปรากฏซ้ำ (Count &gt; 1)
+    List&lt;string&gt; duplicateList = new List&lt;string&gt;();
+    foreach (string item in items)
+    {
+        string cleanItem = item.Trim();
+        if (string.IsNullOrEmpty(cleanItem)) continue;
+
+        int count = items.Count(x =&gt; x.Trim() == cleanItem);
+        if (count &gt; 1 &amp;&amp; !duplicateList.Contains(cleanItem))
+        {
+            duplicateList.Add(cleanItem);
+        }
+    }
+
+    // 4. แยกกองข้อมูลด้วย int.TryParse (ปลอดภัย ไม่พัง)
+    List&lt;string&gt; letterList = new List&lt;string&gt;();
+    List&lt;int&gt; numberList = new List&lt;int&gt;();
+
+    foreach (string text in duplicateList)
+    {
+        if (int.TryParse(text, out int num))
+            numberList.Add(num);   // กองตัวเลขแท้
+        else
+            letterList.Add(text);  // กองตัวอักษร
+    }
+
+    // 5. เรียงลำดับตามเงื่อนไข
+    letterList.Sort(); // เรียง A-Z
+    numberList.Sort(); // เรียงตัวเลขน้อยไปมาก (Numeric Sort)
+
+    // 6. รวมผลลัพธ์: เอาตัวอักษรขึ้นก่อน ตามด้วยตัวเลข
+    List&lt;DuplicateResponse&gt; result = new List&lt;DuplicateResponse&gt;();
+    foreach (var l in letterList) result.Add(new DuplicateResponse { rank = l });
+    foreach (var n in numberList) result.Add(new DuplicateResponse { rank = n.ToString() });
+
+    return Ok(result);
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- Interactive Live Tester -->
+                <div class="live-tester-box">
+                    <h4 style="color: var(--accent-warning); margin-bottom: 8px;">🎮 Interactive Lab: ทดสอบจำลองรัน Task 2 สดๆ</h4>
+                    <p class="text-xs text-muted mb-sm">พิมพ์ค่าทดสอบที่มีทั้งตัวเลขและตัวอักษรซ้ำ เช่น <code>1, 2, 1, 10, AA, BB, AA, 2</code></p>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 10px;">
+                        <input type="text" id="task2-input" class="form-input" value="1, 2, 1, 10, AA, BB, AA, 2" style="flex:1; min-width: 250px;">
+                        <button class="btn btn-primary btn-sm" onclick="runTask2Simulation()">▶ ทดสอบอัลกอริทึม</button>
+                    </div>
+                    <div id="task2-result" class="text-xs" style="background:#000; padding:10px; border-radius:4px; font-family:var(--font-code); color:var(--accent-success);">ผลลัพธ์จะปรากฏที่นี่...</div>
+                </div>
+
+                <div class="analogy-box">
+                    <div class="analogy-label">🗣️ คำอธิบายภาษาคน (Analogy):</div>
+                    <p class="analogy-text">
+                        เหมือน <strong>"เอากรรไกรตัดข้อความ แล้วใช้เครื่องสแกนแยกขยะ 2 กอง"</strong><br>
+                        1. ตัดก้อนข้อความตาม Comma<br>
+                        2. โกยเฉพาะชิ้นที่มีฝาแฝด (โผล่มาเกิน 1 ครั้ง)<br>
+                        3. เอาเครื่องสแกน <code>int.TryParse</code> สแกน ถ้าเป็นตัวเลขแท้ส่งเข้ากองตัวเลข ถ้าไม่ใช่ส่งเข้ากองตัวอักษร<br>
+                        4. กองตัวอักษรจัดเรียงตามพจนานุกรม (A-Z), กองตัวเลขจัดเรียงตามค่าจริง (1, 2, 4, 10) แล้วเอากองตัวอักษรยืนแถวหน้า
+                    </p>
+                </div>
+            </div>
+
+            <!-- Task 3 -->
+            <div class="task-card">
+                <span class="task-header-badge" style="background: rgba(126,231,135,0.15); color: var(--accent-success); border: 1px solid var(--accent-success);">
+                    📍 Task 3: External API Integration
+                </span>
+                <h3>การเชื่อมต่อระบบภายนอก (HttpClient &amp; Async/Await)</h3>
+
+                <div class="callout callout-warning mb-md">
+                    <div class="callout-title">⚠️ ปัญหาที่มักจะเจอ (The Challenges):</div>
+                    <ul class="text-xs" style="line-height: 1.8; margin-top: 6px; padding-left: 16px;">
+                        <li><strong>Blocking I/O (เซิร์ฟเวอร์ค้าง):</strong> การยิงขอข้อมูลจากภายนอกแบบ Synchronous ทำให้ Thread ของเซิร์ฟเวอร์หยุดรอ ไม่สามารถรับงานคนอื่นได้</li>
+                        <li><strong>Socket Exhaustion (พอร์ตเครือข่ายล้น):</strong> สร้าง <code>new HttpClient()</code> เองทุกครั้งจนพอร์ตเชื่อมต่อของระบบปฏิบัติการหมด</li>
+                        <li><strong>Payload Format Mismatch:</strong> ห่อข้อมูลส่งกลับไม่ตรงตามโครงสร้างที่โจทย์กำหนด (url, method, response)</li>
+                    </ul>
+                </div>
+
+                <div class="code-block-wrapper">
+                    <div class="code-block-header">
+                        <div class="file-info"><span class="file-icon">📄</span> ExternalApiController.cs</div>
+                        <button class="copy-btn">📋 Copy</button>
+                    </div>
+                    <div class="code-block-body">
+<pre class="language-csharp"><code>[HttpGet]
+public async Task&lt;IActionResult&gt; GetTodo()
+{
+    string url = "https://jsonplaceholder.typicode.com/todos/1";
+
+    // ยิงคำขอแบบ Asynchronous (Non-blocking I/O) ผ่าน IHttpClientFactory
+    var response = await _httpClient.GetAsync(url);
+    var content = await response.Content.ReadAsStringAsync();
+    var data = JsonSerializer.Deserialize&lt;object&gt;(content);
+
+    // ห่อข้อมูลกลับตามข้อกำหนดมาตรฐาน
+    var result = new
+    {
+        url = url,
+        method = "GET",
+        response = data
+    };
+
+    return Ok(result);
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="analogy-box">
+                    <div class="analogy-label">🗣️ คำอธิบายภาษาคน (Analogy):</div>
+                    <p class="analogy-text">
+                        เหมือน <strong>"พนักงานหน้าร้านแจกบัตรคิว แล้วส่งไรเดอร์ไปรับของ"</strong> ระหว่างที่ไรเดอร์ (HttpClient) เดินทางไปเอาของจากอีกร้าน พนักงานหน้าร้านไม่ต้องยืนนิ่ง สามารถรับออเดอร์ลูกค้ารายถัดไปได้ทันที (<code>async/await</code>) พอน้ำชามาถึงค่อยหยิบใส่กล่องของร้านเราแล้วส่งให้ลูกค้า
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🎙️ 3. Interview Defense Matrix -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-warning); color: #000;">03</div>
+                <h2>🎙️ ตารางดักคอคำถามสัมภาษณ์ (Interview Defense Matrix)</h2>
+            </div>
+            <p class="text-sm text-secondary mb-md">
+                5 คำถามไม้ตายที่กรรมการสัมภาษณ์ชอบใช้ลองของ พร้อมแนวทางตอบแบบมืออาชีพที่แสดงถึงความเข้าใจเชิงลึก:
+            </p>
+
+            <table class="defense-table">
+                <thead>
+                    <tr>
+                        <th style="width: 28%;">คำถามที่กรรมการจะลองของ</th>
+                        <th style="width: 25%;">จุดประสงค์ของคำถาม</th>
+                        <th style="width: 47%;">แนวทางการตอบแบบมืออาชีพ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1. ทำไม Task 2 ถึงใช้ <code>int.TryParse</code>?</strong></td>
+                        <td>เช็คว่ารู้เรื่อง Exception Handling และ Performance ไหม</td>
+                        <td><span style="color:var(--accent-success);">"เพื่อความปลอดภัยและประสิทธิภาพครับ เพราะ <code>TryParse</code> จะคืนค่า boolean โดยไม่ขว้าง Exception เมื่อเจอตัวหนังสือ ทำให้ระบบทำงานได้ลื่นไหล ไม่เกิด Overhead จาก Exception Handling ครับ"</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>2. ทำไมต้องแปลงเป็น <code>List&lt;int&gt;</code> ก่อน Sort?</strong></td>
+                        <td>เช็คความเข้าใจเรื่อง Data Types และ Lexicographical Ordering</td>
+                        <td><span style="color:var(--accent-success);">"เพื่อป้องกันปัญหาการเรียงแบบตัวอักษรครับ ถ้าเรียงแบบ String เลข <code>'10'</code> จะมาก่อน <code>'2'</code> การแปลงเป็น <code>int</code> ทำให้เรียงตามมูลค่าทางคณิตศาสตร์ที่แท้จริงครับ"</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>3. ใน Task 1 ถ้าไม่ใส่ <code>.Include</code> จะเป็นอย่างไร?</strong></td>
+                        <td>เช็คความเข้าใจเรื่อง ORM, Eager Loading และ N+1 Query</td>
+                        <td><span style="color:var(--accent-success);">"จะทำให้ Category เป็น <code>null</code> หรือถ้าเปิด Lazy Loading ไว้ จะเกิดปัญหา <strong>N+1 Query</strong> ยิง SQL ซ้ำหลายรอบ การใช้ <code>.Include</code> เป็นการทำ Eager Loading ดึงข้อมูลมาพร้อมกันใน 1 SQL JOIN ครับ"</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>4. ทำไม Task 3 ต้องใช้ <code>async / await</code>?</strong></td>
+                        <td>เช็คความเข้าใจเรื่อง Concurrency และ Web Server Scalability</td>
+                        <td><span style="color:var(--accent-success);">"เป็น Non-blocking I/O ครับ ระหว่างที่รอ Response จาก External API ตัว Thread จะถูกปล่อยคืนสู่ Thread Pool ไปรับคำขอของลูกค้ารายอื่น ทำให้เซิร์ฟเวอร์รองรับ Throughput ได้สูงขึ้นโดยไม่เกิด Thread Starvation ครับ"</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>5. ข้อสอบชุดนี้มีกระบวนการทำอย่างไร และใช้ AI หรือไม่?</strong></td>
+                        <td>วัดความเป็นเจ้าของโค้ด (Ownership) และทัศนคติต่อเครื่องมือ AI</td>
+                        <td><span style="color:var(--accent-success);">"ผมใช้ AI เป็นผู้ช่วยระดมความคิดและขึ้นโครงร่างเบื้องต้นครับ แต่ผมเป็นคนกำหนดตรรกะ ตรวจสอบความถูกต้องของโค้ดทุกบรรทัด ทดสอบ Edge Cases ด้วยตนเอง และเข้าใจการทำงานของสถาปัตยกรรม 100% ครับ"</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 🚀 4. AI-Assisted Engineering Workflow -->
+        <section class="lesson-section reveal">
+            <div class="section-header">
+                <div class="section-number" style="background: var(--accent-info); color: #fff;">04</div>
+                <h2>🚀 วงจรการเป็น Software Engineer ยุคใหม่ (AI-Assisted Workflow)</h2>
+            </div>
+            
+            <div class="grid grid-3">
+                <div class="card text-center">
+                    <div style="font-size: 2rem; margin-bottom: 6px;">1️⃣</div>
+                    <h4 style="color: var(--accent-primary);">รับ Requirement</h4>
+                    <p class="text-xs text-muted">ทำความเข้าใจ Business Need และขอบเขตของโจทย์</p>
+                </div>
+                <div class="card text-center">
+                    <div style="font-size: 2rem; margin-bottom: 6px;">2️⃣</div>
+                    <h4 style="color: var(--accent-info);">ใช้ AI ระดมความคิด</h4>
+                    <p class="text-xs text-muted">วิเคราะห์ Decomposition และร่างสถาปัตยกรรม</p>
+                </div>
+                <div class="card text-center">
+                    <div style="font-size: 2rem; margin-bottom: 6px;">3️⃣</div>
+                    <h4 style="color: var(--accent-warning);">เข้าใจตรรกะภาษาคน</h4>
+                    <p class="text-xs text-muted">มองเห็นภาพ Data Flow ด้วย Analogies ชัดเจน</p>
+                </div>
+                <div class="card text-center">
+                    <div style="font-size: 2rem; margin-bottom: 6px;">4️⃣</div>
+                    <h4 style="color: var(--accent-danger);">ดักจับ Edge Cases</h4>
+                    <p class="text-xs text-muted">ดักค่า null, whitespace, boundary limit, TryParse</p>
+                </div>
+                <div class="card text-center">
+                    <div style="font-size: 2rem; margin-bottom: 6px;">5️⃣</div>
+                    <h4 style="color: var(--accent-success);">เขียน Unit Test</h4>
+                    <p class="text-xs text-muted">รัน Automated Test พิสูจน์ความถูกต้องทุกเงื่อนไข</p>
+                </div>
+                <div class="card text-center">
+                    <div style="font-size: 2rem; margin-bottom: 6px;">6️⃣</div>
+                    <h4 style="color: #fff;">Full Ownership</h4>
+                    <p class="text-xs text-muted">อธิบายที่มาที่ไปและปกป้องการตัดสินใจได้ 100%</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/animation-controller.js"></script>
+
+<script>
+function runTask2Simulation() {
+    const raw = document.getElementById('task2-input').value;
+    const resultBox = document.getElementById('task2-result');
+
+    if (!raw || raw.trim() === "") {
+        resultBox.innerHTML = '<span style="color:var(--accent-danger);">❌ Error: กรุณากรอกข้อมูล</span>';
+        return;
+    }
+    if (raw.length > 99) {
+        resultBox.innerHTML = '<span style="color:var(--accent-danger);">❌ Error: ความยาวเกินกว่า 99 ตัวอักษร</span>';
+        return;
+    }
+
+    const items = raw.split(',');
+    const duplicates = [];
+
+    items.forEach(item => {
+        const clean = item.trim();
+        if (clean !== "") {
+            const count = items.filter(x => x.trim() === clean).length;
+            if (count > 1 && !duplicates.includes(clean)) {
+                duplicates.push(clean);
+            }
+        }
+    });
+
+    const letters = [];
+    const numbers = [];
+
+    duplicates.forEach(d => {
+        const num = parseInt(d, 10);
+        if (!isNaN(num) && String(num) === d) {
+            numbers.push(num);
+        } else {
+            letters.push(d);
+        }
+    });
+
+    letters.sort();
+    numbers.sort((a, b) => a - b);
+
+    const finalResult = [];
+    letters.forEach(l => finalResult.push({ rank: l }));
+    numbers.forEach(n => finalResult.push({ rank: String(n) }));
+
+    resultBox.innerHTML = `✅ ผลลัพธ์ Response (JSON):\n` + JSON.stringify(finalResult, null, 2);
+    Progress.addXP(10, 'ทดสอบ Task 2 Simulation');
+}
+</script>
+
+<!-- Mobile Bottom Navigation Bar -->
+<nav class="mobile-bottom-nav">
+    <a href="../index.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>แดชบอร์ด</span>
+    </a>
+    <a href="./logic-flows.html" class="bottom-nav-item">
+        <span class="nav-icon">🧩</span>
+        <span>Flow ตรรกะ</span>
+    </a>
+    <a href="./assessment-playbook.html" class="bottom-nav-item active">
+        <span class="nav-icon">⚔️</span>
+        <span>ข้อสอบจริง</span>
+    </a>
+    <a href="./white-hat-vault.html" class="bottom-nav-item">
+        <span class="nav-icon">🛡️</span>
+        <span>สายขาว</span>
+    </a>
+    <a href="./code-sandbox.html" class="bottom-nav-item">
+        <span class="nav-icon">💻</span>
+        <span>Sandbox</span>
+    </a>
+</nav>
+
+</body>
+</html>
